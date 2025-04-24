@@ -225,7 +225,7 @@ footer {
             "footer";
         min-height: 100vh;    
         background-color: rgb(7, 42, 70);
-        padding-top: 40px;
+        padding-top: 20px;
         padding-bottom: 20px;
         }
 
@@ -323,7 +323,7 @@ footer {
         margin-left: 0;
         margin-bottom: 10px;
         width: 100%;
-   }
+       
 
     .nav-link {
         width: 100%;
@@ -331,12 +331,14 @@ footer {
         padding: 10px;
         display: block;
         color: white;
+        
+    }
 
     }
 
     .has-dropdown > .nav-link::after {
         display: none;
-    }
+    }    
 
     .dropdown {
         position: relative;
@@ -345,15 +347,17 @@ footer {
         width: 100%;
         border: none;
         box-shadow: none;
+        border-bottom: 1px solid #eee;
+        color: #25D366;
+    }
      }
 
     main {
-        padding: 60px 10px;
+        padding: 40px 10px 10px;
         font-weight: 400;
         background-color: rgb(7, 42, 70);
         color: white;
         
-    
     }
 
    span {
@@ -370,6 +374,7 @@ footer {
         background-repeat: no-repeat;
         background-position: center;
         height: 100vh;
+      
     }
 
     #sidebar {
@@ -379,17 +384,20 @@ footer {
         height: 160vh;
         align-items: center;
         background-color: rgb(7, 42, 70);
+        border-bottom: 1px solid #eee;
     }
 
     .sidebar-why {
         display: flex;
         flex-direction: column;
+        border-bottom: 1px solid #eee;
        
 
         h1 {
             text-align: center;
             text-transform: uppercase;
             font-size: 23px;
+            font-weight: 500;
             letter-spacing: 9px;
             color: #25D366;
             word-spacing: 4px;
@@ -411,6 +419,7 @@ footer {
         text-align: center;
         text-transform: uppercase;
         font-size: 23px;
+        font-weight: 500;
         letter-spacing: 9px;
         color: #25D366;
         word-spacing: 4px;
@@ -490,9 +499,11 @@ footer {
         justify-content: space-around;
         align-items: center;
         background-color: rgb(7, 42, 70);
+        border-bottom: 1px solid #eee;
+        padding: 10px;
     }
 
-    .content1-services {
+    .content1-about {
         display: flex;
         flex-direction: column;
 
@@ -500,11 +511,12 @@ footer {
             text-align: center;
             text-transform: uppercase;
             font-size: 23px;
+            font-weight: 500;
             letter-spacing: 9px;
             color: #25D366;
             word-spacing: 4px;
             line-height: 23px;
-            margin-bottom: 20px;
+            padding: 20px;
         }
 
         p {
@@ -528,14 +540,10 @@ footer {
         display: flex;
         flex-direction: column;
         justify-content: space-around;
-     
         align-items: center;
         background-color: rgb(7, 42, 70);
-    }
-
-    .content2-about {
-        display: flex;
-        flex-direction: column;
+        padding: 20px;
+        height: fit-content;
 
         h1 {
             text-align: center;
@@ -545,16 +553,44 @@ footer {
             color: #25D366;
             word-spacing: 4px;
             line-height: 23px;
-            margin-bottom: 20px;
+            padding: 20px;
+            font-weight: 500;
+        }
+    }
+
+
+    .price-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: baseline;
+        align-items: center;
+        height: auto;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #eee;
+
+        
+        h3 {
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 15px;
+            letter-spacing: 6px;
+            color: #25D366;
+            word-spacing: 4px;
+            line-height: 23px;         
+
         }
 
         p {
-            text-align: justify;
+            text-align: center;
             font-size: 15px;
             color: white;
             word-spacing: 2px;
-            padding: 20px;
-            margin-bottom: 30px;
+            letter-spacing: 4px;
+        }
+
+        .price {
+            text-align: center;
+            padding: 5px;
         }
     }
 
