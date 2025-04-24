@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>MC Quote</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/home-btn.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="preload" href="/img/image2.png" as="image">
+    <link rel="preload" href="/img/caraccident.png" as="image">
+    <link rel="preload" href="/img/carraccident.png" as="image">
+    <link rel="preload" href="/img/carsaccident.png" as="image">
+
+
+
+</head>
+
+<body>
+        <%- include('partials/header') %>
+        
+    <div class="container">
+        
+        
+
+        <main>
+            
+        
+            <div class="main-banner-hero">
+                               
+                <h1>Get Your Private Repair Quote</h1>
+
+                <div class="whatsapp-buttons">
+                    <a href="https://wa.me/447123456789?text=Hi, I’d like to send images for a quote" class="whatsapp-btn" target="_blank">
+                        <img src="/img/whatsapp-logo.png" alt="WhatsApp"> Send images
+                    </a>
+                </div>
+    
+            
+                <h2>We provide transparent, 
+                    fair repair cost estimates for <span>lease returns </span>and <span>private repairs</span> ,
+                    connecting you with our trusted bodyshop network.</h2>
+            
+            </div>
+   
+           
+    </main>
+
+        <div id="sidebar">
+
+            <div class="sidebar-why">
+
+                <h1>HOW</h1>
+                        <p>1. Send your images via WhatsApp. <br>
+                            <br>2. Receive your quote confirmation on the email provided. <br>
+                            <br>3. Make payment and download your repair quote.
+                        </p>
+                
+                <h1>Why Choose Us</h1>
+                    <p>We can provide written reliable private repair quotations from the confort of your home. <br>
+                    <br>You don't need to travel to different garages to obtain an written report.<br>
+                    <br>Depending on your damage severity and your budget we can refer you in our trusted bodyshop network.
+                        </p>
+            
+             
+
+            </div>
+
+
+            <div class="key-services">
+                <h1>Key Services</h1>
+            </div>
+            
+            <div class="sidebar-bodyshop-btn">             
+
+                <a href="bodyshop">
+                    <h1>Bodyshop <br> VDA Solution</h1>
+                </a>
+                </div>
+
+             <div class="sidebar-quotations-btn">
+                <a href="quotations">
+                    <h1>Damage <br>Quotations</h1>
+                </a>
+            </div>  
+            
+            <div class="sidebar-training-btn">
+                <a href="training">
+                    <h1>VDA Training</h1>
+                </a>
+            </div>  
+
+        </div>
+
+        <div id="content1">
+
+            <div class="content1-services">
+
+                <h1>Empowered by technology</h1>
+
+                <p>Our 20 years of motor trade experience,
+                     combined with specialized software and 
+                     accurate vehicle damage assessment, 
+                     enables us to provide you with highly 
+                     accurate repair estimates. <br>
+                     <br>
+                    
+                </p>
+
+                
+
+             </div>
+
+
+        </div>       
+                      
+        <div id="content2">
+                    
+                    <div class="content2-about">
+                        <h1>About us</h1>
+                        <p>At MC Quote, we understand the importance of accurate
+                            and reliable repair estimates. With over 20 years of experience 
+                            in the motor trade, we leverage specialized software and 
+                            accurate vehicle damage assessment techniques to provide you 
+                            with the most precise and dependable repair cost predictions.</p>
+                       </div>
+
+        </div>
+
+
+        <div id="content3">
+                    
+            <div class="content3-Why">
+            <p>Lorem </p>
+            </div>
+
+        </div>
+
+   
+   
+        
+
+     <footer>
+            <%- include('partials/footer', { headerData: footerData }) %>
+     </footer>
+   
+    <script src="/js/mobile-nav.js"></script>
+</body>
+
+</html>
