@@ -533,6 +533,15 @@ footer {
             font-weight: 700;
         }
 
+        ul li {
+            list-style-type: circle;
+            color: white;
+            padding: 10px;
+            margin: 20px;
+            
+
+        }
+
     }
 
 
