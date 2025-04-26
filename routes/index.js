@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-// Reusable header data
+
 const headerData = {
-    logoPath: '/public/img/logo.png',  // Ensure this is correctly pointing to your logo path
+    logoPath: '/public/img/logo.png',  
     navLinks: [
         { url: '/', text: 'Home' },
         { url: '/quotations', text: 'Private Quotations' },
@@ -13,9 +13,9 @@ const headerData = {
     ]
 };
 
-// Reusable footer data
+
 const footerData = {
-    content: '&copy; 2024 MC Quote'
+    content: '&copy; 2025 MC Quote'
 };
 
 router.get('/', (req, res, next) => {
@@ -29,11 +29,11 @@ router.get('/', (req, res, next) => {
             content2: 'Home Content 2',
             content3: 'Home Content 3',
             footerData: footerData,
-            logoPath: headerData.logo  // Add logoPath to pageData
+            logoPath: headerData.logo  
         };
         res.render('index', pageData);
     } catch (error) {
-        next(error); // Pass error to the error-handling middleware
+        next(error);
     }
 });
 

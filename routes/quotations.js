@@ -1,8 +1,8 @@
 const express = require('express');
-const router = express.Router(); // ✅ Correct
+const router = express.Router();
 
-//  Import header/footer data if it's in a separate file
-const headerData = {  //  Move this to a separate file if used in multiple routes
+
+const headerData = {  
     logo: '/public/img/logo.png',
     navLinks: [
         { url: '/', text: 'Home' },
@@ -13,9 +13,9 @@ const headerData = {  //  Move this to a separate file if used in multiple route
     ]
 };
 
-//  Reusable footer data
+
 const footerData = {
-    content: '&copy; 2024 MC Quote'
+    content: '&copy; 2025 MC Quote'
 };
 
 router.get('/', (req, res, next) => {

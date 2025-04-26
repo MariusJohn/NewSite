@@ -1,11 +1,11 @@
 const express = require('express');
-const router = express.Router(); // ✅ Correct
+const router = express.Router(); // 
 const bodyParser = require('body-parser');
 
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
-  //  Reusable header data
-const headerData = {  //  Move this to a separate file if used in multiple routes
+
+const headerData = {  
     logo: '/public/img/logo.png',
     navLinks: [
         { url: '/', text: 'Home' },
@@ -16,9 +16,8 @@ const headerData = {  //  Move this to a separate file if used in multiple route
     ]
 };
 
-//  Reusable footer data
 const footerData = {
-    content: '&copy; 2024 MC Quote'
+    content: '&copy; 2025 MC Quote'
 };
 
 router.get('/', (req, res, next) => {
@@ -42,7 +41,7 @@ router.get('/', (req, res, next) => {
 router.post('/', (req, res, next) => {
     try {
         console.log('Contact form submitted:', req.body);
-        // Handle form submission (e.g., send email, save to database)
+       
         res.redirect('/');
     } catch (error) {
         next(error);
