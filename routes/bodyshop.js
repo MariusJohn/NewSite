@@ -1,8 +1,8 @@
 const express = require('express');
-const router = express.Router(); // ✅ Correct
+const router = express.Router(); //
 
 
-//  Reusable header data
+
 const headerData = {
     logo: '/public/img/logo.png',
     navLinks: [
@@ -16,7 +16,7 @@ const headerData = {
 
 //  Reusable footer data
 const footerData = {
-        content: '&copy; 2024 MC Quote'
+        content: '&copy; 2025 MC Quote'
 };
 
 router.get('/', (req, res) => {

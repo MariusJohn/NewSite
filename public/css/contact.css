@@ -1,0 +1,153 @@
+
+.content3 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e9ecef;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Container styles */
+  .container3 {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 20px auto;
+    max-width: 1200px;
+  }
+  
+  /* Column styles */
+  .col {
+    flex: 1;
+    padding: 20px;
+    min-width: 300px;
+  }
+  
+  /* Contact Section */
+  .contact-section {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .contact-section h3 {
+    margin-top: 0;
+    color: #333;
+  }
+  
+  .contact-section i {
+    margin-right: 8px;
+    color: #007BFF;
+  }
+  
+  /* Contact section hover effect */
+  .contact-section:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-3px);
+  }
+  
+  /* Form Section */
+  form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  form h3 {
+    margin-top: 0;
+    color: #333;
+  }
+  
+  form input,
+  form textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+  }
+  
+  /* Focus effect on input and textarea */
+  form input:focus,
+  form textarea:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+  }
+  
+  /* Submit Button */
+  form button {
+    background-color: #007BFF;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 3px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  form button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+  
+  /* Icon bounce on hover */
+  .contact-section:hover i {
+    animation: bounce 0.6s;
+  }
+  
+  @keyframes bounce {
+    0% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+    60% { transform: translateY(0); }
+    100% { transform: translateY(-2px); }
+  }
+  
+
+  @media screen and (max-width: 768px) {
+    .container3 {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top:0;
+      h2 {
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 23px;
+        letter-spacing: 9px;
+        color: #25D366;
+        word-spacing: 4px;
+        line-height: 23px;
+        padding: 20px;
+        font-weight: 500;
+        margin-top: 0;
+      }
+ 
+  
+    }
+
+    form {
+        background:rgb(7, 42, 70);
+        padding: 30px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px white;
+      
+      }
+      input {
+        color: white;
+      }
+
+      label {
+        color: white;
+      }
+      textarea {
+        color: white;
+      }
+
+  }

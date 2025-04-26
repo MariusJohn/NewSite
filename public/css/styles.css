@@ -222,8 +222,7 @@ main {
 #content1,
 #content2,
 #content3 {
-    background-color: rgb(197, 249, 249);
-    border-radius: var(--main-radius);
+      border-radius: var(--main-radius);
     padding-top: var(--main-padding);
     overflow: auto;
 }
@@ -241,11 +240,13 @@ main {
 }
 
 footer {
-    background-color: rgb(189, 244, 206);
     grid-area: footer;
     border-radius: var(--main-radius);
     padding-top: var(--main-padding);
     text-align: center;
+    p {
+        color: white;
+    }
 }
 
 .mobile-menu-btn {
