@@ -13,7 +13,7 @@
 body {
     font-family: "Poppins", sans-serif;
     margin: 5px;
-    background-color: rgb(8, 50, 80);
+    background-color: rgb(7, 42, 70);
 }
 
 .container {
@@ -31,7 +31,7 @@ body {
 
 
 main {
-    background-color:rgb(210, 241, 255);
+    background-color:rgb(7, 42, 70);
     grid-area: main;
     border-radius: var(--main-radius);
     padding-top: var(--main-padding);
@@ -52,17 +52,18 @@ main {
  .main-banner-hero h1 {
      font-size: 33px;
      font-weight: bold;
-     color: #060606; 
+     color: white; 
      margin-bottom: 20px; 
      text-align: center; 
      z-index: 4;
- 
  }
  
  .main-banner-hero h2 {
      font-weight: 400;
      line-height: 1.4;
      z-index: 2;
+     color: white;
+     text-align: justify;
  }
 
  .whatsapp-buttons {
@@ -98,20 +99,20 @@ main {
 }
 
 #sidebar {
-    background-color: rgb(210, 241, 255);
     grid-area: sidebar;
     border-radius: var(--main-radius);
     padding-top: var(--main-padding);
     overflow: auto;
-    color: rgb(20, 18, 18);
+    color: white;
 }
 
 #content1,
 #content2,
 #content3 {
-      border-radius: var(--main-radius);
+    border-radius: var(--main-radius);
     padding-top: var(--main-padding);
     overflow: auto;
+    color: white;
 }
 
 #content1 {
