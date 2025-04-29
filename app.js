@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+const privacyRoutes = require('./routes/privacy')
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use('/quotations', quotationsRoutes);
 app.use('/bodyshop', bodyshopRoutes);
 app.use('/training', trainingRoutes);
 app.use('/contact', contactRoutes);
+app.use('/privacy', privacyRoutes)
 
 // Error handling middleware
 app.use((err, req, res, next) => {

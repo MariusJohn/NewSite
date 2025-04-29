@@ -23,6 +23,7 @@ const footerData = {
 
 // GET /contact page
 router.get('/', (req, res, next) => {
+  
     try {
         const pageData = {
             title: 'MC Quote - Contact',
@@ -42,29 +43,32 @@ router.get('/', (req, res, next) => {
 
 // POST /contact (handle form submission)
 router.post('/', (req, res, next) => {
-    const { name, email, subject, message } = req.body;
+    const { name, email, subject, message, consent } = req.body;
 
-    // 1. Log the request body to see what data is being sent.
-    console.log('Request Body:', req.body);
+  
 
-    // 2.  Check if email is defined.
-    if (!email) {
-        console.error('email is undefined or empty');
-        return res.status(400).send('Email address is required'); // More specific message
+    if (!consent) {
+        console.error('Consent not given');
+        return res.status(400).send('You must agree to the Privacy Policy.');
     }
 
-    // 3. Basic email validation (improved regex)
+    if (!email) {
+        console.error('Email is undefined or empty');
+        return res.status(400).send('Email address is required');
+    }
+
+
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     if (!emailRegex.test(email)) {
         console.error('Invalid email address:', email);
         return res.status(400).send('Invalid email address format');
     }
 
-    // create transporter inside the POST handler to access process.env
+
     const transporter = nodemailer.createTransport({
         host: 'smtp.ionos.co.uk',
         port: 587,
-        secure: false, // Use TLS on port 587
+        secure: false,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
@@ -72,10 +76,10 @@ router.post('/', (req, res, next) => {
     });
 
     const mailOptions = {
-        from: process.env.EMAIL_USER, // Use a default
+        from: process.env.EMAIL_USER, 
         replyTo: email,
-        to: 'office@mcquote.co.uk', // your receiving email
-        subject: subject || 'No Subject', // Provide a default
+        to: 'office@mcquote.co.uk',
+        subject: subject || 'No Subject', 
         text: `New contact form submission:
 
 Name: ${name || 'No Name'}
@@ -83,7 +87,7 @@ Email: ${email}
 Subject: ${subject || 'No Subject'}
 
 Message:
-${message || 'No Message'}`, // Provide a default
+${message || 'No Message'}`,
     };
 
     transporter.sendMail(mailOptions)
@@ -93,7 +97,7 @@ ${message || 'No Message'}`, // Provide a default
         })
         .catch((error) => {
             console.error('Error sending email:', error);
-            next(error); // Pass the error to the next middleware
+            next(error); 
         });
 });
 
