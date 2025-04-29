@@ -7,7 +7,7 @@
     --link-hover-color: #25D366;
     --dropdown-bg-color: rgb(7, 42, 70);
     --dropdown-border-color: white;
-    font-family: Poppins, Arial, Helvetica, sans-serif;
+    
 }
 
 
@@ -23,7 +23,7 @@
     padding-right: 20px;
     position: relative;
     color: white;
-   
+    font-family: Poppins, Arial, Helvetica, sans-serif;
 }
 
 .navbar .nav-header {
@@ -125,6 +125,11 @@
     color: var(--link-hover-color);
 }
 
+.mobile-menu-btn {
+    display: none;
+    cursor: pointer;
+}
+
 @media screen and (max-width: 600px) {
     .navbar {
         position: fixed;
@@ -198,4 +203,9 @@
         color: #25D366;
     }
     
+    .mobile-menu-btn img {
+        height: 80%;
+        width: auto;
+        max-width: 80%;
+    }
 }

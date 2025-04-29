@@ -7,7 +7,6 @@
     --link-hover-color: #25D366;
     --dropdown-bg-color: rgb(7, 42, 70);
     --dropdown-border-color: white;
-    font-family: Poppins, Arial, Helvetica, sans-serif;
 }
 
 body {
@@ -22,11 +21,11 @@ body {
     grid-template-rows: var(--nav-height) auto auto auto auto;
     grid-template-areas:
         "nav nav nav nav"
-        "sidebar main main main"
-        "content1 content2 content3 content3"
+        "sidebar sidebar main main"
+        "content1 content1 content2 content3"
         "footer footer footer footer";
-    grid-gap: 0.4rem;
-    min-height: 100vh;
+    grid-gap: 0.6rem;
+    margin: 0px;
 }
 
 
@@ -41,32 +40,43 @@ main {
 
 .main-banner-hero {
     flex-direction: column;
-     gap: 10px;
-     padding: 20px;
-     align-items: center;
-     justify-content:space-around;
-   
- 
+    display: flex;
+    background-image:url(../img/image3.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 850px;
+    justify-content: space-around;
+    padding: 10px;
  }
  
  .main-banner-hero h1 {
-     font-size: 33px;
-     font-weight: bold;
-     color: white; 
-     margin-bottom: 20px; 
-     text-align: center; 
-     z-index: 4;
+    font-size: 35px;
+    font-weight: bold;
+    color: #25D366; 
+    text-align: center; 
+    z-index: 4;
+    letter-spacing: 3px;
+
  }
  
  .main-banner-hero h2 {
-     font-weight: 400;
-     line-height: 1.4;
-     z-index: 2;
-     color: white;
-     text-align: justify;
+    padding: 20px 10px 0;
+    font-size: 18px;
+    margin-bottom: 0;
+    text-align: center;
+    font-weight: 400;
+    letter-spacing: 3px;
+    line-height: 1.2;
+    color: white;
  }
 
- .whatsapp-buttons {
+ span {
+    color: #df4b4b;
+    font-weight: 700;
+}
+
+.whatsapp-buttons {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -104,7 +114,36 @@ main {
     padding-top: var(--main-padding);
     overflow: auto;
     color: white;
+    padding: 20px;
 }
+
+.sidebar-why {
+    display: flex;
+    flex-direction: column;
+
+
+    h1 {
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 23px;
+        font-weight: 600;
+        letter-spacing: 9px;
+        color: #25D366;
+        word-spacing: 4px;
+        line-height: 23px;
+        margin-bottom: 20px;
+    }
+
+    p {
+        text-align: justify;
+        font-size: 18px;
+        color: white;
+        word-spacing: 3px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+}
+
 
 #content1,
 #content2,
@@ -256,8 +295,7 @@ footer {
         margin-top: 8px;
         font-size: 16px;
         margin-bottom: 15px;
-        text-align: center;
-        
+        text-align: center; 
     }
 
     .mobile-menu-btn {
@@ -269,11 +307,7 @@ footer {
         justify-content: space-evenly;
     }
 
-    .mobile-menu-btn img {
-        height: 80%;
-        width: auto;
-        max-width: 80%;
-    }
+
 
    
 
@@ -305,8 +339,8 @@ footer {
     #sidebar {
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
-        height: 160vh;
+        justify-content:space-between;
+        height: 200vh;
         align-items: center;
         background-color: rgb(7, 42, 70);
         border-bottom: 1px solid #eee;
@@ -331,11 +365,11 @@ footer {
 
         p {
             text-align: justify;
-            font-size: 15px;
+            font-size: 16px;
             color: white;
             word-spacing: 2px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
     }
 
@@ -449,7 +483,7 @@ footer {
             color: white;
             word-spacing: 2px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         span {
@@ -533,4 +567,6 @@ footer {
         color: white;
     }
    
+
+  
 }
