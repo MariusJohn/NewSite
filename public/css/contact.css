@@ -279,9 +279,6 @@ p {
   margin-bottom: 5px;
 }
 
-
-
-
 @keyframes bounce {
   0% { transform: translateY(0); }
   30% { transform: translateY(-5px); }

@@ -10,6 +10,7 @@ const headerData = {
         { url: '/quotations', text: 'Private Quotations' },
         { url: '/bodyshop', text: 'Bodyshop Support' },
         { url: '/training', text: 'Training' },
+        { url: '/training', text: 'Pricing' },
         { url: '/contact', text: 'Contact' }
     ]
 };
