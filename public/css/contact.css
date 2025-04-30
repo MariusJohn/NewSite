@@ -269,11 +269,11 @@ form button:hover {
 }
 
 footer {
-  grid-area: footer;
-  border-radius: var(--main-radius);
-  padding-top: var(--main-padding);
-  text-align: center;
-  
+grid-area: footer;
+border-radius: var(--main-radius);
+padding-top: var(--main-padding);
+text-align: center;
+} 
 p {
   color: white;
   margin-bottom: 5px;
@@ -281,7 +281,7 @@ p {
 
 
 
-}
+
 @keyframes bounce {
   0% { transform: translateY(0); }
   30% { transform: translateY(-5px); }
@@ -290,7 +290,7 @@ p {
 }
   
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 600px) {
   .container-contact {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto auto;
@@ -350,119 +350,132 @@ p {
     }
 
     /* Form Section */
-form {
-  background: #fbfbfb;
-  padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 8px 5px rgba(223, 218, 218, 0.754);
-  color: #333;
-}
+  form {
+    background: #fbfbfb;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 8px 5px rgba(223, 218, 218, 0.754);
+    color: #333;
+  }
 
-form h3 {
-  margin-top: 0;
-  color: #333;
-}
+  form h3 {
+    margin-top: 0;
+    color: #333;
+  }
 
-form input[type="text"],
-form input[type="email"],
-form textarea {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  font-size: 1em;
-  transition: all 0.3s ease;
-}
+  form input[type="text"],
+  form input[type="email"],
+  form textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+  }
 
-form input[type="checkbox"] {
-  margin-right: 8px;
-  transform: scale(1.2);
-  cursor: pointer;
-}
+  form input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+    cursor: pointer;
+  }
 
-/* Focus effect on input and textarea */
-form input[type="text"]:focus,
-form input[type="email"]:focus,
-form textarea:focus {
-  background-color: #ccc;
-  border-color: #007BFF;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  outline: none;
-}
+  /* Focus effect on input and textarea */
+  form input[type="text"]:focus,
+  form input[type="email"]:focus,
+  form textarea:focus {
+    background-color: #ccc;
+    border-color: #007BFF;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+  }
 
-.checkbox-group {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
 
-.checkbox-group input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none;
-  background-color: #fff;
-  border: 2px solid #ccc;
-  height: 20px;
-  width: 20px;
-  border-radius: 3px;
-  display: inline-block;
-  position: relative;
-  cursor: pointer;
-  margin-right: 10px;
-  transition: all 0.2s ease;
-}
+  .checkbox-group input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: #fff;
+    border: 2px solid #ccc;
+    height: 20px;
+    width: 20px;
+    border-radius: 3px;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: all 0.2s ease;
+  }
 
-.checkbox-group input[type="checkbox"]:checked {
-  background-color: #007BFF;
-  border-color: #007BFF;
-}
+  .checkbox-group input[type="checkbox"]:checked {
+    background-color: #007BFF;
+    border-color: #007BFF;
+  }
 
-.checkbox-group input[type="checkbox"]:checked::after {
-  content: '\2714';
-  color: white;
-  font-size: 16px;
-  position: absolute;
-  top: -2px;
-  left: 3px;
-}
+  .checkbox-group input[type="checkbox"]:checked::after {
+    content: '\2714';
+    color: white;
+    font-size: 16px;
+    position: absolute;
+    top: -2px;
+    left: 3px;
+  }
 
-.checkbox-group label {
-  margin: 0;
-  font-size: 0.95em;
-}
+  .checkbox-group label {
+    margin: 0;
+    font-size: 0.95em;
+  }
 
-.checkbox-group a {
-  color: #007BFF;
-  text-decoration: underline;
-}
+  .checkbox-group a {
+    color: #007BFF;
+    text-decoration: underline;
+  }
 
-.checkbox-group a:hover {
-  text-decoration: none;
-}
+  .checkbox-group a:hover {
+    text-decoration: none;
+  }
 
 
-/* Submit Button */
-form button {
-  background-color: #007BFF;
-  color: white;
-  padding: 12px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
+  /* Submit Button */
+  form button {
+    background-color: #007BFF;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
 
-form button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
-}
+  form button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
 
-/* Icon bounce on hover */
-.contact-section:hover i {
-  animation: bounce 0.6s;
-}
+  /* Icon bounce on hover */
+  .contact-section:hover i {
+    animation: bounce 0.6s;
+  }
+
+  footer {
+    grid-area: footer;
+    border-radius: var(--main-radius);
+    padding-top: var(--main-padding);
+    text-align: center;
+    } 
+
+    p {
+      color: white;
+    }
+
+ 
 
 
 }
