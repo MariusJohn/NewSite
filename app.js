@@ -17,6 +17,8 @@ const trainingRoutes = require('./routes/training');
 const pricingRoutes = require('./routes/pricing');
 const contactRoutes = require('./routes/contact');
 const privacyRoutes = require('./routes/privacy')
+const jobsRoutes = require('./routes/jobs');
+
 
 
 
@@ -39,7 +41,7 @@ app.use('/training', trainingRoutes);
 app.use('/pricing', pricingRoutes);
 app.use('/contact', contactRoutes);
 app.use('/privacy', privacyRoutes)
-
+app.use('/jobs', jobsRoutes);
 
 
 // Error handling middleware
