@@ -3,10 +3,13 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const { Job } = require('../models');
+const axios = require('axios');
+
+const RECAPTCHA_SECRET_KEY = '***REMOVED***';
 
 const router = express.Router();
 
-// Configure multer (upload to uploads/job-images/)
+// === Multer Storage Config ===
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, '..', 'uploads', 'job-images'));
@@ -18,23 +21,50 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ 
+const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit per file
 });
 
-// Route: GET form
+// === Route: GET Upload Form ===
 router.get('/upload', (req, res) => {
   res.render('job-upload');
 });
 
-// Route: POST form
-router.post('/upload', upload.array('images', 5), async (req, res) => {
+// === Route: POST Upload Form ===
+router.post('/upload', upload.array('images', 8), async (req, res) => {
   try {
     const { name, email, location } = req.body;
+    const recaptchaResponse = req.body['g-recaptcha-response'];
+
+    // Validate CAPTCHA
+    if (!recaptchaResponse) {
+      return res.status(400).send('Error: Please complete the CAPTCHA.');
+    }
+
+    const captchaVerifyRes = await axios.post(
+      'https://www.google.com/recaptcha/api/siteverify',
+      new URLSearchParams({
+        secret: RECAPTCHA_SECRET_KEY,
+        response: recaptchaResponse
+      })
+    );
+
+    if (!captchaVerifyRes.data.success) {
+      return res.status(400).send('Error: CAPTCHA verification failed.');
+    }
+
+    //Check for duplicate filenames in upload batch
+    const uploadedFilenames = req.files.map(file => file.originalname);
+    const duplicates = uploadedFilenames.filter((item, index) => uploadedFilenames.indexOf(item) !== index);
+
+    if (duplicates.length > 0) {
+      return res.status(400).send(`Error: Duplicate images detected: ${duplicates.join(', ')}. Please upload unique images.`);
+    }
+
+    // Save job to database
     const imageFilenames = req.files.map(file => file.filename);
 
-    // Save job in database (pending approval)
     await Job.create({
       customerName: name,
       customerEmail: email,
@@ -43,10 +73,21 @@ router.post('/upload', upload.array('images', 5), async (req, res) => {
       status: 'pending'
     });
 
-    res.send('Your job has been submitted and is awaiting approval!');
+    res.send('✅ Your job has been submitted and is awaiting approval!');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error submitting your job.');
+    res.status(500).send('❌ Error submitting your job.');
+  }
+});
+
+// === Route: Admin View - List Jobs ===
+router.get('/admin', async (req, res) => {
+  try {
+    const jobs = await Job.findAll();
+    res.render('admin-jobs', { jobs });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('❌ Error loading jobs.');
   }
 });
 

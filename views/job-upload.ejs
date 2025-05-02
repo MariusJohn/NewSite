@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/reset.css">
-   
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="/css/job-upload.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +20,12 @@
 <body>
      <!-- views/job-upload.ejs -->
 <%- include('partials/header') %>
+
+
+<main>
+
+<div class="g-recaptcha" data-sitekey="***REMOVED***"></div>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 <section class="upload-section">
   <h1>Submit Your Vehicle Images</h1>
@@ -39,9 +46,11 @@
     <button type="submit">Submit Job</button>
   </form>
 </section>
+</main>
 
+<footer>
 <%- include('partials/footer') %>
-
+</footer>
 
     <script src="/js/mobile-nav.js"></script>
 </body>
