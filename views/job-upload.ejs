@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/css/navbar.css">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/reset.css">
-    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/job-upload.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,11 +24,12 @@
 
 <main>
 
-<div class="g-recaptcha" data-sitekey="6LdiViwrAAAAAITGILKol9WCjLr2_Y_67xOS0YMb"></div>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 
 <section class="upload-section">
   <h1>Submit Your Vehicle Images</h1>
+
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
   <form action="/jobs/upload" method="POST" enctype="multipart/form-data">
     <label for="name">Your Name:</label>
@@ -40,11 +41,18 @@
     <label for="location">Your Location (City/Postcode):</label>
     <input type="text" name="location" id="location" required>
 
-    <label for="images">Upload Images (max 5):</label>
+    <label for="images">Upload Images (max 8):</label>
     <input type="file" name="images" id="images" accept="image/*" multiple required>
 
+    
+
+    <div class="g-recaptcha" data-sitekey="6LdiViwrAAAAAITGILKol9WCjLr2_Y_67xOS0YMb"></div> 
+    
     <button type="submit">Submit Job</button>
+      
+
   </form>
+
 </section>
 </main>
 
