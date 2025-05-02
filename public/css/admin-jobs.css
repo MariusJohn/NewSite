@@ -1,0 +1,89 @@
+/* public/css/admin-jobs.css */
+
+
+
+.admin-jobs h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #edf2f7;
+    text-align: center;
+  
+  }
+  
+  .admin-jobs table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem auto;
+    font-family: 'Poppins', sans-serif;
+    background-color: whitesmoke;
+  }
+  
+  .admin-jobs table th,
+  .admin-jobs table td {
+    padding: 0.75rem;
+    border: 1px solid #181717;
+    text-align: center;
+  }
+  
+  .admin-jobs table th {
+    background-color: #e1e5e9;
+    color: rgb(22, 21, 21);
+    font-weight: 600;
+  }
+  
+  .admin-jobs table td img {
+    border-radius: 4px;
+    margin: 2px;
+  }
+  
+  .admin-jobs table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .admin-jobs table tr:hover {
+    background-color: #e6f0ff;
+  }
+  
+  .admin-jobs button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    margin: 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .admin-jobs button:hover {
+    background-color: #5c6d80;
+  }
+  
+  .admin-jobs em {
+    color: #666;
+    font-weight: 500;
+  }
+  
+  /* Status badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    display: inline-block;
+  }
+  
+  .status-pending {
+    background-color: #6c757d; /* grey */
+  }
+  
+  .status-approved {
+    background-color: #28a745; /* green */
+  }
+  
+  .status-rejected {
+    background-color: #dc3545; /* red */
+  }
+  

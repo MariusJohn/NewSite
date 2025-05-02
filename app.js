@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 
 
+
 dotenv.config();
 
 const app = express();
@@ -18,7 +19,7 @@ const pricingRoutes = require('./routes/pricing');
 const contactRoutes = require('./routes/contact');
 const privacyRoutes = require('./routes/privacy')
 const jobsRoutes = require('./routes/jobs');
-
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
 
 
