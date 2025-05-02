@@ -13,6 +13,7 @@ body {
     font-family: "Poppins", sans-serif;
     margin: 5px;
     background-color: rgb(7, 42, 70);
+    color: white;
 }
 
 .container {
@@ -466,7 +467,7 @@ footer {
         display: flex;
         flex-direction: column;
         justify-content:space-between;
-        height: 200vh;
+        height: 180vh;
         align-items: center;
         background-color: rgb(7, 42, 70);
         border-bottom: 1px solid #eee;

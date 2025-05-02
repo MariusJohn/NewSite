@@ -25,6 +25,9 @@ const jobsRoutes = require('./routes/jobs');
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve uploaded images statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Body Parser Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -42,6 +45,8 @@ app.use('/pricing', pricingRoutes);
 app.use('/contact', contactRoutes);
 app.use('/privacy', privacyRoutes)
 app.use('/jobs', jobsRoutes);
+
+
 
 
 // Error handling middleware
