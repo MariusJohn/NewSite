@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>MC Quote-Pricing</title>
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/admin-jobs.css">
+   
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+
+</head>
+<!-- views/admin-jobs.ejs -->
+<%- include('partials/header') %>
+
+<main class="admin-jobs">
+  <h1>Submitted Jobs</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Customer Name</th>
+        <th>Email</th>
+        <th>Location</th>
+        <th>Images</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% jobs.forEach(job => { %>
+        <tr>
+          <td><%= job.customerName %></td>
+          <td><%= job.customerEmail %></td>
+          <td><%= job.location %></td>
+          <td>
+            <% JSON.parse(job.images).forEach(img => { %>
+              <img src="/uploads/job-images/<%= img %>" width="80">
+            <% }) %>
+          </td>
+          <td><%= job.status %></td>
+          <td>
+            <% if (job.status === 'pending') { %>
+              <form action="/jobs/<%= job.id %>/approve" method="POST" style="display:inline;">
+                <button type="submit">Approve</button>
+              </form>
+              <form action="/jobs/<%= job.id %>/reject" method="POST" style="display:inline;">
+                <button type="submit">Reject</button>
+              </form>
+            <% } else { %>
+              <em><%= job.status %></em>
+            <% } %>
+
+            <td>
+                <% if (job.status === 'pending') { %>
+                  <span class="status-badge status-pending">Pending</span>
+                <% } else if (job.status === 'approved') { %>
+                  <span class="status-badge status-approved">Approved</span>
+                <% } else if (job.status === 'rejected') { %>
+                  <span class="status-badge status-rejected">Rejected</span>
+                <% } %>
+              </td>
+              
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+</main>
+
+<%- include('partials/footer') %>
+
+
+</html>

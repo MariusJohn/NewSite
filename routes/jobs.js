@@ -4,8 +4,9 @@ const multer = require('multer');
 const path = require('path');
 const { Job } = require('../models');
 const axios = require('axios');
+require('dotenv').config();
 
-const RECAPTCHA_SECRET_KEY = '***REMOVED***';
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
 const router = express.Router();
 
@@ -90,5 +91,40 @@ router.get('/admin', async (req, res) => {
     res.status(500).send('❌ Error loading jobs.');
   }
 });
+
+router.get('/list', async (req, res) => {
+  try {
+    const jobs = await Job.findAll();
+    res.render('admin-jobs', { jobs });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('❌ Error loading jobs.');
+  }
+});
+
+
+
+// === Route: Approve Job ===
+router.post('/:id/approve', async (req, res) => {
+  try {
+    await Job.update({ status: 'approved' }, { where: { id: req.params.id } });
+    res.redirect('/jobs/admin');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('❌ Error approving job.');
+  }
+});
+
+// === Route: Reject Job ===
+router.post('/:id/reject', async (req, res) => {
+  try {
+    await Job.update({ status: 'rejected' }, { where: { id: req.params.id } });
+    res.redirect('/jobs/admin');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('❌ Error rejecting job.');
+  }
+});
+
 
 module.exports = router;
