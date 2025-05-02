@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Job List</title>
+  <link rel="stylesheet" href="/css/styles.css"> <!-- Optional styling -->
+</head>
+<body>
+  <h1>Submitted Jobs (Admin View)</h1>
+
+  <% if (jobs.length === 0) { %>
+    <p>No jobs submitted yet.</p>
+  <% } else { %>
+    <table border="1" cellpadding="5" cellspacing="0">
+      <thead>
+        <tr>
+          <th>Customer Name</th>
+          <th>Email</th>
+          <th>Location</th>
+          <th>Images</th>
+          <th>Status</th>
+          <th>Submitted On</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% jobs.forEach(job => { %>
+          <tr>
+            <td><%= job.customerName %></td>
+            <td><%= job.customerEmail %></td>
+            <td><%= job.location %></td>
+            <td>
+              <% JSON.parse(job.images).forEach(img => { %>
+                <img src="/uploads/job-images/<%= img %>" alt="Image" width="100"><br>
+              <% }); %>
+            </td>
+            <td>
+                <%= job.status %><br>
+                <% if (job.status === 'pending') { %>
+                  <form action="/jobs/<%= job.id %>/approve" method="POST" style="display:inline;">
+                    <button type="submit">Approve</button>
+                  </form>
+                  <form action="/jobs/<%= job.id %>/reject" method="POST" style="display:inline;">
+                    <button type="submit">Reject</button>
+                  </form>
+                <% } %>
+              </td>
+              
+            <td><%= job.createdAt.toLocaleString() %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+
+</body>
+</html>

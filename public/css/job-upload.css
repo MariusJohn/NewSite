@@ -1,0 +1,21 @@
+
+.job-upload {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 60px;
+
+}
+
+form {
+    label {
+        color: aliceblue;
+    }
+    input {
+        color: aliceblue;
+    }
+
+    button {
+        color: aliceblue;
+    }
+}
