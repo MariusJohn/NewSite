@@ -9,6 +9,17 @@
     --dropdown-border-color: white;
 }
 
+
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  main {
+    flex: 1;
+  }
+
 body {
     font-family: "Poppins", sans-serif;
     margin: 5px;

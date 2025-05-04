@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quotes for Your Job</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <h1>Quotes for Job in <%= job.location %></h1>
+
+  <% if (quotes.length === 0) { %>
+    <p>No quotes yet. Please check back soon.</p>
+  <% } else { %>
+    <ul>
+      <% quotes.forEach(q => { %>
+        <li>
+          <strong><%= q.bodyshopName %></strong>: £<%= q.price.toFixed(2) %>
+          <% if (!job.selectedBodyshop) { %>
+          <form action="/quotes/<%= job.id %>/select" method="POST" style="display:inline;">
+            <input type="hidden" name="bodyshopName" value="<%= q.bodyshopName %>">
+            <button type="submit">Accept Quote</button>
+          </form>
+          <% } else if (job.selectedBodyshop === q.bodyshopName) { %>
+            ✅ Accepted
+          <% } %>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</body>
+</html>

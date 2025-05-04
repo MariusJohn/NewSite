@@ -15,7 +15,7 @@ const Job = sequelize.define('Job', {
     allowNull: false
   },
   images: {
-    type: DataTypes.TEXT,  // store JSON stringified list of image URLs
+    type: DataTypes.TEXT, 
     allowNull: false
   },
   status: {
@@ -23,9 +23,14 @@ const Job = sequelize.define('Job', {
     defaultValue: 'pending'
   },
   selectedBodyshopId: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: true
+  },
+  paid: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
   }
+  
 });
 
 module.exports = Job;

@@ -2,13 +2,22 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-
-
+const session = require('express-session');
+const customerRoutes = require('./routes/customer');
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+
+
+app.use(session({
+    secret: 'SESSION_KEY', 
+    resave: false,
+    saveUninitialized: false
+  }));
+
 
 // Import routes
 const indexRoutes = require('./routes/index'); // <--- Import the router objects
@@ -46,7 +55,7 @@ app.use('/pricing', pricingRoutes);
 app.use('/contact', contactRoutes);
 app.use('/privacy', privacyRoutes)
 app.use('/jobs', jobsRoutes);
-
+app.use('/', customerRoutes);
 
 
 

@@ -1,4 +1,4 @@
-footer{
+.footer{
     position: relative;
     left: 0;
     bottom: 0;
@@ -13,4 +13,14 @@ footer{
         padding-left: 10px;
         text-align: center;
     }
+}
+
+@media screen and (max-width: 600px){
+    footer {
+        padding: 20px;
+        text-align: center;
+        background-color: rgb(7, 42, 70);
+        color: white;
+      }
+      
 }
