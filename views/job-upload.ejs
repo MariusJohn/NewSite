@@ -1,67 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>MC Quote-Pricing</title>
-    <link rel="stylesheet" href="/css/navbar.css">
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/reset.css">
-    <link rel="stylesheet" href="/css/footer.css">
-    <link rel="stylesheet" href="/css/job-upload.css">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-
-
+  <meta charset="UTF-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>Upload Job - MC Quote</title>
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/job-upload.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
-
 <body>
-  <div class="page-wrapper">
 
+<div class="page-wrapper">
 <%- include('partials/header') %>
 
+<main class="upload-main">
+  <section class="upload-container">
+    <h1>Submit Your Vehicle Images</h1>
+    <p class="upload-subtext">Please fill out the form and upload up to 8 images (max 5MB each)</p>
 
-<main>
+    <form action="/jobs/upload" method="POST" enctype="multipart/form-data" class="upload-form">
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" required>
 
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" name="email" required>
 
+      <label for="location">Location (City or Postcode):</label>
+      <input type="text" id="location" name="location" required>
 
-<section class="upload-section">
-  <h1>Submit Your Vehicle Images</h1>
+      <label for="images">Upload Images:</label>
+      <input type="file" id="images" name="images" multiple accept="image/*" required>
 
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+      <div class="g-recaptcha" data-sitekey="***REMOVED***"></div>
 
-  <form action="/jobs/upload" method="POST" enctype="multipart/form-data">
-    <label for="name">Your Name:</label>
-    <input type="text" name="name" id="name" required>
-
-    <label for="email">Your Email:</label>
-    <input type="email" name="email" id="email" required>
-
-    <label for="location">Your Location (City/Postcode):</label>
-    <input type="text" name="location" id="location" required>
-
-    <label for="images">Upload Images (max 8):</label>
-    <input type="file" name="images" id="images" accept="image/*" multiple required>
-
-    
-
-    <div class="g-recaptcha" data-sitekey="***REMOVED***"></div> 
-    
-    <button type="submit">Submit Job</button>
-      
-
-  </form>
-
-</section>
+      <button type="submit" class="upload-btn">Submit Job</button>
+    </form>
+  </section>
 </main>
 
-<footer>
 <%- include('partials/footer') %>
-</footer>
-</div>
-    <script src="/js/mobile-nav.js"></script>
-</body>
 
+</div>
+</body>
 </html>
