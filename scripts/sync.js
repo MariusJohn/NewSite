@@ -1,10 +1,13 @@
+// scripts/sync.js
 const { sequelize } = require('../models');
 
-sequelize.sync({ force: false })  // force: true resets DB
-  .then(() => {
-    console.log('Database synced.');
+(async () => {
+  try {
+    await sequelize.sync({ alter: true }); // use { force: true } to drop all data (careful!)
+    console.log('✅ Database synced');
     process.exit();
-  })
-  .catch(err => {
-    console.error('Error syncing:', err);
-  });
+  } catch (err) {
+    console.error('❌ Sync error:', err);
+    process.exit(1);
+  }
+})();
