@@ -1,44 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
+    <title>MC Quote - Bodyshop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MC Quote-Bodyshop</title>
-   <!--<link rel="stylesheet" href="/public/css/reset.css">-->
-   <link rel="stylesheet" href="css/navbar.css">
-   <link rel="stylesheet" href="css/styles.css">
-   <link rel="stylesheet" href="css/reset.css">
-   <link rel="stylesheet" href="css/footer.css">
-      
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
-</head>
+    
+    <link rel="stylesheet" href="/css/reset.css">
+    <link rel="stylesheet" href="/css/navbar.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/bodyshop.css">
+  
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  </head>
 
 <body>
- 
-
-<%- include('partials/header') %>
-
+  <div class="page-wrapper">
+    
+  <%- include('partials/header') %>
 
   <section class="hero">
     <h1>Bodyshop Solutions</h1>
     <p>Providing professional services with excellence and integrity.</p>
-    <img src="/img/logo.png" alt="Placeholder Image">
-  </section>
-
-
-    <!-- Main Content -->
-    <div class="container">
-      <h2>Bodyshop</h2>
-      <p>We are committed to delivering top-notch services to our clients, ensuring satisfaction and value.</p>
+    <div class="login-button">
+      <a href="/bodyshop/login">Login to Bodyshop Portal</a>
     </div>
+  </section>
+  
+  <section class="services-section">
+    <div class="service-box">
+      <h2>Accident Damage - Detailed Report</h2>
+      <p>We provide precise, independent assessments for accident damage, supporting bodyshops with documentation that improves approval speed and accuracy in repair quoting.</p>
+    </div>
+  
+    <div class="service-box">
+      <h2>Invoicing & Matching Support</h2>
+      <p>Our invoicing support ensures clarity between bodyshops and insurers. We help reduce discrepancies, disputes, and delays — ensuring your payments match your estimates.</p>
+    </div>
+  
+    <div class="service-box">
+      <h2>On-Site Support</h2>
+      <p>Need expert help on the floor? We offer on-site inspection, reporting, or training sessions to support your team in delivering high-quality and consistent repairs.</p>
+    </div>
+  </section>
+  
 
-
-
-<%- include('partials/footer') %>
-
-<script src="/js/mobile-nav.js"></script>
+  
+  <%- include('partials/footer') %>
+</div>
+  <script src="/js/mobile-nav.js"></script>
 </body>
 
 

@@ -1,0 +1,28 @@
+<!-- views/upload-error.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Error</title>
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/upload-error.css">
+
+</head>
+<body>
+<div class="page-wrapper">
+  <%- include('partials/header') %>
+
+  <div class="error-box">
+    <h2>🚫 Upload Error</h2>
+    <p><%= message %></p>
+    <a href="/jobs/upload" class="btn">← Go Back & Try Again</a>
+  </div>
+
+  <%- include('partials/footer') %>
+</div>
+</body>
+</html>

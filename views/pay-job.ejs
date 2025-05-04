@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pay for Job #<%= job.id %></title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <main>
+    <h1>Pay for Job #<%= job.id %></h1>
+    <p>This payment unlocks the customer details and reserves the job.</p>
+    <form action="/bodyshop/pay/<%= job.id %>" method="POST">
+      <button type="submit">💳 Confirm Payment (£50)</button>
+    </form>
+  </main>
+</body>
+</html>

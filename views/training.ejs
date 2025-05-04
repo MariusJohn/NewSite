@@ -1,46 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MC Quote-Training</title>
-   <!--<link rel="stylesheet" href="/public/css/reset.css">-->
-   <link rel="stylesheet" href="css/navbar.css">
-   <link rel="stylesheet" href="css/styles.css">
-   <link rel="stylesheet" href="css/reset.css">
-   <link rel="stylesheet" href="css/footer.css">
+  <meta charset="UTF-8">
+  <title>MC Quote - Training</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-   
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/info-pages.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
-<!-- Include Header -->    
-
+<div class="page-wrapper">
 <%- include('partials/header') %>
 
-    <!-- Hero Section -->
-  <section class="hero">
-    <h1>Training</h1>
-    <p>Providing professional services with excellence and integrity.</p>
-    <img src="/img/MC Quote copy.png" alt="Placeholder Image">
-  </section>
+<section class="hero">
+  <h1>On-Site & Remote Training</h1>
+  <p>Enhance your repair assessment and quoting skills with expert-led support.</p>
+</section>
 
+<section class="content-section">
+  <div class="content-box">
+    <h2>Technical Assessment Training</h2>
+    <p>We train your team to improve damage diagnostics, use estimating tools effectively, and ensure cost accuracy in all estimates produced.</p>
+  </div>
 
-    <!-- Main Content -->
-    <div class="container">
-      <h2>About Us</h2>
-      <p>We are committed to delivering top-notch services to our clients, ensuring satisfaction and value.</p>
-    </div>
+  <div class="content-box">
+    <h2>Compliance & Documentation</h2>
+    <p>Stay compliant with insurer and lease return standards. We help you improve documentation workflows to reduce claim rejections.</p>
+  </div>
 
+  <div class="content-box">
+    <h2>Flexible Delivery</h2>
+    <p>Training is available on-site, remotely, or via custom workshops. We adapt to your bodyshop’s schedule and technical level.</p>
+  </div>
+</section>
 
-<!-- Include Footer -->
 <%- include('partials/footer') %>
 
+</div>
 <script src="/js/mobile-nav.js"></script>
 </body>
-
-
 </html>

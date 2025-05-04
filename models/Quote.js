@@ -17,6 +17,10 @@ const Quote = sequelize.define('Quote', {
   notes: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false
   }
 });
 
