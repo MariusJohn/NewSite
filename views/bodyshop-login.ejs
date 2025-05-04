@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Bodyshop Login</title>
+        <link rel="stylesheet" href="/css/reset.css">
+        <link rel="stylesheet" href="/css/navbar.css">
+        <link rel="stylesheet" href="/css/styles.css">
+        <link rel="stylesheet" href="/css/footer.css">
+        <link rel="stylesheet" href="/css/bodyshop-login.css">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+      </head>
+      
+<body>
+  <div class="page-wrapper">
+  <%- include('partials/header') %>
+
+  <main>
+    <div class="login-wrapper">
+      <h1>Bodyshop Login</h1>
+      <form action="/bodyshop/login" method="POST">
+        <label for="bodyshopName">Bodyshop Name:</label>
+        <input type="text" name="bodyshopName" id="bodyshopName" required>
+  
+        <label for="bodyshopArea">Postcode / Area:</label>
+        <input type="text" name="bodyshopArea" id="bodyshopArea" required>
+  
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </main>
+  
+  <%- include('partials/footer') %>
+
+  </div>
+</body>
+</html>
