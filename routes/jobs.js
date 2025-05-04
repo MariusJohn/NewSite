@@ -96,7 +96,8 @@ router.post('/upload', (req, res, next) => {
         status: 'pending'
       });
 
-      res.send('✅ Your job has been submitted and is awaiting approval!');
+      res.render('upload-success');
+
     } catch (err) {
       console.error('❌ Error in upload logic:', err);
       res.status(500).render('upload-error', {
