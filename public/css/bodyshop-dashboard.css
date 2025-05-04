@@ -1,0 +1,96 @@
+.dashboard-main {
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+}
+
+.dashboard-section h1 {
+    text-align: center;
+    color: #004b87;
+    margin-bottom: 30px;
+}
+
+.jobs-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.jobs-table th, .jobs-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.jobs-table th {
+    background-color: #004b87;
+    color: white;
+}
+
+.thumb-img {
+    width: 60px;
+    height: auto;
+    margin: 2px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+form input[type="number"] {
+    width: 80px;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+form button {
+    padding: 5px 10px;
+    background-color: #004b87;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #0060b7;
+}
+
+.image-preview-block {
+    display: inline-block;
+    margin: 5px;
+    text-align: center;
+  }
+  
+  .download-link {
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 3px;
+    color: #004b87;
+    text-decoration: underline;
+  }
+  
+  .download-zip-btn {
+    display: inline-block;
+    margin-top: 8px;
+    color: #004b87;
+    font-size: 0.85rem;
+    text-decoration: underline;
+  }
+  .download-zip-btn:hover {
+    color: #0060b7;
+  }
+  
+  .thumb-img {
+    width: 80px;
+    height: auto;
+    margin: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .thumb-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  }
+  
+  
