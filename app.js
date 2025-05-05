@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const session = require('express-session');
 const customerRoutes = require('./routes/customer');
+const adminRoutes = require('./routes/admin');
+const adminAuth = require('./middleware/adminAuth');
+
 
 dotenv.config();
 
@@ -56,7 +59,8 @@ app.use('/contact', contactRoutes);
 app.use('/privacy', privacyRoutes)
 app.use('/jobs', jobsRoutes);
 app.use('/', customerRoutes);
-
+app.use('/admin', adminRoutes);
+app.use('/jobs/admin', adminAuth);
 
 
 // Error handling middleware

@@ -5,9 +5,9 @@ const path = require('path');
 const fs = require('fs');
 const archiver = require('archiver');
 const { Op } = require('sequelize');
-const { Job, Quote } = require('../models');
+const { Job, Quote, Bodyshop } = require('../models');
 const { requireBodyshopLogin } = require('../middleware/auth');
-
+const bcrypt = require('bcrypt');
 
 const headerData = {
     logo: '/public/img/logo.png',
@@ -24,9 +24,6 @@ const footerData = {
     content: '&copy; 2025 MC Quote'
 };
 
-
-
-
 // === Main Bodyshop Support page ===
 router.get('/', (req, res) => {
     const pageData = {
@@ -42,32 +39,77 @@ router.get('/', (req, res) => {
     res.render('bodyshop', pageData);
 });
 
+// === GET Registration Page ===
+router.get('/register', (req, res) => {
+    res.render('bodyshop-register', { error: null });
+});
+
+// === POST Registration Handler ===
+router.post('/register', async (req, res) => {
+    const { name, email, password, confirmPassword, area } = req.body;
+
+    if (password !== confirmPassword) {
+        return res.render('bodyshop-register', { error: 'Passwords do not match.' });
+    }
+
+    try {
+        const existing = await Bodyshop.findOne({ where: { email } });
+        if (existing) {
+            return res.render('bodyshop-register', { error: 'This email is already registered.' });
+        }
+
+        const hashed = await bcrypt.hash(password, 10);
+
+        await Bodyshop.create({ name, email, password: hashed, area });
+
+        res.redirect('/bodyshop/login');
+    } catch (err) {
+        console.error(err);
+        res.render('bodyshop-register', { error: 'Registration failed. Try again later.' });
+    }
+});
+
 // === GET: Bodyshop Login Page ===
 router.get('/login', (req, res) => {
     res.render('bodyshop-login');
-  });
-  
-  // === POST: Handle Bodyshop Login ===
-  router.post('/login', (req, res) => {
-    const { bodyshopName, bodyshopArea } = req.body;
-  
-    if (!bodyshopName || !bodyshopArea) {
-      return res.status(400).send('Both fields are required');
+});
+
+// === POST: Handle Bodyshop Login ===
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).send('Email and password are required');
     }
-    req.session.bodyshopId = bodyshop.id;
-    req.session.bodyshopName = bodyshopName;
-    req.session.bodyshopArea = bodyshopArea;
-  
-    res.redirect('/bodyshop/dashboard');
-  });
-  
+
+    try {
+        const bodyshop = await Bodyshop.findOne({ where: { email } });
+        if (!bodyshop) {
+            return res.status(401).send('Invalid credentials');
+        }
+
+        const valid = await bcrypt.compare(password, bodyshop.password);
+        if (!valid) {
+            return res.status(401).send('Invalid credentials');
+        }
+
+        req.session.bodyshopId = bodyshop.id;
+        req.session.bodyshopName = bodyshop.name;
+        req.session.bodyshopArea = bodyshop.area;
+
+        res.redirect('/bodyshop/dashboard');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
 
 // === Bodyshop Dashboard (View Available Jobs) ===
 router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
     console.log('Bodyshop area from session:', req.session.bodyshopArea);
 
     try {
-        const bodyshopArea = 'WS10';
+        const bodyshopArea = req.session.bodyshopArea;
 
         const jobs = await Job.findAll({
             where: {
@@ -83,23 +125,18 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
 });
 
 // === Submit a Quote ===
-router.post('/quote/:jobId',requireBodyshopLogin, async (req, res) => {
+router.post('/quote/:jobId', requireBodyshopLogin, async (req, res) => {
     try {
         const { quoteAmount } = req.body;
         const { jobId } = req.params;
-        const bodyshopName = 'VASILE SRL';
+        const bodyshopName = req.session.bodyshopName;
 
-        // Prevent duplicate quotes
         const existing = await Quote.findOne({ where: { jobId, bodyshopName } });
         if (existing) {
             return res.status(400).send('You have already submitted a quote for this job.');
         }
 
-        await Quote.create({
-            jobId,
-            bodyshopName,
-            price: quoteAmount
-        });
+        await Quote.create({ jobId, bodyshopName, price: quoteAmount });
 
         res.redirect('/bodyshop/dashboard');
     } catch (err) {
@@ -136,80 +173,76 @@ router.get('/download/:jobId', async (req, res) => {
 
 router.get('/logout', (req, res) => {
     req.session.destroy(() => {
-      res.redirect('/bodyshop/login');
+        res.redirect('/bodyshop/login');
     });
-  });
-  
+});
 
-  // === GET: Simulated Payment Page for a Job ===
+// === GET: Simulated Payment Page for a Job ===
 router.get('/pay/:jobId', async (req, res) => {
     try {
-      const job = await Job.findByPk(req.params.jobId);
-      if (!job || job.paid) {
-        return res.status(400).send('Job already paid or not found.');
-      }
-      res.render('pay-job', { job });
+        const job = await Job.findByPk(req.params.jobId);
+        if (!job || job.paid) {
+            return res.status(400).send('Job already paid or not found.');
+        }
+        res.render('pay-job', { job });
     } catch (err) {
-      console.error(err);
-      res.status(500).send('Error loading payment page.');
+        console.error(err);
+        res.status(500).send('Error loading payment page.');
     }
-  });
-  
-  // === POST: Simulate Payment Confirmation ===
-  router.post('/pay/:jobId', async (req, res) => {
+});
+
+// === POST: Simulate Payment Confirmation ===
+router.post('/pay/:jobId', async (req, res) => {
     try {
-      const job = await Job.findByPk(req.params.jobId);
-      if (!job || job.paid) {
-        return res.status(400).send('Job already paid or not found.');
-      }
-  
-      // Simulate Stripe payment success
-      await job.update({ paid: true });
-  
-      // Send confirmation email to bodyshop
-      const quote = await Quote.findOne({
-        where: { jobId: job.id, bodyshopName: job.selectedBodyshop }
-      });
-  
-      if (quote) {
-        const transporter = nodemailer.createTransport({
-          host: 'smtp.ionos.co.uk',
-          port: 587,
-          secure: false,
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-          }
+        const job = await Job.findByPk(req.params.jobId);
+        if (!job || job.paid) {
+            return res.status(400).send('Job already paid or not found.');
+        }
+
+        await job.update({ paid: true });
+
+        const quote = await Quote.findOne({
+            where: { jobId: job.id, bodyshopName: job.selectedBodyshop }
         });
-  
-        const mailOptions = {
-          from: process.env.EMAIL_USER,
-          to: quote.email,
-          subject: '✅ Payment Confirmed – Job Details Released',
-          text: `Hello ${quote.bodyshopName},
-  
-  The job #${job.id} has been confirmed after payment.
-  
-  Customer Details:
-  Name: ${job.customerName}
-  Email: ${job.customerEmail}
-  Location: ${job.location}
-  
-  Please proceed to contact the customer and schedule the repair.
-  
-  - MC Quote`
-        };
-  
-        await transporter.sendMail(mailOptions);
-        console.log(`📧 Full job email sent to ${quote.email}`);
-      }
-  
-      res.send('✅ Payment processed. Customer details sent to your email.');
+
+        if (quote) {
+            const transporter = nodemailer.createTransport({
+                host: 'smtp.ionos.co.uk',
+                port: 587,
+                secure: false,
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS
+                }
+            });
+
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: quote.email,
+                subject: '✅ Payment Confirmed – Job Details Released',
+                text: `Hello ${quote.bodyshopName},
+
+The job #${job.id} has been confirmed after payment.
+
+Customer Details:
+Name: ${job.customerName}
+Email: ${job.customerEmail}
+Location: ${job.location}
+
+Please proceed to contact the customer and schedule the repair.
+
+- MC Quote`
+            };
+
+            await transporter.sendMail(mailOptions);
+            console.log(`📧 Full job email sent to ${quote.email}`);
+        }
+
+        res.send('✅ Payment processed. Customer details sent to your email.');
     } catch (err) {
-      console.error(err);
-      res.status(500).send('❌ Payment processing failed.');
+        console.error(err);
+        res.status(500).send('❌ Payment processing failed.');
     }
-  });
-  
+});
 
 module.exports = router;
