@@ -77,13 +77,19 @@ router.get('/login', (req, res) => {
 // === POST: Handle Bodyshop Login ===
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
+    console.log('Received email:', email);
+    console.log('Received password:', password);
 
     if (!email || !password) {
         return res.status(400).send('Email and password are required');
     }
 
     try {
-        const bodyshop = await Bodyshop.findOne({ where: { email } });
+        const bodyshop = await Bodyshop.findOne({
+            where: { email },
+            attributes: ['id', 'name', 'password', 'area'] // <-- Include 'area' here
+        });
+
         if (!bodyshop) {
             return res.status(401).send('Invalid credentials');
         }

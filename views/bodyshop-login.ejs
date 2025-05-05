@@ -19,8 +19,11 @@
     <div class="login-wrapper">
       <h1>Bodyshop Login</h1>
       <form action="/bodyshop/login" method="POST">
-        <label for="bodyshopName">Bodyshop Name:</label>
-        <input type="text" name="bodyshopName" id="bodyshopName" required>
+        <label for="bodyshopEmail">Bodyshop Email:</label>
+        <input type="email" name="email" placeholder="Email" required />
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" placeholder="Your Password" required>
   
         <label for="bodyshopArea">Postcode / Area:</label>
         <input type="text" name="bodyshopArea" id="bodyshopArea" required>
