@@ -3,6 +3,8 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const axios = require('axios');
+const sharp = require('sharp');
+const fs = require('fs');
 const nodemailer = require('nodemailer');
 const { Op } = require('sequelize');
 const { Job, Quote } = require('../models');
@@ -12,10 +14,15 @@ require('dotenv').config();
 const router = express.Router();
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
-// === Multer Storage Config ===
-const storage = multer.diskStorage({
+const tempDir = path.join(__dirname, '..', 'uploads', 'temp');
+if (!fs.existsSync(tempDir)) {
+  fs.mkdirSync(tempDir, { recursive: true });
+}
+
+// === Multer Storage Config (temporary location for Sharp to process) ===
+const tempStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', 'uploads', 'job-images'));
+    cb(null, path.join(__dirname, '..', 'uploads', 'temp'));
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -24,31 +31,24 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5MB
-});
+const upload = multer({ storage: tempStorage }); // ✅ No file size limit here
+
 
 // === GET Upload Form ===
 router.get('/upload', (req, res) => {
   res.render('job-upload');
 });
 
-// === POST Upload Form with Error Handling ===
+// === POST Upload Form with Sharp Compression and Cleanup ===
 router.post('/upload', (req, res, next) => {
   upload.array('images', 8)(req, res, async (err) => {
-    if (err && err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).render('upload-error', {
-        title: 'Upload Error',
-        message: 'One or more images exceed the 5MB size limit. Please upload smaller files.'
-      });
-    } else if (err && err.code === 'LIMIT_UNEXPECTED_FILE') {
+    if (err && err.code === 'LIMIT_UNEXPECTED_FILE') {
       return res.status(400).render('upload-error', {
         title: 'Upload Error',
         message: 'Too many files uploaded. Maximum allowed is 8 images.'
       });
     } else if (err) {
-      console.error('❌ Multer Error:', err);
+      console.error('❌ Multer error:', err);
       return res.status(500).render('upload-error', {
         title: 'Upload Error',
         message: 'An unexpected error occurred during file upload.'
@@ -59,10 +59,12 @@ router.post('/upload', (req, res, next) => {
       const { name, email, location } = req.body;
       const recaptchaResponse = req.body['g-recaptcha-response'];
 
-      if (!recaptchaResponse) return res.status(400).render('upload-error', {
-        title: 'CAPTCHA Error',
-        message: 'CAPTCHA missing. Please complete the CAPTCHA verification.'
-      });
+      if (!recaptchaResponse) {
+        return res.status(400).render('upload-error', {
+          title: 'CAPTCHA Error',
+          message: 'CAPTCHA missing. Please complete the CAPTCHA verification.'
+        });
+      }
 
       const verifyRes = await axios.post(
         'https://www.google.com/recaptcha/api/siteverify',
@@ -72,13 +74,16 @@ router.post('/upload', (req, res, next) => {
         })
       );
 
-      if (!verifyRes.data.success) return res.status(400).render('upload-error', {
-        title: 'CAPTCHA Error',
-        message: 'CAPTCHA verification failed. Please try again.'
-      });
+      if (!verifyRes.data.success) {
+        return res.status(400).render('upload-error', {
+          title: 'CAPTCHA Error',
+          message: 'CAPTCHA verification failed. Please try again.'
+        });
+      }
 
+      // Duplicate check
       const uploadedFilenames = req.files.map(file => file.originalname);
-      const duplicates = uploadedFilenames.filter((item, index) => uploadedFilenames.indexOf(item) !== index);
+      const duplicates = uploadedFilenames.filter((item, idx) => uploadedFilenames.indexOf(item) !== idx);
       if (duplicates.length > 0) {
         return res.status(400).render('upload-error', {
           title: 'Upload Error',
@@ -86,18 +91,45 @@ router.post('/upload', (req, res, next) => {
         });
       }
 
-      const imageFilenames = req.files.map(file => file.filename);
+      // === Sharp Compression and File Size Enforcement ===
+      const compressedFilenames = [];
+      const finalDir = path.join(__dirname, '..', 'uploads', 'job-images');
 
+      for (const file of req.files) {
+        const stats = fs.statSync(file.path);
+        const sizeMB = stats.size / (1024 * 1024);
+
+        if (sizeMB > 20) {
+          fs.unlinkSync(file.path);
+          return res.status(400).render('upload-error', {
+            title: 'Image Too Large',
+            message: `The image "${file.originalname}" is larger than 20MB and was rejected.`
+          });
+        }
+
+        const compressedFilename = `compressed-${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
+        const outputPath = path.join(finalDir, compressedFilename);
+
+        await sharp(file.path)
+          .resize({ width: 1920 })
+          .jpeg({ quality: 75 })
+          .toFile(outputPath);
+
+        fs.unlinkSync(file.path); // Clean up temp file
+        compressedFilenames.push(compressedFilename);
+      }
+
+      // Save job to DB
       await Job.create({
         customerName: name,
         customerEmail: email,
         location,
-        images: JSON.stringify(imageFilenames),
-        status: 'pending'
+        images: JSON.stringify(compressedFilenames),
+        status: 'pending',
+        paid: false
       });
 
       res.render('upload-success');
-
     } catch (err) {
       console.error('❌ Error in upload logic:', err);
       res.status(500).render('upload-error', {
@@ -107,6 +139,8 @@ router.post('/upload', (req, res, next) => {
     }
   });
 });
+
+
 
 // === Admin Job List ===
 router.get('/admin', async (req, res) => {
