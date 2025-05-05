@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register Bodyshop - MC Quote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/bodyshop-register.css">
+</head>
+<body>
+
+<%- include('partials/header') %>
+
+<div class="register-container">
+  <h2>Register Your Bodyshop</h2>
+  <% if (error) { %><p class="error-msg"><%= error %></p><% } %>
+  <form action="/bodyshop/register" method="POST">
+    <input type="text" name="name" placeholder="Bodyshop Name" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required autocomplete="new-password">
+    <input type="password" name="confirmPassword" placeholder="Confirm Password" required autocomplete="new-password">
+    <input type="text" name="area" placeholder="Postcode / Area" required>
+    <button type="submit">Register</button>
+  </form>
+  <p>Already registered? <a href="/bodyshop/login">Login here</a>.</p>
+</div>
+
+<%- include('partials/footer') %>
+
+</body>
+</html>
