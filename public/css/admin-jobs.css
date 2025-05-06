@@ -60,26 +60,33 @@
     font-weight: 500;
   }
   
-  /* Status badges */
-.status-badge {
+  .status-badge {
     padding: 4px 8px;
-    border-radius: 12px;
-    color: white;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: capitalize;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.9em;
     display: inline-block;
   }
-  
   .status-pending {
-    background-color: #6c757d; /* grey */
+    background-color: orange;
+    color: white;
   }
-  
   .status-approved {
-    background-color: #28a745; /* green */
+    background-color: green;
+    color: white;
   }
-  
   .status-rejected {
-    background-color: #dc3545; /* red */
+    background-color: red;
+    color: white;
+  }
+  .btn-download {
+    margin-top: 5px;
+    display: inline-block;
+    background-color: #25D366;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.85em;
   }
   

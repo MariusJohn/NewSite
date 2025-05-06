@@ -1,108 +1,90 @@
-:root {
-    --main-radius: 5px;
-    --main-padding: 5px;
-    --nav-height: 60px;
-    --nav-color: rgb(7,42,70;)
-    --link-color: white;
-    --link-hover-color: #25D366;
-    --dropdown-bg-color: rgb(7, 42, 70);
-    --dropdown-border-color: white;
-}
-
-
 .page-wrapper {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-  }
-  
-  main {
-    flex: 1;
-  }
-
-body {
-    font-family: "Poppins", sans-serif;
-    margin: 5px;
     background-color: rgb(7, 42, 70);
     color: white;
-}
-
-.container {
-    display: grid;
-    grid-template-columns: 2fr 3fr; 
-    grid-template-areas:
-      "sidebar main"
-      "sidebar content1"
-      "sidebar content2"
-      "footer footer";
-    grid-gap: 0.6rem;
-    min-height: 100vh;
-    margin-top: 20px;
+    font-family: 'Poppins', sans-serif;
+    padding: 0 20px;
   }
-
-
-main {
-    background-color:rgb(7, 42, 70);
-    grid-area: main;
-    border-radius: var(--main-radius);
-    padding-top: var(--main-padding);
-    overflow: auto;
-    color: rgb(20, 18, 18);
-}
-
-.main-banner-hero {
-    flex-direction: column;
+  
+  .main-banner-hero {
+    position: relative;
     display: flex;
-    background-image:url(../img/image3.png);
+    flex-direction: column;
+    justify-content: center;
+    background-image: url(../img/image3.png);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    height: 850px;
-    justify-content: space-around;
-    padding: 10px;
- }
- 
- .main-banner-hero h1 {
-    font-size: 35px;
-    font-weight: bold;
-    color: #25D366; 
-    text-align: center; 
-    z-index: 4;
-    letter-spacing: 3px;
- }
- 
- .main-banner-hero h2 {
-    padding: 20px 10px 0;
-    font-size: 18px;
-    margin-bottom: 0;
+    height: 700px;
+    padding: 20px;
     text-align: center;
-    font-weight: 400;
-    letter-spacing: 3px;
-    line-height: 1.2;
+  }
+  
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(7, 42, 70, 0.7); /* adjustable darkness */
+    z-index: 1;
+  }
+  
+  .hero-content {
+    position: relative;
+    z-index: 2;
     color: white;
- }
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+  
 
- span {
-    color: #df4b4b;
+  .hero-section {
+    background: url('../img/image3.png') center/cover no-repeat;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  
+  .hero-content h1 {
+    font-weight:700 ;
+    font-size: 36px;
+    color: #25D366;
+    margin-top: 10px;
+  }
+  
+  .hero-content h2 {
+    font-weight: 400;
+    font-size: 26px;
+    color: white;
+    margin: 20px;
+    line-height: 1.4;
+  }
+
+  span {
+    color: #fa5d28;
     font-weight: 700;
-}
 
-.whatsapp-buttons {
+}
+  .quote-buttons {
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding: 20px;
     align-items: center;
     justify-content: center;
+    text-align: center;
 }
 
-.whatsapp-btn {
+.quote-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    max-width:250px;
-    padding: 12px;
+    max-width: 300px;
+    padding: 14px 20px;
     background-color: #25D366;
     color: white;
     font-weight: bold;
@@ -110,127 +92,54 @@ main {
     border-radius: 8px;
     font-size: 16px;
     transition: background 0.3s ease;
-    z-index: 6;
+    border: none;
 }
 
-.whatsapp-btn img {
-    width: 24px;
-    height: 24px;
-    margin-right: 10px;
+.quote-btn:hover {
+    background-color: #1aa851;
 }
 
-#sidebar {
-    grid-area: sidebar;
-    border-radius: var(--main-radius);
-    padding-top: var(--main-padding);
-    overflow: auto;
+.upload-note {
+    color: #fffcfc;
+    font-size: 18px;
+    margin-top: 5px;
+}
+  
+  .content-flex {
+    display: flex;
+    padding: 20px;
+    gap: 30px;
+   
+  }
+  
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 50%;
+
+
+  h1 {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 9px;
+    color: #25D366;
+    word-spacing: 3px;
+    line-height: 23px;
+    margin-bottom: 20px;
+  }
+
+  p {
+    text-align: justify;
+    font-size: 16px;
     color: white;
+    word-spacing: 2px;
     padding: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.sidebar-why {
-    display: flex;
-    flex-direction: column;
-     
-
-
-    h1 {
-        text-align: center;
-        text-transform: uppercase;
-        font-size: 20px;
-        font-weight: 600;
-        letter-spacing: 9px;
-        color: #25D366;
-        word-spacing: 3px;
-        line-height: 23px;
-        margin-bottom: 20px;
-    }
-
-    p {
-        text-align: justify;
-        font-size: 16px;
-        color: white;
-        word-spacing: 2px;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-}
-
-
-#content1,
-#content2,
-#content3 {
-    border-radius: var(--main-radius);
-    padding-top: var(--main-padding);
-    overflow: auto;
-    color: white;
-}
-
-#content1 {
-    grid-area: content1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#content2 {
-    grid-area: content2;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#content3 {
-    grid-area: content3;
-    
-}
-
-.content1-about {
-    display: flex;
-    flex-direction: column;
-
-    h1 {
-        text-align: center;
-        text-transform: uppercase;
-        font-size: 23px;
-        font-weight: 500;
-        letter-spacing: 9px;
-        color: #25D366;
-        word-spacing: 4px;
-        line-height: 23px;
-        padding: 20px;
-    }
-
-    p {
-        text-align: justify;
-        font-size: 15px;
-        color: white;
-        word-spacing: 2px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    span {
-        color: #fa5d28;
-        font-weight: 700;
-    }
-
-    ul li {
-        list-style-type: circle;
-        color: white;
-        padding: 10px;
-        margin: 20px;
-        
-    }
-
-}
-
-
-.key-services h1{
+    margin-bottom: 10px;
+  }
+  h1{
     text-align: center;
     text-transform: uppercase;
     font-size: 23px;
@@ -239,23 +148,192 @@ main {
     color: #25D366;
     word-spacing: 4px;
     line-height: 23px;
+  }
 }
 
-
+.key-services {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 80vh;
+  flex-direction: column;
+}
 
 .sidebar-bodyshop-btn {
+  display: flex;
+  flex-direction: column;
+  background-image: url(../img/caraccident.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height:100px;
+  justify-content: center;
+}
+
+.sidebar-bodyshop-btn h1 {
+  font-size: 23px;
+  font-weight: bold;
+  color:white; 
+  text-align: center; 
+  z-index: 4;
+  letter-spacing: 3px;
+
+}
+
+.sidebar-quotations-btn {
+  display: flex;
+  flex-direction: column;
+  background-image: url(../img/carraccident.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height:100px;
+  justify-content: center;
+}
+
+.sidebar-quotations-btn h1 {
+  font-size: 23px;
+  font-weight: bold;
+  color:white; 
+  text-align: center; 
+  z-index: 4;
+  letter-spacing: 3px;
+}
+
+.sidebar-training-btn {
+  display: flex;
+  flex-direction: column;
+  background-image: url(../img/carsaccident.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height:100px;
+  justify-content: center;
+}
+
+.sidebar-training-btn h1 {
+  font-size: 23px;
+  font-weight: bold;
+  color:white; 
+  text-align: center; 
+  z-index: 4;
+  letter-spacing: 3px;
+
+}
+  
+  .main-content {
+    flex: 2;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .hero-section {
+      padding-top: 100px;
+    }
+
+    .content-flex {
+      flex-direction: column;
+      padding: 10px;
+    }
+
+    .mobile-menu-btn {
+      display: block;
+      height: 40px;
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+  }
+
+
+ span {
+      color: #fa5d28;
+      font-weight: 700;
+
+  }
+  
+    .hero-content h1 {
+      font-size: 28px;
+    }
+  
+    .hero-content h2 {
+      font-size: 16px;
+    }
+    .content-flex {
+      display: flex;
+      flex-direction: column;
+      justify-content:space-between;
+      align-items: center;
+      background-color: rgb(7, 42, 70);
+      border-bottom: 1px solid #eee;
+  }
+
+  .sidebar{
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #eee;
+    align-content: center;
+    width: 100%;
+  
+    h1 {
+      text-align: center;
+      text-transform: uppercase;
+      font-size: 25px;
+      font-weight: 400;
+      letter-spacing: 7px;
+      color: #25D366;
+      word-spacing: 4px;
+      line-height: 23px;
+      margin: 20px;
+    }
+
+    p {
+    text-align: justify;
+    font-size: 16px;
+    color: white;
+    word-spacing: 2px;
+    padding: 20px;
+    margin-bottom: 10px;
+    }
+  }
+
+
+  .key-services {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    height: 70vh;
+  }
+
+  .key-services h1{
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 23px;
+    font-weight: 500;
+    letter-spacing: 9px;
+    color: #25D366;
+    word-spacing: 4px;
+    line-height: 23px;
+  }
+
+
+
+  .sidebar-bodyshop-btn {
     display: flex;
     flex-direction: column;
     background-image: url(../img/caraccident.png);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
-    width: 100%;
-    height:250px;
+    width: 80%;
+    height:100px;
     justify-content: center;
-}
+  }
 
-.sidebar-bodyshop-btn h1 {
+  .sidebar-bodyshop-btn h1 {
     font-size: 23px;
     font-weight: bold;
     color:white; 
@@ -263,448 +341,53 @@ main {
     z-index: 4;
     letter-spacing: 3px;
 
-}
+  }
 
-.sidebar-quotations-btn {
-    display: flex;
-    flex-direction: column;
-    background-image: url(../img/carraccident.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 100%;
-    height:250px;
-    justify-content: center;
-}
+  .sidebar-quotations-btn {
+      display: flex;
+      flex-direction: column;
+      background-image: url(../img/carraccident.png);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 80%;
+      height:100px;
+      justify-content: center;
+  }
 
-.sidebar-quotations-btn h1 {
-    font-size: 23px;
-    font-weight: bold;
-    color:white; 
-    text-align: center; 
-    z-index: 4;
-    letter-spacing: 3px;
-}
+  .sidebar-quotations-btn h1 {
+      font-size: 23px;
+      font-weight: bold;
+      color:white; 
+      text-align: center; 
+      z-index: 4;
+      letter-spacing: 3px;
+  }
 
-.sidebar-training-btn {
-    display: flex;
-    flex-direction: column;
-    background-image: url(../img/carsaccident.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    width: 100%;
-    height:250px;
-    justify-content: center;
-}
+  .sidebar-training-btn {
+      display: flex;
+      flex-direction: column;
+      background-image: url(../img/carsaccident.png);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 80%;
+      height:100px;
+      justify-content: center;
+  }
 
-.sidebar-training-btn h1 {
-    font-size: 23px;
-    font-weight: bold;
-    color:white; 
-    text-align: center; 
-    z-index: 4;
-    letter-spacing: 3px;
-
-}
-
-#content2{
-    display: hidden;
-}
-
-footer {
-    grid-area: footer;
-    border-radius: var(--main-radius);
-    padding-top: var(--main-padding);
-    text-align: center;
-    p {
-        color: white;
-    }
-}
-
-.mobile-menu-btn {
-    display: none;
-    cursor: pointer;
-}
-
-
-.container-quotations {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: var(--nav-height) auto auto auto auto;
-    grid-template-areas:
-        "nav nav nav nav"
-        "sidebar sidebar main main"
-        "content1 content2 content3 content3"
-        "footer footer footer footer";
-    grid-gap: 0.6rem;
-    min-height: 100vh;
-}
-        
-@media screen and (max-width: 600px) {
-    .container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto auto auto auto auto auto;
-        grid-template-areas:
-            "nav"
-            "nav-menu"
-            "main"
-            "sidebar"
-            "content1"
-            "content2"
-            "content3"
-            "footer";
-        min-height: 100vh;    
-        background-color: rgb(7, 42, 70);
-        padding-top: 20px;
-        padding-bottom: 20px;
-        }
-
-    .container-quotations {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto auto auto auto auto auto;
-        grid-template-areas:
-            "nav"
-            "nav-menu"
-            "main"
-            "sidebar"
-            "content1"
-            "content2"
-            "content3"
-            "footer";
-        min-height: 100vh;
-        padding-top: 60px;  
-        background-color: rgb(7, 42, 70);  
-        color: white;
-    }
-
-    main {
-        grid-area: main;
-        background-color: rgb(7,42,70);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-evenly;
-        text-align: center;
-        color: rgb(7, 42, 70);
-        padding: 40px 10px 10px;
-        font-weight: 400;
-        background-color: rgb(7, 42, 70);
-        color: white;
-    }
-
-    .whatsapp-buttons {
-        display: flex;
-        align-self: center;
-    }
-
-    .main-banner-hero::before{
-        content: "";
-        position: absolute;
-        top: 0; 
-        left: 0;
-        width: 100%;
-        height: 100%;
-       
-    }
-
-    .main-banner-hero {
-        position: relative;
-        display: flex;
-        align-items: baseline;
-    }
-
-    .main-banner-hero h1 {
-        font-size: 33px;
-        font-weight: bold;
-        color: #25D366; 
-        text-align: center; 
-        z-index: 4;
-        letter-spacing: 3px;
-    
-    }
-
-    .main-banner-hero h2 {
-        padding: 20px 10px 0;
-        font-size: 18px;
-        margin-bottom: 0;
-        text-align: center;
-        font-weight: 400;
-        letter-spacing: 3px;
-        line-height: 1.2;
-    
-
-    }
-
-    .main-banner-hero p {
-        margin-top: 8px;
-        font-size: 16px;
-        margin-bottom: 15px;
-        text-align: center; 
-    }
-
-    .mobile-menu-btn {
-        display: block;
-        height: 40px;
-        width: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: space-evenly;
-    }
-
-
-   span {
-        color: #fa5d28;
-        font-weight: 700;
-
-    }
-
-    .main-banner-hero {
-        display: flex;
-        flex-direction: column;
-        background-image:url(../img/image2.png);
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        height: 100vh;
-      
-    }
-
-    #sidebar {
-        display: flex;
-        flex-direction: column;
-        justify-content:space-between;
-        height: 180vh;
-        align-items: center;
-        background-color: rgb(7, 42, 70);
-        border-bottom: 1px solid #eee;
-    }
-
-    .sidebar-why {
-        display: flex;
-        flex-direction: column;
-        border-bottom: 1px solid #eee;
-
-        h1 {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 23px;
-            font-weight: 500;
-            letter-spacing: 9px;
-            color: #25D366;
-            word-spacing: 4px;
-            line-height: 23px;
-            margin-bottom: 20px;
-        }
-
-        p {
-            text-align: justify;
-            font-size: 16px;
-            color: white;
-            word-spacing: 2px;
-            padding: 20px;
-            margin-bottom: 10px;
-        }
-    }
-
-    .key-services h1{
-        text-align: center;
-        text-transform: uppercase;
-        font-size: 23px;
-        font-weight: 500;
-        letter-spacing: 9px;
-        color: #25D366;
-        word-spacing: 4px;
-        line-height: 23px;
-    }
-
-
-
-    .sidebar-bodyshop-btn {
-        display: flex;
-        flex-direction: column;
-        background-image: url(../img/caraccident.png);
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 80%;
-        height:100px;
-        justify-content: center;
-    }
-
-    .sidebar-bodyshop-btn h1 {
-        font-size: 23px;
-        font-weight: bold;
-        color:white; 
-        text-align: center; 
-        z-index: 4;
-        letter-spacing: 3px;
+  .sidebar-training-btn h1 {
+      font-size: 23px;
+      font-weight: bold;
+      color:white; 
+      text-align: center; 
+      z-index: 4;
+      letter-spacing: 3px;
  
-    }
+  }
 
-    .sidebar-quotations-btn {
-        display: flex;
-        flex-direction: column;
-        background-image: url(../img/carraccident.png);
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 80%;
-        height:100px;
-        justify-content: center;
-    }
-
-    .sidebar-quotations-btn h1 {
-        font-size: 23px;
-        font-weight: bold;
-        color:white; 
-        text-align: center; 
-        z-index: 4;
-        letter-spacing: 3px;
-    }
-
-    .sidebar-training-btn {
-        display: flex;
-        flex-direction: column;
-        background-image: url(../img/carsaccident.png);
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        width: 80%;
-        height:100px;
-        justify-content: center;
-    }
-
-    .sidebar-training-btn h1 {
-        font-size: 23px;
-        font-weight: bold;
-        color:white; 
-        text-align: center; 
-        z-index: 4;
-        letter-spacing: 3px;
-   
-    }
-
-    #content1 {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
-        background-color: rgb(7, 42, 70);
-        border-bottom: 1px solid #eee;
-        padding: 10px;
-    }
-
-    .content1-about {
-        display: flex;
-        flex-direction: column;
-
-        h1 {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 23px;
-            font-weight: 500;
-            letter-spacing: 9px;
-            color: #25D366;
-            word-spacing: 4px;
-            line-height: 23px;
-            padding: 20px;
-        }
-
-        p {
-            text-align: justify;
-            font-size: 15px;
-            color: white;
-            word-spacing: 2px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        span {
-            color: #fa5d28;
-            font-weight: 700;
-        }
-
-        ul li {
-            list-style-type: circle;
-            color: white;
-            padding: 10px;
-            margin: 20px;
-            
-        }
-
-    }
+  }
 
 
-    #content2 {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
-        background-color: rgb(7, 42, 70);
-        padding: 20px;
-        height: fit-content;
-
-        h1 {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 23px;
-            letter-spacing: 9px;
-            color: #25D366;
-            word-spacing: 4px;
-            line-height: 23px;
-            padding: 20px;
-            font-weight: 500;
-        }
-    }
-
-
-    .price-card {
-        display: flex;
-        flex-direction: column;
-        justify-content: baseline;
-        align-items: center;
-        height: auto;
-        margin-bottom: 25px;
-        border-bottom: 1px solid #eee;
-
-        
-        h3 {
-            text-align: center;
-            text-transform: uppercase;
-            font-size: 15px;
-            letter-spacing: 6px;
-            color: #25D366;
-            word-spacing: 4px;
-            line-height: 23px;         
-
-        }
-
-        p {
-            text-align: center;
-            font-size: 15px;
-            color: white;
-            word-spacing: 2px;
-            letter-spacing: 4px;
-        }
-
-        .price {
-            text-align: center;
-            padding: 5px;
-        }
-    }
-
-    .content3 {
-        padding: 10px;
-        font-weight: 400;
-        background-color: rgb(7, 42, 70);
-        color: white;
-    }
-   
 
   
-}

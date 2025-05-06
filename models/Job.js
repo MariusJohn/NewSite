@@ -10,6 +10,10 @@ const Job = sequelize.define('Job', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  customerPhone: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   location: {
     type: DataTypes.STRING,
     allowNull: false

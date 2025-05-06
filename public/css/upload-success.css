@@ -1,41 +1,56 @@
 .upload-feedback-main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 70vh;
-    background-color: rgb(7, 42, 70);
-    color: white;
-    text-align: center;
-    padding: 40px 20px;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  background-color: rgb(7, 42, 70);
+  padding: 40px 20px;
+}
+
+.upload-feedback-box {
+  background-color: #0b3c5d;
+  border: 2px solid #25D366;
+  border-radius: 12px;
+  padding: 30px 25px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  color: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+.upload-feedback-box h2 {
+  font-size: 26px;
+  color: #25D366;
+  margin-bottom: 15px;
+}
+
+.upload-feedback-box p {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-bottom: 25px;
+  color: #eee;
+}
+
+.btn-home {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #25D366;
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-home:hover {
+  background-color: #1bbd57;
+}
+
+@media screen and (max-width: 600px) {
   .upload-feedback-box {
-    background-color: #0b3c5d;
-    border: 2px solid #25D366;
-    border-radius: 12px;
-    padding: 30px;
-    max-width: 500px;
-    width: 100%;
+    display: flex;
   }
   
-  .upload-feedback-box h2 {
-    font-size: 26px;
-    color: #25D366;
-    margin-bottom: 10px;
-  }
-  
-  .upload-feedback-box p {
-    font-size: 16px;
-    margin-bottom: 20px;
-  }
-  
-  .btn-home {
-    display: inline-block;
-    padding: 12px 20px;
-    background-color: #25D366;
-    color: white;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
+}

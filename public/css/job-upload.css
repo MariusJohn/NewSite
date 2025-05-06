@@ -3,6 +3,21 @@ body {
     font-family: 'Poppins', sans-serif;
     color: rgb(187, 85, 85);
   }
+
+  .logo-jobUpload {
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  .logo-jobUpload img {
+    width: 80px;
+    height: 100px;
+    max-width: 100;
+  }
+
+  input {
+    background-color: aliceblue;
+  }
   
   .upload-main {
     min-height: 80vh;
@@ -68,6 +83,17 @@ body {
   }
   
   @media screen and (max-width: 600px) {
+    .logo-jobUpload {
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .logo-jobUpload img {
+      width: 80px;
+      height: auto;
+      max-width: 100%;
+    }
+   
     .upload-container {
       padding: 20px;
     }
@@ -76,4 +102,6 @@ body {
       font-size: 22px;
     }
   }
+
+
   
