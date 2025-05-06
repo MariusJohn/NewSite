@@ -3,7 +3,7 @@ const { sequelize } = require('../models');
 
 (async () => {
   try {
-    await sequelize.sync({ alter: true }); // use { force: true } to drop all data (careful!)
+    await sequelize.sync({ alter: true }); 
     console.log('✅ Database synced');
     process.exit();
   } catch (err) {

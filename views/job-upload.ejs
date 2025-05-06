@@ -5,7 +5,7 @@
   <meta content="width=device-width, initial-scale=1" name="viewport" />
   <title>Upload Job - MC Quote</title>
   <link rel="stylesheet" href="/css/reset.css">
-  <link rel="stylesheet" href="/css/navbar.css">
+
   <link rel="stylesheet" href="/css/footer.css">
   <link rel="stylesheet" href="/css/job-upload.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -14,8 +14,11 @@
 <body>
 
 <div class="page-wrapper">
-<%- include('partials/header') %>
-
+  <div class="logo-jobUpload">
+    <a href="/">
+      <img src="/img/logo.png" alt="MC Quote Logo">      
+  </a>
+</div>
 <main class="upload-main">
   <section class="upload-container">
     <h1>Submit Your Vehicle Images</h1>
@@ -23,13 +26,16 @@
 
     <form action="/jobs/upload" method="POST" enctype="multipart/form-data" class="upload-form">
       <label for="name">Full Name:</label>
-      <input type="text" id="name" name="name" required>
+      <input type="text" id="name" name="name" placeholder="Your full name" required>
 
       <label for="email">Email Address:</label>
-      <input type="email" id="email" name="email" required>
+      <input type="email" id="email" name="email" placeholder="Your email address" required>
 
-      <label for="location">Location (City or Postcode):</label>
-      <input type="text" id="location" name="location" required>
+      <label for="telephone">Telephone number:</label>
+      <input type="tel" name="telephone" placeholder="Your phone number" required>
+
+      <label for="location">Location (Postcode):</label>
+      <input type="text" id="location" name="location" placeholder="Your post code" required>
 
       <label for="images">Upload Images:</label>
       <input type="file" id="images" name="images" multiple accept="image/*" required>
@@ -44,5 +50,9 @@
 <%- include('partials/footer') %>
 
 </div>
+
+<script src="/js/navbar-toggle.js"></script>
 </body>
+
+
 </html>
