@@ -56,10 +56,22 @@ router.post('/upload', (req, res, next) => {
     }
 
     try {
-      const { name, email, location } = req.body;
-      const recaptchaResponse = req.body['g-recaptcha-response'];
+      const phoneRegex = /^07\d{9}$/;
+      const { name, email, location, telephone } = req.body;
+      
+     
+      if (!phoneRegex.test(telephone)) {
+        return res.status(400).render('upload-error', {
+          title: 'Invalid telehone number',
+          message: 'Please enter a validUK phone number.'
+        });
+      }
 
-      if (!recaptchaResponse) {
+      const recaptchaResponse = req.body['g-recaptcha-response'];
+      
+
+
+          if (!recaptchaResponse) {
         return res.status(400).render('upload-error', {
           title: 'CAPTCHA Error',
           message: 'CAPTCHA missing. Please complete the CAPTCHA verification.'
@@ -123,6 +135,7 @@ router.post('/upload', (req, res, next) => {
       await Job.create({
         customerName: name,
         customerEmail: email,
+        customerPhone: telephone,
         location,
         images: JSON.stringify(compressedFilenames),
         status: 'pending',
@@ -246,3 +259,5 @@ router.post('/quotes/:jobId/select', async (req, res) => {
 });
 
 module.exports = router;
+
+

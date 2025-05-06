@@ -43,3 +43,12 @@
 .btn-back:hover {
   background-color: #1cb75e;
 }
+
+@media screen and (max-width: 600px) {
+  .error-box {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  
+}
