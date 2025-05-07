@@ -1,3 +1,5 @@
+
+
 .page-wrapper {
     display: flex;
     flex-direction: column;
@@ -129,6 +131,7 @@
     word-spacing: 3px;
     line-height: 23px;
     margin-bottom: 20px;
+    padding-top: 10px;
   }
 
   p {
