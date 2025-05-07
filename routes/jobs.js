@@ -31,8 +31,7 @@ const tempStorage = multer.diskStorage({
   }
 });
 
-const upload = multer({ storage: tempStorage }); // ✅ No file size limit here
-
+const upload = multer({ storage: tempStorage });
 
 // === GET Upload Form ===
 router.get('/upload', (req, res) => {
@@ -42,12 +41,7 @@ router.get('/upload', (req, res) => {
 // === POST Upload Form with Sharp Compression and Cleanup ===
 router.post('/upload', (req, res, next) => {
   upload.array('images', 8)(req, res, async (err) => {
-    if (err && err.code === 'LIMIT_UNEXPECTED_FILE') {
-      return res.status(400).render('upload-error', {
-        title: 'Upload Error',
-        message: 'Too many files uploaded. Maximum allowed is 8 images.'
-      });
-    } else if (err) {
+    if (err) {
       console.error('❌ Multer error:', err);
       return res.status(500).render('upload-error', {
         title: 'Upload Error',
@@ -58,20 +52,16 @@ router.post('/upload', (req, res, next) => {
     try {
       const phoneRegex = /^07\d{9}$/;
       const { name, email, location, telephone } = req.body;
-      
-     
+
       if (!phoneRegex.test(telephone)) {
         return res.status(400).render('upload-error', {
-          title: 'Invalid telehone number',
-          message: 'Please enter a validUK phone number.'
+          title: 'Invalid telephone number',
+          message: 'Please enter a valid UK phone number (07...).'
         });
       }
 
       const recaptchaResponse = req.body['g-recaptcha-response'];
-      
-
-
-          if (!recaptchaResponse) {
+      if (!recaptchaResponse) {
         return res.status(400).render('upload-error', {
           title: 'CAPTCHA Error',
           message: 'CAPTCHA missing. Please complete the CAPTCHA verification.'
@@ -93,32 +83,10 @@ router.post('/upload', (req, res, next) => {
         });
       }
 
-      // Duplicate check
-      const uploadedFilenames = req.files.map(file => file.originalname);
-      const duplicates = uploadedFilenames.filter((item, idx) => uploadedFilenames.indexOf(item) !== idx);
-      if (duplicates.length > 0) {
-        return res.status(400).render('upload-error', {
-          title: 'Upload Error',
-          message: `Duplicate images detected: ${duplicates.join(', ')}`
-        });
-      }
-
-      // === Sharp Compression and File Size Enforcement ===
+      // Image Compression
       const compressedFilenames = [];
       const finalDir = path.join(__dirname, '..', 'uploads', 'job-images');
-
       for (const file of req.files) {
-        const stats = fs.statSync(file.path);
-        const sizeMB = stats.size / (1024 * 1024);
-
-        if (sizeMB > 20) {
-          fs.unlinkSync(file.path);
-          return res.status(400).render('upload-error', {
-            title: 'Image Too Large',
-            message: `The image "${file.originalname}" is larger than 20MB and was rejected.`
-          });
-        }
-
         const compressedFilename = `compressed-${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
         const outputPath = path.join(finalDir, compressedFilename);
 
@@ -127,7 +95,7 @@ router.post('/upload', (req, res, next) => {
           .jpeg({ quality: 75 })
           .toFile(outputPath);
 
-        fs.unlinkSync(file.path); // Clean up temp file
+        fs.unlinkSync(file.path);
         compressedFilenames.push(compressedFilename);
       }
 
@@ -153,16 +121,59 @@ router.post('/upload', (req, res, next) => {
   });
 });
 
-
-
-// === Admin Job List ===
+// === Admin Job List with Filters and Counts ===
 router.get('/admin', async (req, res) => {
   try {
-    const jobs = await Job.findAll();
-    res.render('admin-jobs', { jobs });
+    const filter = req.query.filter || 'total';
+    let whereClause = {};
+
+    switch (filter) {
+      case 'total':
+        break;
+      case 'live':
+        whereClause.status = { [Op.or]: ['pending', 'approved'] };
+        break;
+      case 'approved':
+        whereClause.status = 'approved';
+        break;
+      case 'rejected':
+        whereClause.status = 'rejected';
+        break;
+      case 'archived':
+        whereClause.status = 'archived';
+        break;
+      case 'deleted':
+        whereClause.status = 'deleted';
+        break;
+      default:
+        break;
+    }
+
+    const jobs = await Job.findAll({
+      where: whereClause,
+      order: [['createdAt', 'DESC']]
+    });
+
+    const totalCount = await Job.count();
+    const liveCount = await Job.count({ where: { status: { [Op.or]: ['pending', 'approved'] } } });
+    const approvedCount = await Job.count({ where: { status: 'approved' } });
+    const rejectedCount = await Job.count({ where: { status: 'rejected' } });
+    const archivedCount = await Job.count({ where: { status: 'archived' } });
+    const deletedCount = await Job.count({ where: { status: 'deleted' } });
+
+    res.render('admin-jobs', {
+      jobs,
+      totalCount,
+      liveCount,
+      approvedCount,
+      rejectedCount,
+      archivedCount,
+      deletedCount,
+      filter
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).send('❌ Error loading jobs.');
+    res.status(500).send('Server error');
   }
 });
 
@@ -170,7 +181,7 @@ router.get('/admin', async (req, res) => {
 router.post('/:id/approve', async (req, res) => {
   try {
     await Job.update({ status: 'approved' }, { where: { id: req.params.id } });
-    res.redirect('/jobs/admin');
+    res.redirect('/jobs/admin?filter=live');
   } catch (err) {
     console.error(err);
     res.status(500).send('❌ Error approving job.');
@@ -181,83 +192,51 @@ router.post('/:id/approve', async (req, res) => {
 router.post('/:id/reject', async (req, res) => {
   try {
     await Job.update({ status: 'rejected' }, { where: { id: req.params.id } });
-    res.redirect('/jobs/admin');
+    res.redirect('/jobs/admin?filter=rejected');
   } catch (err) {
     console.error(err);
     res.status(500).send('❌ Error rejecting job.');
   }
 });
 
-// === View Quotes for a Job ===
-router.get('/quotes/:jobId', async (req, res) => {
+// === Archive Job ===
+router.post('/:jobId/archive', async (req, res) => {
   try {
     const job = await Job.findByPk(req.params.jobId);
-    const quotes = await Quote.findAll({ where: { jobId: job.id } });
-    res.render('job-quotes', { job, quotes });
+    if (!job || job.status !== 'rejected') {
+      return res.status(400).send('Only rejected jobs can be archived.');
+    }
+
+    await job.update({ status: 'archived' });
+    res.redirect('/jobs/admin?filter=archived');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error loading quotes');
+    res.status(500).send('Server error');
   }
 });
 
-// === Accept a Quote and Notify ===
-router.post('/quotes/:jobId/select', async (req, res) => {
+// === Delete Job ===
+router.post('/:jobId/delete', async (req, res) => {
   try {
-    const jobId = req.params.jobId;
-    const selectedBodyshop = req.body.bodyshopName;
-
-    const job = await Job.findByPk(jobId);
-    if (!job || job.selectedBodyshop) {
-      return res.status(400).send('Quote already accepted or job not found');
+    const job = await Job.findByPk(req.params.jobId);
+    if (!job || job.status !== 'archived') {
+      return res.status(400).send('Only archived jobs can be deleted.');
     }
 
-    await job.update({ selectedBodyshop, status: 'allocated' });
-
-    const quote = await Quote.findOne({ where: { jobId, bodyshopName: selectedBodyshop } });
-
-    if (quote) {
-      const transporter = nodemailer.createTransport({
-        host: 'smtp.ionos.co.uk',
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-        }
-      });
-
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: quote.email,
-        subject: '✅ Your quote has been accepted!',
-        html: `
-        <div style="font-family: Arial, sans-serif; color: #333;">
-          <h2 style="color: #0066cc;">MC Quote - Quote Accepted</h2>
-          <p>Hello <strong>${quote.bodyshopName}</strong>,</p>
-          <p>Great news! Your quote of <strong>£${quote.price}</strong> has been selected for the following job:</p>
-          <ul>
-            <li><strong>Job ID:</strong> ${job.id}</li>
-            <li><strong>Location:</strong> ${job.location}</li>
-          </ul>
-          <p>Please log in to your dashboard to view the full job details.</p>
-          <br>
-          <p>Thank you,</p>
-          <p><strong>MC Quote Team</strong></p>
-        </div>
-        `
-      };
-
-      await transporter.sendMail(mailOptions);
-      console.log(`📧 Email sent to ${quote.email}`);
+    const images = JSON.parse(job.images);
+    for (const image of images) {
+      const imagePath = path.join(__dirname, '..', 'uploads', 'job-images', image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
 
-    res.redirect(`/jobs/quotes/${jobId}`);
+    await job.destroy();
+    res.redirect('/jobs/admin?filter=deleted');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error accepting quote');
+    res.status(500).send('Server error');
   }
 });
 
 module.exports = router;
-
-

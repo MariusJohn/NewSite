@@ -8,6 +8,7 @@ const { Op } = require('sequelize');
 const { Job, Quote, Bodyshop } = require('../models');
 const { requireBodyshopLogin } = require('../middleware/auth');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 
 const headerData = {
     logo: '/public/img/logo.png',
@@ -44,7 +45,7 @@ router.get('/register', (req, res) => {
     res.render('bodyshop-register', { error: null });
 });
 
-// === POST Registration Handler ===
+// === POST Registration Handler with Email Verification ===
 router.post('/register', async (req, res) => {
     const { name, email, password, confirmPassword, area } = req.body;
 
@@ -59,13 +60,67 @@ router.post('/register', async (req, res) => {
         }
 
         const hashed = await bcrypt.hash(password, 10);
+        const verificationToken = require('crypto').randomBytes(32).toString('hex');
 
-        await Bodyshop.create({ name, email, password: hashed, area });
+        await Bodyshop.create({ name, email, password: hashed, area, verificationToken });
 
-        res.redirect('/bodyshop/login');
+        // Send verification email
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.ionos.co.uk',
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const verificationUrl = `http://${req.headers.host}/bodyshop/verify/${verificationToken}`;
+        
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Verify Your Bodyshop Account',
+            html: `
+            <div>
+                <h2>Welcome to MC Quote</h2>
+                <p>Thank you for registering your bodyshop. Please verify your email by clicking the link below:</p>
+                <a href="${verificationUrl}" style="background-color:#25D366;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Verify Email</a>
+                <p>If you did not register, please ignore this email.</p>
+            </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`📧 Verification email sent to ${email}`);
+
+        res.render('bodyshop-register', { error: 'Registration successful! Please check your email to verify your account.' });
     } catch (err) {
         console.error(err);
         res.render('bodyshop-register', { error: 'Registration failed. Try again later.' });
+    }
+});
+
+
+// === GET: Verify Bodyshop Email ===
+router.get('/verify/:token', async (req, res) => {
+    try {
+        const token = req.params.token;
+        const bodyshop = await Bodyshop.findOne({ where: { verificationToken: token } });
+
+        if (!bodyshop) {
+            return res.status(400).send('Invalid or expired verification token.');
+        }
+
+        // Mark as verified
+        bodyshop.verified = true;
+        bodyshop.verificationToken = null;
+        await bodyshop.save();
+
+        res.send('✅ Your email has been successfully verified. You can now log in.');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error. Please try again later.');
     }
 });
 
@@ -77,21 +132,16 @@ router.get('/login', (req, res) => {
 // === POST: Handle Bodyshop Login ===
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    console.log('Received email:', email);
-    console.log('Received password:', password);
 
     if (!email || !password) {
         return res.status(400).send('Email and password are required');
     }
 
     try {
-        const bodyshop = await Bodyshop.findOne({
-            where: { email },
-            attributes: ['id', 'name', 'password', 'area'] // <-- Include 'area' here
-        });
+        const bodyshop = await Bodyshop.findOne({ where: { email } });
 
-        if (!bodyshop) {
-            return res.status(401).send('Invalid credentials');
+        if (!bodyshop || !bodyshop.verified) {
+            return res.status(401).send('Invalid credentials or account not verified');
         }
 
         const valid = await bcrypt.compare(password, bodyshop.password);
@@ -107,6 +157,124 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Server error');
+    }
+});
+
+// === GET: Password Reset Request Page ===
+router.get('/password-reset', (req, res) => {
+    res.render('bodyshop-password-reset', { error: null });
+});
+
+// === POST: Send Password Reset Email ===
+router.post('/password-reset', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const bodyshop = await Bodyshop.findOne({ where: { email } });
+        if (!bodyshop) {
+            return res.render('bodyshop-password-reset', { error: 'No account found with this email.' });
+        }
+
+        // Generate reset token
+        const resetToken = require('crypto').randomBytes(32).toString('hex');
+        const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
+        bodyshop.resetToken = resetToken;
+        bodyshop.resetTokenExpiry = resetTokenExpiry;
+        await bodyshop.save();
+
+        // Send reset email
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.ionos.co.uk',
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        const resetUrl = `http://${req.headers.host}/bodyshop/reset-password/${resetToken}`;
+        
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Password Reset Request',
+            html: `
+            <div>
+                <h2>Password Reset Request</h2>
+                <p>We received a request to reset your password. Click the link below to reset it:</p>
+                <a href="${resetUrl}" style="background-color:#25D366;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Reset Password</a>
+                <p>This link will expire in 1 hour. If you did not request a password reset, you can ignore this email.</p>
+            </div>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`📧 Password reset email sent to ${email}`);
+
+        res.render('bodyshop-password-reset', { error: 'Password reset link sent to your email.' });
+    } catch (err) {
+        console.error(err);
+        res.render('bodyshop-password-reset', { error: 'Failed to send reset email. Try again later.' });
+    }
+});
+
+// === GET: Reset Password Page ===
+router.get('/reset-password/:token', async (req, res) => {
+    const { token } = req.params;
+
+    try {
+        const bodyshop = await Bodyshop.findOne({
+            where: {
+                resetToken: token,
+                resetTokenExpiry: { [Op.gt]: new Date() }
+            }
+        });
+
+        if (!bodyshop) {
+            return res.send('Invalid or expired reset link.');
+        }
+
+        res.render('bodyshop-reset-password', { error: null, token });
+    } catch (err) {
+        console.error(err);
+        res.send('Server error. Please try again later.');
+    }
+});
+
+// === POST: Update Password ===
+router.post('/reset-password/:token', async (req, res) => {
+    const { token } = req.params;
+    const { password, confirmPassword } = req.body;
+
+    if (password !== confirmPassword) {
+        return res.render('bodyshop-reset-password', { error: 'Passwords do not match.', token });
+    }
+
+    try {
+        const bodyshop = await Bodyshop.findOne({
+            where: {
+                resetToken: token,
+                resetTokenExpiry: { [Op.gt]: new Date() }
+            }
+        });
+
+        if (!bodyshop) {
+            return res.send('Invalid or expired reset link.');
+        }
+
+        // Update the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        bodyshop.password = hashedPassword;
+        bodyshop.resetToken = null;
+        bodyshop.resetTokenExpiry = null;
+        await bodyshop.save();
+
+        res.send('✅ Your password has been updated. You can now log in.');
+    } catch (err) {
+        console.error(err);
+        res.send('Server error. Please try again later.');
     }
 });
 
@@ -252,3 +420,5 @@ Please proceed to contact the customer and schedule the repair.
 });
 
 module.exports = router;
+
+

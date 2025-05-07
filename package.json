@@ -28,5 +28,11 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
-  }
+  },
+"development": {
+  "dialect": "sqlite",
+  "storage": "./database.sqlite",
+  "timezone": "+00:00"
+}
+
 }

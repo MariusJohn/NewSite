@@ -1,0 +1,266 @@
+/* General Styles */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: rgb(7, 42, 70);
+  color: white;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-dashboard-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 25%;
+  background-color: #102b45;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-right: 1px solid #333;
+}
+
+.sidebar img {
+  width: 150px;
+  margin-bottom: 20px;
+}
+
+.sidebar h2 {
+  color: #25D366;
+  font-weight: 600;
+  font-size: 28px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.sidebar .menu {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
+.sidebar .menu li {
+  margin-bottom: 15px;
+}
+
+.sidebar .menu li a {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 10px 20px;
+  display: block;
+  border-radius: 5px;
+  transition: background 0.3s;
+  font-weight: normal;
+}
+
+.sidebar .menu li a:hover,
+.sidebar .menu li a.active {
+  background-color: #d6f5e1;
+  color: #2f2c2c;
+}
+
+/* Main Content Styles */
+.main-content {
+  flex-grow: 1;
+  padding: 40px;
+  background-color: #0b3c5d;
+  overflow-x: auto;
+}
+
+.main-content h1 {
+  margin-bottom: 20px;
+  color: #25D366;
+  text-align: center;
+  font-weight: 700;
+  font-size: 32px;
+}
+
+/* Table Styles */
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+  background-color: #0b3c5d;
+}
+
+.jobs-table th, 
+.jobs-table td {
+  border: 1px solid #444;
+  padding: 15px;
+  text-align: left;
+  vertical-align: middle;
+  color: white;
+}
+
+.jobs-table th {
+  background-color: #102b45;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: center;
+}
+
+.jobs-table tbody tr:nth-child(even) {
+  background-color: #122f45;
+}
+
+.jobs-table tbody tr:nth-child(odd) {
+  background-color: #102b45;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: #ffffff;
+  font-weight: bold;
+  display: inline-block;
+  text-align: center;
+}
+
+.status-pending {
+  background-color: #ffa500;
+}
+
+.status-approved {
+  background-color: #25D366;
+}
+
+.status-rejected {
+  background-color: #fa5d28;
+}
+
+.status-archived {
+  background-color: #6c757d;
+}
+
+.status-deleted {
+  background-color: #444;
+}
+
+/* Job Actions */
+.job-actions {
+  text-align: center;
+}
+
+.job-actions button {
+  background-color: #25D366;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.job-actions button:hover {
+  background-color: #1aa851;
+}
+
+.job-actions .archive-btn {
+  background-color: #6c757d;
+}
+
+.job-actions .archive-btn:hover {
+  background-color: #5a6268;
+}
+
+.job-actions .delete-btn {
+  background-color: #fa5d28;
+  margin-top: 10px;
+}
+
+.job-actions .delete-btn:hover {
+  background-color: #c4401b;
+}
+
+.job-actions a {
+  color: #25D366;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 5px;
+}
+
+.job-actions a:hover {
+  color: #1aa851;
+}
+
+/* Image Preview */
+.image-preview-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.thumb-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s;
+}
+
+.thumb-img:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar {
+      width: 200px;
+      padding: 15px;
+  }
+
+  .main-content {
+      padding: 20px;
+  }
+
+  .jobs-table th, 
+  .jobs-table td {
+      padding: 10px;
+  }
+
+  .thumb-img {
+      width: 100px;
+      height: 100px;
+  }
+
+  .job-actions button {
+      padding: 6px 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+      width: 100%;
+      padding: 15px;
+  }
+
+  .main-content {
+      padding: 15px;
+  }
+
+  .jobs-table th, 
+  .jobs-table td {
+      padding: 8px;
+  }
+
+  .thumb-img {
+      width: 80px;
+      height: 80px;
+  }
+
+  .job-actions button {
+      padding: 6px 8px;
+  }
+
+  .sidebar .menu li {
+      margin-bottom: 10px;
+  }
+}
