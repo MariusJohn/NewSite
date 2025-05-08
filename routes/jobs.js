@@ -199,7 +199,21 @@ router.post('/:id/reject', async (req, res) => {
   }
 });
 
+// === Archive Job ===
+router.post('/:jobId/archive', async (req, res) => {
+  try {
+    const job = await Job.findByPk(req.params.jobId);
+    if (!job || job.status !== 'rejected') {
+      return res.status(400).send('Only rejected jobs can be archived.');
+    }
 
+    await job.update({ status: 'archived' });
+    res.redirect('/jobs/admin?filter=archived');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
 
 
 // === Restore Archived & Rejected Job ===
