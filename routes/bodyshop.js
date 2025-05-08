@@ -51,8 +51,14 @@ router.post('/register', async (req, res) => {
 
     // Password strength check
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    const postcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
+
     if (!passwordRegex.test(password)) {
         return res.render('bodyshop-register', { error: 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.' });
+    }
+
+    if (!postcodeRegex.test(area)) {
+        return res.render('bodyshop-register', { error: 'Please enter a valid UK postcode.' });
     }
 
     if (password !== confirmPassword) {
@@ -137,10 +143,15 @@ router.get('/login', (req, res) => {
 
 // === POST: Handle Bodyshop Login ===
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password,area } = req.body;
+    
 
-    if (!email || !password) {
-        return res.status(400).send('Email and password are required');
+    if (!email || !password || !area) {
+        return res.status(400).send('Email, password and postcode are required');
+    }
+    const postcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
+    if (!postcodeRegex.test(area)) {
+        return res.status(400).send('Invalid postcode format');
     }
 
     try {
@@ -151,8 +162,10 @@ router.post('/login', async (req, res) => {
         }
 
         const valid = await bcrypt.compare(password, bodyshop.password);
-        if (!valid) {
-            return res.status(401).send('Invalid credentials');
+        if (!valid || bodyshop.area !== area.toUpperCase()) {
+            return res.status(401).render('bodyshop-login-error', {
+                error: 'Invalid credentials. Please check your email, password, and postcode.'
+            });
         }
 
         req.session.bodyshopId = bodyshop.id;
