@@ -3,7 +3,7 @@ body {
 }
 
 .register-container {
-    max-width: 400px;
+    max-width: 380px;
     margin: 60px auto;
     padding: 20px;
     background-color: rgba(64, 141, 204, 0);
@@ -11,40 +11,73 @@ body {
     box-shadow: 0 0 15px rgba(0,0,0,0.3);
     color: white;
     text-align: center;
-  }
-  
-  .register-container h2 {
+}
+
+.register-container h2 {
     margin-bottom: 20px;
     color: #25D366;
     font-weight: 600;
-  }
-  
-  .register-container input {
+    font-size: 1.8rem;
+}
+
+.register-container input {
     width: 100%;
-    padding: 12px;
+    padding: 12px 15px;
     margin-bottom: 15px;
     border-radius: 8px;
-    border: none;
+    border: 1px solid #ccc;
     font-size: 1rem;
-    }
-  
-  .register-container button {
-    padding: 10px 20px;
+    box-sizing: border-box; /* Make sure padding is included in width */
+}
+
+.password-container {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.password-container input {
+    padding-right: 45px; /* Space for the eye icon */
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: #333;
+}
+
+.register-container button {
+    width: 100%;
+    padding: 12px;
     background-color: #25D366;
     color: white;
     border: none;
     border-radius: 6px;
     font-size: 1rem;
     cursor: pointer;
-  }
-  
-  .register-container a {
+    margin-bottom: 15px;
+}
+
+.register-container button:hover {
+    background-color: #1aa851;
+}
+
+.register-container a {
     color: #25D366;
     text-decoration: none;
-  }
-  
-  .error-msg {
+}
+
+.register-container a:hover {
+    color: #1aa851;
+    text-decoration: underline;
+}
+
+.error-msg {
     color: #fa5d28;
     margin-bottom: 15px;
-  }
-  
+    font-weight: 600;
+    font-size: 0.9rem;
+}
