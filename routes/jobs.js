@@ -7,7 +7,7 @@ const sharp = require('sharp');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 const { Op } = require('sequelize');
-const { Job, Quote } = require('../models');
+const { Job, Quote,Bodyshop } = require('../models');
 
 require('dotenv').config();
 
@@ -273,4 +273,44 @@ router.post('/:jobId/restore-deleted', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+// === Jobs with Quotes (Admin) ===
+router.get('/admin/quotes', async (req, res) => {
+  try {
+      const jobs = await Job.findAll({
+          include: [
+              {
+                  model: Quote,
+                  include: [Bodyshop]
+              }
+          ],
+          order: [['createdAt', 'DESC']]
+      });
+
+      // Count jobs by status
+      const totalCount = await Job.count();
+      const liveCount = await Job.count({ where: { status: { [Op.or]: ['pending', 'approved'] } } });
+      const approvedCount = await Job.count({ where: { status: 'approved' } });
+      const rejectedCount = await Job.count({ where: { status: 'rejected' } });
+      const archivedCount = await Job.count({ where: { status: 'archived' } });
+      const deletedCount = await Job.count({ where: { status: 'deleted' } });
+
+      console.log("Fetched Jobs with Quotes:", jobs); // Debug line
+
+      res.render('admin-jobs-quotes', {
+          jobs,
+          totalCount,
+          liveCount,
+          approvedCount,
+          rejectedCount,
+          archivedCount,
+          deletedCount
+      });
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('Server error');
+  }
+});
+
+
 module.exports = router;
