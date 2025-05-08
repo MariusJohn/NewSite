@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>Job Quotes - Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/admin-dashboard.css">
+    <link rel="stylesheet" href="/css/reset.css">
+</head>
+<body>
+<div class="admin-dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <img src="/img/logo.png" alt="MC Quote Logo">
+        <h2>Admin Panel</h2>
+        <ul class="menu">
+            <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=live">Live Jobs (<%= liveCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
+            <li><a href="/jobs/admin/quotes">Jobs with Quotes</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Submitted Jobs with Quotes</h1>
+    
+        <% if (jobs.length === 0) { %>
+            <p>No jobs with quotes available at the moment.</p>
+        <% } else { %>
+            <table class="quotes-table">
+                <thead>
+                    <tr>
+                        <th>Job ID</th>
+                        <th>Customer Details</th>
+                        <th>Bodyshop</th>
+                        <th>Quote</th>
+                        <th>Notes</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% jobs.forEach(job => { %>
+                        <% if (job.Quotes.length === 0) { %>
+                            <tr>
+                                <td colspan="6">No quotes for this job yet.</td>
+                            </tr>
+                        <% } else { %>
+                            <% job.Quotes.forEach(quote => { %>
+                                <tr>
+                                    <td><%= job.id %></td>
+                                    <td>
+                                        <strong>Name:</strong> <%= job.customerName %><br>
+                                        <strong>Email:</strong> <%= job.customerEmail %><br>
+                                        <strong>Phone:</strong> <%= job.customerPhone %><br>
+                                        <strong>Location:</strong> <%= job.location %>
+                                    </td>
+                                    <td>
+                                        <%= quote.Bodyshop ? quote.Bodyshop.name : 'Unknown Bodyshop' %><br>
+                                        <%= quote.Bodyshop ? quote.Bodyshop.email : 'No Email' %><br>
+                                        <%= quote.Bodyshop ? quote.Bodyshop.area : 'No Area' %>
+                                    </td>
+                                    <td>£<%= quote.price.toFixed(2) %></td>
+                                    <td><%= quote.notes || 'No notes provided' %></td>
+                                    <td><%= quote.createdAt.toDateString() %></td>
+                                </tr>
+                            <% }) %>
+                        <% } %>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+</body>
+</html>
