@@ -1,21 +1,21 @@
-
-
-// === Restore Rejected Job ===
-router.post('/:id/restore', async (req, res) => {
+// === Restore Job ===
+router.post('/:jobId/restore', async (req, res) => {
     try {
-      const jobId = req.params.id;
+      const jobId = req.params.jobId;
       const job = await Job.findByPk(jobId);
   
-      if (!job || job.status !== 'rejected') {
-        return res.status(400).send('Only rejected jobs can be restored.');
+      // Allow restoring both rejected and archived jobs
+      if (!job || !['rejected', 'archived'].includes(job.status)) {
+        return res.status(400).send('Only rejected or archived jobs can be restored.');
       }
   
-      // Restore the job to "pending" (or another status if needed)
+      // Set the status to pending for both rejected and archived jobs
       await job.update({ status: 'pending' });
   
-      res.redirect('/jobs/admin?filter=rejected');
+      res.redirect('/jobs/admin?filter=live'); // Redirect to live jobs after restore
     } catch (err) {
       console.error(err);
-      res.status(500).send('❌ Error restoring job.');
+      res.status(500).send('Server error');
     }
   });
+  
