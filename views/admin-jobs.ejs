@@ -100,14 +100,16 @@
                                     <form action="/jobs/<%= job.id %>/restore" method="POST" style="display:inline-block;">
                                         <button type="submit" class="restore-btn">Restore</button>
                                     </form>
-                                    <form action="/jobs/<%= job.id %>/delete" method="POST" style="display:inline-block;">
+                                    <form action="/jobs/<%= job.id %>/delete" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to move this job to the Deleted state? It will be permanently removed after 30 days.')">
                                         <button type="submit" class="delete-btn">Delete</button>
                                     </form>
                                 <% } else if (job.status === 'deleted') { %>
+                                    <form action="/jobs/<%= job.id %>/restore-deleted" method="POST" style="display:inline-block;">
+                                        <button type="submit" class="restore-btn">Restore</button>
+                                    </form>
                                     <em>Deleted</em>
                                 <% } %>
-                              
-                    
+                                                 
                               <br>
                               <a href="/bodyshop/download/<%= job.id %>" class="download-zip-btn">📦 Download Images</a>
                           </td>

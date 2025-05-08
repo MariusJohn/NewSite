@@ -236,7 +236,7 @@ router.post('/:jobId/restore', async (req, res) => {
 });
 
 
-// === Delete Job ===
+// === Move Job to Deleted Status (from Archived) ===
 router.post('/:jobId/delete', async (req, res) => {
   try {
     const job = await Job.findByPk(req.params.jobId);
@@ -244,15 +244,9 @@ router.post('/:jobId/delete', async (req, res) => {
       return res.status(400).send('Only archived jobs can be deleted.');
     }
 
-    const images = JSON.parse(job.images);
-    for (const image of images) {
-      const imagePath = path.join(__dirname, '..', 'uploads', 'job-images', image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
-    }
+    // Move to "deleted" status instead of full removal
+    await job.update({ status: 'deleted' });
 
-    await job.destroy();
     res.redirect('/jobs/admin?filter=deleted');
   } catch (err) {
     console.error(err);
@@ -260,4 +254,23 @@ router.post('/:jobId/delete', async (req, res) => {
   }
 });
 
+
+// === Restore Deleted Job ===
+router.post('/:jobId/restore-deleted', async (req, res) => {
+  try {
+    const job = await Job.findByPk(req.params.jobId);
+
+    if (!job || job.status !== 'deleted') {
+      return res.status(400).send('Only deleted jobs can be restored.');
+    }
+
+    // Restore the job to 'pending' or another appropriate status
+    await job.update({ status: 'pending' });
+
+    res.redirect('/jobs/admin?filter=deleted');
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
 module.exports = router;
