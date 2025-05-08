@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Error</title>
+    <link rel="stylesheet" href="/css/bodyshop-login.css">
+    <style>
+        .error-container {
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 20px;
+    background-color: rgba(14, 64, 105, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    color: white;
+    text-align: center;
+}
+
+.error-container h2 {
+    margin-bottom: 20px;
+    color: #fa5d28;
+    font-weight: 600;
+}
+
+.error-container .error-msg {
+    color: #fa5d28;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.error-container button {
+    padding: 10px 20px;
+    background-color: #25D366;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.error-container button:hover {
+    background-color: #1cb75e;
+}
+
+.error-container .error-logo {
+    width: 150px;
+    margin-bottom: 20px;
+}
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <img src="/img/logo.png" alt="MC Quote Logo" class="error-logo">
+    <h2>Login Error</h2>
+    <% if (error) { %><p class="error-msg"><%= error %></p><% } %>
+    <button onclick="window.location.href='/bodyshop/login'">Back to Login</button>
+</div>
+</body>
+</html>
