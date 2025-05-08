@@ -57,4 +57,27 @@ body {
   .login-wrapper button:hover {
     background-color: #004880;
   }
-  
+  .password-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.password-container input[type="password"],
+.password-container input[type="text"] {
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 35%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: #333;
+}

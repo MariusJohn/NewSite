@@ -19,8 +19,14 @@
   <form action="/bodyshop/register" method="POST">
     <input type="text" name="name" placeholder="Bodyshop Name" required>
     <input type="email" name="email" placeholder="Email" required>
+    <div class="password-container">
     <input type="password" name="password" placeholder="Password" required autocomplete="new-password">
+    <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
+    </div>
+    <div class="password-container">
     <input type="password" name="confirmPassword" placeholder="Confirm Password" required autocomplete="new-password">
+    <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>  
+    </div>
     <input type="text" name="area" placeholder="Postcode / Area" required>
     <button type="submit">Register</button>
   </form>
