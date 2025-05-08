@@ -236,6 +236,21 @@ body {
   }
 }
 
+.restore-btn {
+  background-color: #25D366;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.restore-btn:hover {
+  background-color: #1aa851;
+}
+
 @media (max-width: 600px) {
   .sidebar {
       width: 100%;

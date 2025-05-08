@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/css/reset.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
 </head>
 
@@ -19,13 +19,13 @@
         <img src="/img/logo.png" alt="MC Quote Logo">
         <h2>Admin Panel</h2>
         <ul class="menu">
-            <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=live">Live Jobs (<%= liveCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
-        </ul>
+          <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=live">Live Jobs (<%= liveCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
+      </ul>
     </div>
 
     <!-- Main Content -->
@@ -54,21 +54,22 @@
                                 <strong>Location:</strong> <%= job.location %>
                             </td>
                             <td>
-                                <div class="image-preview-block">
-                                    <% JSON.parse(job.images).forEach(function(image) { %>
-                                        <a 
-                                            href="/uploads/job-images/<%= image %>" 
-                                            class="glightbox" 
-                                            data-gallery="job-<%= job.id %>" 
-                                            data-title="Job Image">
-                                            <img 
-                                                src="/uploads/job-images/<%= image %>" 
-                                                alt="Job Image" 
-                                                class="thumb-img">
-                                        </a>
-                                    <% }); %>
-                                </div>
-                            </td>
+                              <div class="image-preview-block">
+                                  <% JSON.parse(job.images).forEach(function(image) { %>
+                                      <a 
+                                          href="/uploads/job-images/<%= image %>" 
+                                          class="glightbox" 
+                                          data-gallery="job-<%= job.id %>" 
+                                          data-title="Job Image">
+                                          <img 
+                                              src="/uploads/job-images/<%= image %>" 
+                                              alt="Job Image" 
+                                              class="thumb-img">
+                                      </a>
+                                  <% }); %>
+                              </div>
+                          </td>
+              
                             <td>
                                 <% if (job.status === 'pending') { %>
                                     <span class="status-badge status-pending">Pending</span>
@@ -76,10 +77,6 @@
                                     <span class="status-badge status-approved">Approved</span>
                                 <% } else if (job.status === 'rejected') { %>
                                     <span class="status-badge status-rejected">Rejected</span>
-                                <% } else if (job.status === 'archived') { %>
-                                    <span class="status-badge status-archived">Archived</span>
-                                <% } else if (job.status === 'deleted') { %>
-                                    <span class="status-badge status-deleted">Deleted</span>
                                 <% } %>
                             </td>
                             <td class="job-actions">
@@ -93,19 +90,27 @@
                                 <% } else if (job.status === 'approved') { %>
                                     <em>Approved</em>
                                 <% } else if (job.status === 'rejected') { %>
+                                    <form action="/jobs/<%= job.id %>/restore" method="POST" style="display:inline-block;">
+                                        <button type="submit" class="restore-btn">Restore</button>
+                                    </form>
                                     <form action="/jobs/<%= job.id %>/archive" method="POST" style="display:inline-block;">
-                                        <button type="submit">Archive</button>
+                                        <button type="submit" class="archive-btn">Archive</button>
                                     </form>
                                 <% } else if (job.status === 'archived') { %>
+                                    <form action="/jobs/<%= job.id %>/restore" method="POST" style="display:inline-block;">
+                                        <button type="submit" class="restore-btn">Restore</button>
+                                    </form>
                                     <form action="/jobs/<%= job.id %>/delete" method="POST" style="display:inline-block;">
                                         <button type="submit" class="delete-btn">Delete</button>
                                     </form>
                                 <% } else if (job.status === 'deleted') { %>
                                     <em>Deleted</em>
                                 <% } %>
-                                <br>
-                                <a href="/bodyshop/download/<%= job.id %>" class="download-zip-btn">📦 Download Images</a>
-                            </td>
+                              
+                    
+                              <br>
+                              <a href="/bodyshop/download/<%= job.id %>" class="download-zip-btn">📦 Download Images</a>
+                          </td>
                         </tr>
                     <% }) %>
                 </tbody>
