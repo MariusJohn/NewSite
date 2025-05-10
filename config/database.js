@@ -1,10 +1,12 @@
+// config/database.js
 const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: './database.sqlite',
-    logging: false,
+require('dotenv').config();
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    logging: false, // Disable logging for cleaner output
     dialectOptions: {
-        timeout: 30000  // 30 seconds
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     }
 });
 
