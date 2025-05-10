@@ -1,14 +1,14 @@
 {
   "development": {
-    "dialect": "sqlite",
-    "storage": "./database.sqlite"
+    "dialect": "postgres",
+    "url": process.env.DATABASE_URL
   },
   "test": {
-    "dialect": "sqlite",
-    "storage": ":memory:"
+    "dialect": "postgres",
+    "url": process.env.DATABASE_URL
   },
   "production": {
-    "dialect": "sqlite",
-    "storage": "./database.sqlite"
+    "dialect": "postgres",
+    "url": process.env.DATABASE_URL
   }
 }

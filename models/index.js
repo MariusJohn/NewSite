@@ -1,14 +1,20 @@
+// models/index.js
+const Sequelize = require('sequelize');
 const sequelize = require('../config/database');
-const Job = require('./Job');
-const Quote = require('./Quote');
-const Bodyshop = require('./Bodyshop');
 
-// Relations
-Job.hasMany(Quote, { foreignKey: 'jobId' });
-Quote.belongsTo(Job, { foreignKey: 'jobId' });
+const JobModel = require('./Job');
+const QuoteModel = require('./Quote');
+const BodyshopModel = require('./Bodyshop');
 
-Bodyshop.hasMany(Quote, { foreignKey: 'bodyshopId' });
-Quote.belongsTo(Bodyshop, { foreignKey: 'bodyshopId' });
+const Job = JobModel;
+const Quote = QuoteModel;
+const Bodyshop = BodyshopModel;
+
+Job.hasMany(Quote, { foreignKey: 'jobId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+Quote.belongsTo(Job, { foreignKey: 'jobId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+
+Bodyshop.hasMany(Quote, { foreignKey: 'bodyshopId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+Quote.belongsTo(Bodyshop, { foreignKey: 'bodyshopId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 
 module.exports = {
   sequelize,
