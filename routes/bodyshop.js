@@ -5,10 +5,12 @@ const path = require('path');
 const fs = require('fs');
 const archiver = require('archiver');
 const { Op } = require('sequelize');
-const { Job, Quote, Bodyshop } = require('../models');
+const { Job, Quote, Bodyshop, sequelize } = require('../models');
 const { requireBodyshopLogin } = require('../middleware/auth');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+require ("dotenv").config();
+const axios = require('axios');
 
 const headerData = {
     logo: '/public/img/logo.png',
@@ -71,10 +73,39 @@ router.post('/register', async (req, res) => {
             return res.render('bodyshop-register', { error: 'This email is already registered.' });
         }
 
+      // Fetching coordinates from OpenCage API
+      const apiKey = process.env.OPENCAGE_API_KEY;
+      const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
+          params: {
+              q: area,
+              key: apiKey,
+              countrycode: 'gb',
+              limit: 1
+          }
+      });
+
+      if (!response.data || !response.data.results || !response.data.results.length===0) {
+          return res.render('bodyshop-register', { error: 'Unable to find coordinates for the given postcode.' });
+      }
+
+
+    const { lat, lng } = response.data.results[0].geometry;
+    console.log(`Coordinates for ${area}: Latitude - ${lat}, Longitude - ${lng}`);
+
+
         const hashed = await bcrypt.hash(password, 10);
         const verificationToken = require('crypto').randomBytes(32).toString('hex');
 
-        await Bodyshop.create({ name, email, password: hashed, area, verificationToken });
+    // Create the bodyshop
+    await Bodyshop.create({
+    name,
+    email,
+    password: hashed,
+    area,
+    latitude: lat,
+    longitude: lng,
+    verificationToken
+});
 
         // Send verification email
         const transporter = nodemailer.createTransport({
@@ -305,20 +336,49 @@ router.post('/reset-password/:token', async (req, res) => {
     }
 });
 
-
-// === Bodyshop Dashboard (View Available Jobs) ===
+// === Bodyshop Dashboard (View Available Jobs) with Radius Check ===
 router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
-    console.log('Bodyshop area from session:', req.session.bodyshopArea);
-
     try {
-        const bodyshopArea = req.session.bodyshopArea;
+        const bodyshop = await Bodyshop.findByPk(req.session.bodyshopId);
+
+        if (!bodyshop || !bodyshop.latitude || !bodyshop.longitude) {
+            return res.status(400).send('Bodyshop location not set.');
+        }
+
+        const radiusInMeters = bodyshop.radius * 1609.34; // Convert miles to meters
 
         const jobs = await Job.findAll({
             where: {
                 status: 'pending',
-                location: { [Op.like]: `${bodyshopArea}%` }
-            }
+                latitude: { [Op.ne]: null },
+                longitude: { [Op.ne]: null }
+            },
+            attributes: [
+                'id',
+                'customerName',
+                'customerEmail',
+                'customerPhone',
+                'location',
+                'latitude',
+                'longitude',
+                'images',
+                'status',
+                'createdAt',
+                [sequelize.literal(`ST_DistanceSphere(
+                    ST_MakePoint("longitude", "latitude"),
+                    ST_MakePoint(${bodyshop.longitude}, ${bodyshop.latitude})
+                ) / 1609.34`), 'distance']
+            ],
+            order: sequelize.literal('distance ASC'),
+            group: ['Job.id', 'Job.customerName', 'Job.customerEmail', 'Job.customerPhone', 'Job.location', 'Job.latitude', 'Job.longitude', 'Job.images', 'Job.status', 'Job.createdAt'],
+            having: sequelize.literal(`ST_DistanceSphere(
+                ST_MakePoint("longitude", "latitude"),
+                ST_MakePoint(${bodyshop.longitude}, ${bodyshop.latitude})
+            ) <= ${radiusInMeters}`)
         });
+
+        console.log("Nearby Jobs:", jobs);
+
         res.render('bodyshop-dashboard', { headerData, footerData, jobs });
     } catch (error) {
         console.error(error);
@@ -446,6 +506,7 @@ Please proceed to contact the customer and schedule the repair.
         res.status(500).send('❌ Payment processing failed.');
     }
 });
+
 
 module.exports = router;
 

@@ -55,20 +55,22 @@
                                 <strong>Location:</strong> <%= job.location %>
                             </td>
                             <td>
-                              <div class="image-preview-block">
-                                  <% JSON.parse(job.images).forEach(function(image) { %>
-                                      <a 
-                                          href="/uploads/job-images/<%= image %>" 
-                                          class="glightbox" 
-                                          data-gallery="job-<%= job.id %>" 
-                                          data-title="Job Image">
-                                          <img 
-                                              src="/uploads/job-images/<%= image %>" 
-                                              alt="Job Image" 
-                                              class="thumb-img">
-                                      </a>
-                                  <% }); %>
-                              </div>
+                                <td>
+                                    <div class="image-preview-block">
+                                        <% job.images.forEach(function(image) { %>
+                                            <a 
+                                                href="/uploads/job-images/<%= image %>" 
+                                                class="glightbox" 
+                                                data-gallery="job-<%= job.id %>" 
+                                                data-title="Job Image">
+                                                <img 
+                                                    src="/uploads/job-images/<%= image %>" 
+                                                    alt="Job Image" 
+                                                    class="thumb-img">
+                                            </a>
+                                        <% }); %>
+                                    </div>
+                                  </td>
                           </td>
               
                             <td>

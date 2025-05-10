@@ -1,41 +1,63 @@
 // models/Bodyshop.js
-const { DataTypes } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Bodyshop = sequelize.define('Bodyshop', {
+class Bodyshop extends Model {}
+
+Bodyshop.init({
     name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false
     },
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        unique: true
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false
     },
     area: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: false
+    },
+    latitude: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    longitude: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    radius: {
+        type: DataTypes.FLOAT,
+        defaultValue: 10, 
+        validate: {
+            min: 1,
+            max: 50
+        }
     },
     verificationToken: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true
     },
     verified: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        defaultValue: false
     },
     resetToken: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true
     },
     resetTokenExpiry: {
         type: DataTypes.DATE,
-        allowNull: true,
+        allowNull: true
     }
+}, {
+    sequelize,
+    modelName: 'Bodyshop',
+    timestamps: true
 });
 
 module.exports = Bodyshop;
