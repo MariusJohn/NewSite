@@ -55,22 +55,26 @@
                                 <strong>Location:</strong> <%= job.location %>
                             </td>
                             <td>
-                                <td>
+                                
                                     <div class="image-preview-block">
-                                        <% job.images.forEach(function(image) { %>
-                                            <a 
-                                                href="/uploads/job-images/<%= image %>" 
-                                                class="glightbox" 
-                                                data-gallery="job-<%= job.id %>" 
-                                                data-title="Job Image">
-                                                <img 
-                                                    src="/uploads/job-images/<%= image %>" 
-                                                    alt="Job Image" 
-                                                    class="thumb-img">
-                                            </a>
-                                        <% }); %>
+                                        <% if (job.images && job.images.length > 0) { %>
+                                            <% job.images.forEach(function(image) { %>
+                                                <a 
+                                                    href="/uploads/job-images/<%= image %>" 
+                                                    class="glightbox" 
+                                                    data-gallery="job-<%= job.id %>" 
+                                                    data-title="Job Image">
+                                                    <img 
+                                                        src="/uploads/job-images/<%= image %>" 
+                                                        alt="Job Image" 
+                                                        class="thumb-img">
+                                                </a>
+                                            <% }); %>
+                                        <% } else { %>
+                                            <em>No Images</em>
+                                        <% } %>
                                     </div>
-                                  </td>
+                            
                           </td>
               
                             <td>

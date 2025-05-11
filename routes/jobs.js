@@ -60,30 +60,6 @@ router.post('/upload', (req, res, next) => {
               });
           }
 
-          const recaptchaResponse = req.body['g-recaptcha-response'];
-          if (!recaptchaResponse) {
-              return res.status(400).render('upload-error', {
-                  title: 'CAPTCHA Error',
-                  message: 'CAPTCHA missing. Please complete the CAPTCHA verification.'
-              });
-          }
-
-          const verifyRes = await axios.post(
-              'https://www.google.com/recaptcha/api/siteverify',
-              new URLSearchParams({
-                  secret: process.env.RECAPTCHA_SECRET_KEY,
-                  response: recaptchaResponse
-              })
-          );
-
-          if (!verifyRes.data.success) {
-              return res.status(400).render('upload-error', {
-                  title: 'CAPTCHA Error',
-                  message: 'CAPTCHA verification failed. Please try again.'
-              });
-          }
-
-          // Fetching coordinates from OpenCage API
           const apiKey = process.env.OPENCAGE_API_KEY;
           const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
               params: {
@@ -95,6 +71,7 @@ router.post('/upload', (req, res, next) => {
           });
 
           if (!geoRes.data || !geoRes.data.results || !geoRes.data.results.length) {
+              console.error('❌ No coordinates found for:', location);
               return res.status(400).render('upload-error', {
                   title: 'Location Error',
                   message: 'Unable to find coordinates for the given postcode.'
@@ -102,8 +79,8 @@ router.post('/upload', (req, res, next) => {
           }
 
           const { lat, lng } = geoRes.data.results[0].geometry;
+          console.log('Latitude:', lat, 'Longitude:', lng);
 
-          // Image Compression
           const compressedFilenames = [];
           const finalDir = path.join(__dirname, '..', 'uploads', 'job-images');
           for (const file of req.files) {
@@ -142,6 +119,7 @@ router.post('/upload', (req, res, next) => {
       }
   });
 });
+
 
 // === Admin Job List with Filters and Counts ===
 router.get('/admin', async (req, res) => {
