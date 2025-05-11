@@ -41,6 +41,21 @@ Quote.init({
             isEmail: true
         }
     },
+    viewed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+    },
+    actioned: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+    },
+    lastActionDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: DataTypes.NOW
+    },
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -56,5 +71,11 @@ Quote.init({
     modelName: 'Quote',
     timestamps: true
 });
+
+// Associations
+Quote.associate = (models) => {
+    Quote.belongsTo(models.Job, { foreignKey: 'jobId', onDelete: 'CASCADE' });
+    Quote.belongsTo(models.Bodyshop, { foreignKey: 'bodyshopId', onDelete: 'CASCADE' });
+};
 
 module.exports = Quote;

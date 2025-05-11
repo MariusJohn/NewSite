@@ -58,8 +58,9 @@ body {
 
 .sidebar .menu li a:hover,
 .sidebar .menu li a.active {
-  background-color: #d6f5e1;
-  color: #2f2c2c;
+  background-color: #25D366;
+  color: #ffffff;
+  font-weight: bold;
 }
 
 /* Main Content Styles */
@@ -78,36 +79,54 @@ body {
   font-size: 32px;
 }
 
-/* Table Styles */
-.jobs-table {
+/* Quotes Table Styles */
+.quotes-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   background-color: #0b3c5d;
+  border-radius: 8px;
+  overflow: hidden;
+  color: #ffffff;
 }
 
-.jobs-table th, 
-.jobs-table td {
-  border: 1px solid #444;
-  padding: 15px;
+.quotes-table thead {
+  background-color: #102b45;
+  color: white;
+}
+
+.quotes-table th, .quotes-table td {
+  padding: 12px 15px;
   text-align: left;
+  border-bottom: 1px solid #444;
   vertical-align: middle;
   color: white;
 }
 
-.jobs-table th {
-  background-color: #102b45;
-  color: #ffffff;
+.quotes-table th {
   font-weight: bold;
   text-align: center;
 }
 
-.jobs-table tbody tr:nth-child(even) {
+.quotes-table tbody tr:nth-child(even) {
   background-color: #122f45;
 }
 
-.jobs-table tbody tr:nth-child(odd) {
+.quotes-table tbody tr:nth-child(odd) {
   background-color: #102b45;
+}
+
+.quotes-table tbody tr:hover {
+  background-color: #1f4e6f;
+  cursor: pointer;
+}
+
+/* No Quotes Row */
+.no-quotes {
+  background-color: #ffa500;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
 }
 
 /* Status Badges */
@@ -118,18 +137,19 @@ body {
   font-weight: bold;
   display: inline-block;
   text-align: center;
+  margin-bottom: 5px;
 }
 
 .status-pending {
   background-color: #ffa500;
 }
 
-.status-approved {
+.status-viewed {
   background-color: #25D366;
 }
 
-.status-rejected {
-  background-color: #fa5d28;
+.status-not-viewed {
+  background-color: #f39c12;
 }
 
 .status-archived {
@@ -140,69 +160,50 @@ body {
   background-color: #444;
 }
 
-/* Job Actions */
-.job-actions {
-  text-align: center;
+/* Pending Days */
+.days-pending {
+  font-weight: bold;
+  color: #f39c12;
 }
 
-.job-actions button {
-  background-color: #25D366;
-  color: white;
-  padding: 8px 12px;
-  border: none;
+/* Action Buttons */
+.btn {
+  padding: 5px 10px;
+  margin-right: 5px;
   border-radius: 5px;
-  margin-bottom: 10px;
+  color: #ffffff;
+  text-decoration: none;
   font-weight: bold;
   cursor: pointer;
+  display: inline-block;
+  margin-bottom: 5px;
   transition: background 0.3s;
 }
 
-.job-actions button:hover {
-  background-color: #1aa851;
+.btn-view {
+  background-color: #007bff;
 }
 
-.job-actions .archive-btn {
+.btn-archive {
   background-color: #6c757d;
 }
 
-.job-actions .archive-btn:hover {
-  background-color: #5a6268;
+.btn-remind {
+  background-color: #28a745;
 }
 
-.job-actions .delete-btn {
-  background-color: #fa5d28;
-  margin-top: 10px;
+.btn:hover {
+  opacity: 0.9;
 }
 
-.job-actions .delete-btn:hover {
-  background-color: #c4401b;
-}
-
-.job-actions a {
-  color: #25D366;
-  font-weight: bold;
-  text-decoration: none;
-  display: inline-block;
-  margin-top: 5px;
-}
-
-.job-actions a:hover {
-  color: #1aa851;
-}
-
-/* Image Preview */
-.image-preview-block {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
 
 .thumb-img {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: 8px;
+  margin: 5px;
+  cursor: pointer;
   transition: transform 0.3s;
 }
 
@@ -210,7 +211,7 @@ body {
   transform: scale(1.05);
 }
 
-/* Responsive */
+/* Responsive Styles */
 @media (max-width: 900px) {
   .sidebar {
       width: 200px;
@@ -221,99 +222,63 @@ body {
       padding: 20px;
   }
 
-  .jobs-table th, 
-  .jobs-table td {
+  .quotes-table th, 
+  .quotes-table td {
       padding: 10px;
+      font-size: 12px;
   }
 
-  .thumb-img {
-      width: 100px;
-      height: 100px;
+  .btn {
+      padding: 4px 8px;
+      font-size: 12px;
   }
 
-  .job-actions button {
-      padding: 6px 10px;
+  .status-badge {
+      padding: 4px 8px;
+      font-size: 12px;
   }
 }
+/* Job Table Row Separation */
+.jobs-table tbody tr {
+  border-bottom: 2px solid #333;
+  border-top: 2px solid #333;
+}
 
-.restore-btn {
-  background-color: #25D366;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+/* Make the headers stand out */
+.jobs-table thead th {
+  background-color: #102b45;
+  color: #ffffff;
   font-weight: bold;
+  text-align: center;
+}
+
+/* Even and Odd Row Styling */
+.jobs-table tbody tr:nth-child(even) {
+  background-color: #122f45;
+}
+
+.jobs-table tbody tr:nth-child(odd) {
+  background-color: #102b45;
+}
+
+.jobs-table tbody tr:hover {
+  background-color: #1f4e6f;
   cursor: pointer;
-  transition: background 0.3s;
 }
 
-.restore-btn:hover {
-  background-color: #1aa851;
-}
-
-.jobs-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.jobs-table th, .jobs-table td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: left;
-}
-
-.jobs-table th {
-  background-color: #25D366;
-  color: #fff;
-  font-weight: bold;
-}
-
-.jobs-table td ul {
-  list-style: none;
-  padding: 0;
-}
-
-.jobs-table td ul li {
-  background-color: #f9f9f9;
+.jobs-table tbody tr {
   margin-bottom: 10px;
-  padding: 10px;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border-collapse: separate;
+  border-spacing: 0 10px;
 }
 
-.quotes-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.quotes-table thead {
-  background-color: #004b87;
-  color: white;
-}
-
-.quotes-table th, .quotes-table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-.quotes-table tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-.quotes-table tbody tr:hover {
-  background-color: #ddd;
-}
-
-.quotes-table th {
+/* Overdue Job Highlight */
+.overdue {
+  background-color: #fa5d28 !important;
+  color: #ffffff !important;
   font-weight: bold;
 }
-
 
 @media (max-width: 600px) {
   .sidebar {
@@ -325,18 +290,9 @@ body {
       padding: 15px;
   }
 
-  .jobs-table th, 
-  .jobs-table td {
+  .quotes-table th, 
+  .quotes-table td {
       padding: 8px;
-  }
-
-  .thumb-img {
-      width: 80px;
-      height: 80px;
-  }
-
-  .job-actions button {
-      padding: 6px 8px;
   }
 
   .sidebar .menu li {
@@ -344,3 +300,8 @@ body {
   }
 }
 
+/* Hover Effects */
+.quotes-table tbody tr:hover {
+  background-color: #1f4e6f;
+  cursor: pointer;
+}
