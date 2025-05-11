@@ -20,15 +20,15 @@ const Job = sequelize.define('Job', {
         allowNull: false
     },
     latitude: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DOUBLE,
         allowNull: true
     },
     longitude: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DOUBLE,
         allowNull: true
     },
     images: {
-        type: DataTypes.ARRAY(DataTypes.STRING), // Correct for PostgreSQL
+        type: DataTypes.ARRAY(DataTypes.STRING), 
         allowNull: false,
         defaultValue: []
     },

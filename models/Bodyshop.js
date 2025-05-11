@@ -23,20 +23,16 @@ Bodyshop.init({
         allowNull: false
     },
     latitude: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DOUBLE,
         allowNull: true
     },
     longitude: {
-        type: DataTypes.FLOAT,
+        type: DataTypes.DOUBLE,
         allowNull: true
     },
     radius: {
         type: DataTypes.FLOAT,
-        defaultValue: 10, 
-        validate: {
-            min: 1,
-            max: 50
-        }
+        defaultValue: 10
     },
     verificationToken: {
         type: DataTypes.STRING,
