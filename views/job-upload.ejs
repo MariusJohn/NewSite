@@ -19,39 +19,52 @@
       <img src="/img/logo.png" alt="MC Quote Logo">      
   </a>
 </div>
+
 <main class="upload-main">
   <section class="upload-container">
     <h1>Submit Your Vehicle Images</h1>
-    <p class="upload-subtext">Please fill out the form and upload up to 8 images (max 5MB each)</p>
+    <p class="upload-subtext">Please fill out the form and upload 5 to 8 images (max 5MB each)</p>
 
-    <form action="/jobs/upload" method="POST" enctype="multipart/form-data" class="upload-form">
+    <form id="uploadForm" action="/jobs/upload" method="POST" enctype="multipart/form-data" class="upload-form">
+      
       <label for="name">Full Name:</label>
       <input type="text" id="name" name="name" placeholder="Your full name" required>
+      <span class="error-message" id="name-error"></span>
 
       <label for="email">Email Address:</label>
       <input type="email" id="email" name="email" placeholder="Your email address" required>
+      <span class="error-message" id="email-error"></span>
 
       <label for="telephone">Telephone number:</label>
-      <input type="tel" name="telephone" placeholder="Your phone number" required>
+      <input type="tel" id="telephone" name="telephone" placeholder="Your phone number" required>
+      <span class="error-message" id="phone-error"></span>
 
       <label for="location">Location (Postcode):</label>
       <input type="text" id="location" name="location" placeholder="Your post code" required>
+      <span class="error-message" id="postcode-error"></span>
 
       <label for="images">Upload Images:</label>
       <input type="file" id="images" name="images" multiple accept="image/*" required>
+      <span class="error-message" id="images-error"></span>
 
       <div class="g-recaptcha" data-sitekey="6LdiViwrAAAAAITGILKol9WCjLr2_Y_67xOS0YMb"></div>
 
       <button type="submit" class="upload-btn">Submit Job</button>
+
+      <p id="form-error-message" style="color: rgb(41, 250, 26); display: none;"></p>
     </form>
   </section>
 </main>
 
+
 <%- include('partials/footer') %>
+
+
 
 </div>
 
 <script src="/js/navbar-toggle.js"></script>
+<script src="/js/job-upload.js"></script>
 </body>
 
 

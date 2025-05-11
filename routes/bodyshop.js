@@ -63,6 +63,9 @@ router.post('/register', async (req, res) => {
         return res.render('bodyshop-register', { error: 'Please enter a valid UK postcode.' });
     }
 
+    const normalizedPostcode = area.toUpperCase().replace(/\s+/g, '');
+
+
     if (password !== confirmPassword) {
         return res.render('bodyshop-register', { error: 'Passwords do not match.' });
     }
@@ -77,7 +80,7 @@ router.post('/register', async (req, res) => {
       const apiKey = process.env.OPENCAGE_API_KEY;
       const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
           params: {
-              q: area,
+              q: normalizedPostcode,
               key: apiKey,
               countrycode: 'gb',
               limit: 1
@@ -87,6 +90,8 @@ router.post('/register', async (req, res) => {
       if (!response.data || !response.data.results || !response.data.results.length===0) {
           return res.render('bodyshop-register', { error: 'Unable to find coordinates for the given postcode.' });
       }
+
+     
 
 
     const { lat, lng } = response.data.results[0].geometry;
