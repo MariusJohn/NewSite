@@ -49,11 +49,19 @@ Bodyshop.init({
     resetTokenExpiry: {
         type: DataTypes.DATE,
         allowNull: true
+    },
+    lastReminderSent: {
+        type: DataTypes.DATE,
+        allowNull: true
     }
 }, {
     sequelize,
     modelName: 'Bodyshop',
     timestamps: true
 });
+// models/Bodyshop.js
+Bodyshop.associate = (models) => {
+    Bodyshop.hasMany(models.Quote, { foreignKey: 'bodyshopId', onDelete: 'CASCADE' });
+};
 
 module.exports = Bodyshop;

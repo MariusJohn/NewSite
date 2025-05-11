@@ -44,9 +44,52 @@ const Job = sequelize.define('Job', {
     paid: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    // New Fields for Quotes Submenu
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        defaultValue: ''
+    },
+    approvalDate: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    lastActionDate: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        defaultValue: DataTypes.NOW
+    },
+    viewed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    quoteStatus: {
+        type: DataTypes.ENUM('no_quotes', 'quoted', 'actioned', 'approved'),
+        defaultValue: 'no_quotes',
+        allowNull: false
+    },
+    daysPending: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     }
 }, {
-    timestamps: true
+    timestamps: true,
+    hooks: {
+        beforeUpdate: (job, options) => {
+            if (!job.approvalDate && job.status === 'approved') {
+                job.approvalDate = new Date();
+            }
+            job.lastActionDate = new Date();
+        }
+    }
 });
+
+// Associations
+Job.associate = (models) => {
+    Job.hasMany(models.Quote, { foreignKey: 'jobId', onDelete: 'CASCADE' });
+    Job.belongsTo(models.Bodyshop, { foreignKey: 'selectedBodyshopId', as: 'selectedBodyshop' });
+};
 
 module.exports = Job;

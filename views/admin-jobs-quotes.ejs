@@ -8,49 +8,49 @@
     <link rel="stylesheet" href="/css/reset.css">
 </head>
 <body>
-<div class="admin-dashboard-container">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <img src="/img/logo.png" alt="MC Quote Logo">
-        <h2>Admin Panel</h2>
-        <ul class="menu">
-            <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=live">Live Jobs (<%= liveCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
-            <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
-            <li><a href="/jobs/admin/quotes">Jobs with Quotes</a></li>
-        </ul>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <h1>Submitted Jobs with Quotes</h1>
+    <div class="admin-dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <img src="/img/logo.png" alt="MC Quote Logo">
+            <h2>Admin Panel</h2>
+            <ul class="menu">
+                <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
+                <li><a href="/jobs/admin?filter=live">Live Jobs (<%= liveCount %>)</a></li>
+                <li><a href="/jobs/admin?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
+                <li><a href="/jobs/admin?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
+                <li><a href="/jobs/admin?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
+                <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
+                <li><a href="/jobs/admin/quotes" class="active">Jobs with Quotes</a></li>
+            </ul>
+        </div>
     
-        <% if (jobs.length === 0) { %>
-            <p>No jobs with quotes available at the moment.</p>
-        <% } else { %>
-            <table class="quotes-table">
-                <thead>
-                    <tr>
-                        <th>Job ID</th>
-                        <th>Customer Details</th>
-                        <th>Bodyshop</th>
-                        <th>Quote</th>
-                        <th>Notes</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% jobs.forEach(job => { %>
-                        <% if (job.Quotes.length === 0) { %>
-                            <tr>
-                                <td colspan="6">No quotes for this job yet.</td>
-                            </tr>
-                        <% } else { %>
-                            <% job.Quotes.forEach(quote => { %>
-                                <tr>
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1>Submitted Jobs with Quotes</h1>
+    
+            <% if (jobs.length === 0) { %>
+                <p>No jobs with quotes available at the moment.</p>
+            <% } else { %>
+                <table class="quotes-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Customer Details</th>
+                            <th>Bodyshop</th>
+                            <th>Quote</th>
+                            <th>Notes</th>
+                            <th>Quote Date</th>
+                            <th>Status</th>
+                            <th>Days Pending</th>
+                            <th>Quote Status</th>
+                            <th>Last Action</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% jobs.forEach(job => { %>
+                            <% if (job.Quotes.length === 0) { %>
+                                <tr class="no-quotes">
                                     <td><%= job.id %></td>
                                     <td>
                                         <strong>Name:</strong> <%= job.customerName %><br>
@@ -58,21 +58,50 @@
                                         <strong>Phone:</strong> <%= job.customerPhone %><br>
                                         <strong>Location:</strong> <%= job.location %>
                                     </td>
-                                    <td>
-                                        <%= quote.Bodyshop ? quote.Bodyshop.name : 'Unknown Bodyshop' %><br>
-                                        <%= quote.Bodyshop ? quote.Bodyshop.email : 'No Email' %><br>
-                                        <%= quote.Bodyshop ? quote.Bodyshop.area : 'No Area' %>
+                                    <td colspan="8">
+                                        <span class="pending-warning">No quotes received yet.</span>
+                                        <br>
+                                        <strong>Pending for:</strong> <%= job.daysPending %> days
                                     </td>
-                                    <td>£<%= quote.price.toFixed(2) %></td>
-                                    <td><%= quote.notes || 'No notes provided' %></td>
-                                    <td><%= quote.createdAt.toDateString() %></td>
+                                    <td>
+                                        <a href="/jobs/<%= job.id %>/remind" class="btn btn-remind">Remind</a>
+                                    </td>
                                 </tr>
-                            <% }) %>
-                        <% } %>
-                    <% }) %>
-                </tbody>
-            </table>
-        <% } %>
+                            <% } else { %>
+                                <% job.Quotes.forEach(quote => { %>
+                                    <tr>
+                                        <td><%= job.id %></td>
+                                        <td>
+                                            <strong>Name:</strong> <%= job.customerName %><br>
+                                            <strong>Email:</strong> <%= job.customerEmail %><br>
+                                            <strong>Phone:</strong> <%= job.customerPhone %><br>
+                                            <strong>Location:</strong> <%= job.location %>
+                                        </td>
+                                        <td>
+                                            <%= quote.Bodyshop ? quote.Bodyshop.name : 'Unknown Bodyshop' %><br>
+                                            <%= quote.Bodyshop ? quote.Bodyshop.email : 'No Email' %><br>
+                                            <%= quote.Bodyshop ? quote.Bodyshop.area : 'No Area' %>
+                                        </td>
+                                        <td>£<%= quote.price.toFixed(2) %></td>
+                                        <td><%= quote.notes || 'No notes provided' %></td>
+                                        <td><%= quote.createdAt.toLocaleDateString() %></td>
+                                        <td><%= job.status || 'Pending' %></td>
+                                        <td><%= job.daysPending || 0 %> days</td>
+                                        <td><%= job.quoteStatus || 'no_quotes' %></td>
+                                        <td><%= quote.updatedAt ? quote.updatedAt.toLocaleDateString() : 'No Action' %></td>
+                                        <td>
+                                            <a href="/jobs/<%= job.id %>/details" class="btn btn-view">View</a>
+                                            <a href="/jobs/<%= job.id %>/archive" class="btn btn-archive">Archive</a>
+                                            <a href="/jobs/<%= job.id %>/remind" class="btn btn-remind">Remind</a>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            <% } %>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
     </div>
 </body>
 </html>
