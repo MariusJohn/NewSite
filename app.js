@@ -6,7 +6,7 @@ const session = require('express-session');
 const customerRoutes = require('./routes/customer');
 const adminRoutes = require('./routes/admin');
 const adminAuth = require('./middleware/adminAuth');
-
+require('./scheduler');
 
 dotenv.config();
 
