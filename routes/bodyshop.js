@@ -352,14 +352,10 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
         if (!bodyshop || !bodyshop.latitude || !bodyshop.longitude) {
             return res.status(400).send('Bodyshop location not set.');
         }
-        console.log('Logged-in Bodyshop ID:', bodyshop.id);
-        console.log('Logged-in Bodyshop Name:', bodyshop.name);
-        console.log('Logged-in Bodyshop Latitude:', bodyshop.latitude);
-        console.log('Logged-in Bodyshop Longitude:', bodyshop.longitude);
-        console.log('Logged-in Bodyshop Radius (Miles):', bodyshop.radius);
 
-        const radiusInMeters = (bodyshop.radius || 10) * 1609.34; // Convert miles to meters
+        const radiusInMeters = (bodyshop.radius || 10) * 1609.34; // Default to 10 miles if not set
 
+        // Fetching jobs within the specified radius
         const jobs = await Job.findAll({
             where: {
                 status: 'approved',
@@ -390,14 +386,44 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
             group: ['Job.id', 'Job.customerName', 'Job.customerEmail', 'Job.customerPhone', 'Job.location', 'Job.latitude', 'Job.longitude', 'Job.images', 'Job.status', 'Job.createdAt']
         });
 
+
         console.log("Nearby Jobs:", jobs.map(job => job.toJSON()));
 
-        res.render('bodyshop-dashboard', { headerData, footerData, jobs });
+        // Pass bodyshop radius for the frontend
+        res.render('bodyshop-dashboard', { headerData, footerData, jobs, bodyshop });
     } catch (error) {
         console.error(error);
         res.status(500).send('❌ Error loading jobs.');
     }
 });
+
+// === Update Bodyshop Radius ===
+router.post('/update-radius', requireBodyshopLogin, async (req, res) => {
+    try {
+        const bodyshopId = req.session.bodyshopId;
+        const { radius } = req.body;
+
+        // Validate radius
+        const radiusValue = parseInt(radius, 10);
+        if (isNaN(radiusValue) || radiusValue < 1 || radiusValue > 50) {
+            return res.status(400).send('Radius must be between 1 and 50 miles.');
+        }
+
+        // Update the bodyshop radius
+        await Bodyshop.update(
+            { radius: radiusValue },
+            { where: { id: bodyshopId } }
+        );
+
+        console.log(`✅ Radius updated to ${radiusValue} miles for Bodyshop ID: ${bodyshopId}`);
+        res.redirect('/bodyshop/dashboard');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('❌ Error updating radius. Please try again later.');
+    }
+});
+
+
 
 // === Submit a Quote ===
 router.post('/quote/:jobId', requireBodyshopLogin, async (req, res) => {
