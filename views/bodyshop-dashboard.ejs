@@ -9,15 +9,10 @@
     <link rel="stylesheet" href="/css/footer.css">
     <link rel="stylesheet" href="/css/bodyshop-dashboard.css">
     <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
-
-
 </head>
-
 
 <body>
 <div class="page-wrapper">
-<%- include('partials/header') %>
-
 <main class="dashboard-main">
     <section class="dashboard-section">
         <h1>Available Jobs for Quoting</h1>
@@ -29,6 +24,7 @@
                 <thead>
                     <tr>
                         <th>Customer Location</th>
+                        <th>Distance (miles)</th>
                         <th>Images</th>
                         <th>Action</th>
                     </tr>
@@ -37,32 +33,35 @@
                     <% jobs.forEach(job => { %>
                         <tr>
                             <td><%= job.location %></td>
+                            <td><%= job.dataValues.distance ? job.dataValues.distance.toFixed(2) : "N/A" %></td>
                             <td>
                                 <div class="image-preview-block">
-                                    <% JSON.parse(job.images).forEach(function(image, index) { %>
-                                      <a 
-                                        href="/uploads/job-images/<%= image %>" 
-                                        class="glightbox"
-                                        data-gallery="job-<%= job.id %>"
-                                        data-title="Image <%= index + 1 %>"
-                                      >
-                                        <img 
-                                          src="/uploads/job-images/<%= image %>" 
-                                          alt="Job Image" 
-                                          class="thumb-img"
-                                        >
-                                      </a>
-                                    <% }); %>
-                                  </div>
-                                                                  
+                                    <% if (job.images && job.images.length > 0) { %>
+                                        <% job.images.forEach(function(image, index) { %>
+                                            <a 
+                                                href="/uploads/job-images/<%= image %>" 
+                                                class="glightbox"
+                                                data-gallery="job-<%= job.id %>"
+                                                data-title="Image <%= index + 1 %>"
+                                            >
+                                                <img 
+                                                    src="/uploads/job-images/<%= image %>" 
+                                                    alt="Job Image" 
+                                                    class="thumb-img"
+                                                >
+                                            </a>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <em>No Images</em>
+                                    <% } %>
+                                </div>
                             </td>
                             <td>
                                 <form action="/bodyshop/quote/<%= job.id %>" method="POST">
                                     <input type="number" name="quoteAmount" placeholder="Your quote (£)" required>
-                                    <button type="submit">Submit Quote</button>
+                                    <button type="submit" class="btn">Submit Quote</button>
                                 </form>
-                                                         <a href="/bodyshop/download/<%= job.id %>" class="download-zip-btn">📦 Download All Images</a>
-                                  
+                                <a href="/bodyshop/download/<%= job.id %>" class="download-zip-btn">📦 Download All Images</a>
                             </td>
                         </tr>
                     <% }) %>
@@ -76,14 +75,12 @@
 
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 <script>
   const lightbox = GLightbox({
     selector: '.glightbox'
   });
 </script>
-
 
 </body>
 </html>

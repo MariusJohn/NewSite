@@ -6,6 +6,7 @@ const session = require('express-session');
 const customerRoutes = require('./routes/customer');
 const adminRoutes = require('./routes/admin');
 const adminAuth = require('./middleware/adminAuth');
+
 require('./scheduler');
 
 dotenv.config();
@@ -32,7 +33,7 @@ const contactRoutes = require('./routes/contact');
 const privacyRoutes = require('./routes/privacy')
 const jobsRoutes = require('./routes/jobs');
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
-
+const adminBodyshopRoutes = require('./routes/admin-bodyshops');
 
 
 // Serve static files
@@ -61,7 +62,7 @@ app.use('/jobs', jobsRoutes);
 app.use('/', customerRoutes);
 app.use('/admin', adminRoutes);
 app.use('/jobs/admin', adminAuth);
-
+app.use('/jobs/admin', adminBodyshopRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

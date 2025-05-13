@@ -1,6 +1,7 @@
 .dashboard-main {
     padding: 40px 20px;
     background-color: #f9f9f9;
+    color: #004b87;
 }
 
 .dashboard-section h1 {
@@ -12,7 +13,7 @@
 .jobs-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: white;
+    background-color: rgb(90, 40, 40);
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 

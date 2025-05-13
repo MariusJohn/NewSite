@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bodyshops - Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/admin-dashboard.css">
+</head>
+<body>
+<div class="admin-dashboard-container">
+    <div class="sidebar">
+        <a href="/."><img src="/img/logo.png" alt="MC Quote Logo"></a>
+        <h2>Admin Panel</h2>
+        <ul class="menu">
+            <li><a href="/jobs/admin?filter=total">Total Jobs</a></li>
+            <li><a href="/jobs/admin?filter=live">Live Jobs</a></li>
+            <li><a href="/jobs/admin?filter=approved">Approved Jobs</a></li>
+            <li><a href="/jobs/admin?filter=rejected">Rejected Jobs</a></li>
+            <li><a href="/jobs/admin?filter=archived">Archived Jobs</a></li>
+            <li><a href="/jobs/admin?filter=deleted">Deleted Jobs</a></li>
+            <li><a href="/jobs/admin/quotes">Jobs with Quotes</a></li>
+            <li><a href="/jobs/admin/bodyshops" class="active">Bodyshops</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h1>Pending Bodyshop Approvals</h1>
+        <table class="jobs-table">
+            <thead>
+                <tr>
+                    <th>Bodyshop Name</th>
+                    <th>Email</th>
+                    <th>Location</th>
+                    <th>Verified</th>
+                    <th>Admin Approved</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% bodyshops.forEach(bodyshop => { %>
+                    <tr>
+                        <td><%= bodyshop.name %></td>
+                        <td><%= bodyshop.email %></td>
+                        <td><%= bodyshop.area %></td>
+                        <td><%= bodyshop.verified ? 'Yes' : 'No' %></td>
+                        <td><%= bodyshop.adminApproved ? 'Yes' : 'No' %></td>
+                        <td>
+                            <% if (!bodyshop.adminApproved) { %>
+                                <form action="/jobs/admin/bodyshops/<%= bodyshop.id %>/approve" method="POST">
+                                    <button type="submit" class="btn btn-approve">Approve</button>
+                                </form>
+                            <% } %>
+                            <form action="/jobs/admin/bodyshops/<%= bodyshop.id %>/reject" method="POST">
+                                <button type="submit" class="btn btn-reject">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
