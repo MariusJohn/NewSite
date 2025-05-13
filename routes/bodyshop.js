@@ -352,12 +352,17 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
         if (!bodyshop || !bodyshop.latitude || !bodyshop.longitude) {
             return res.status(400).send('Bodyshop location not set.');
         }
+        console.log('Logged-in Bodyshop ID:', bodyshop.id);
+        console.log('Logged-in Bodyshop Name:', bodyshop.name);
+        console.log('Logged-in Bodyshop Latitude:', bodyshop.latitude);
+        console.log('Logged-in Bodyshop Longitude:', bodyshop.longitude);
+        console.log('Logged-in Bodyshop Radius (Miles):', bodyshop.radius);
 
         const radiusInMeters = (bodyshop.radius || 10) * 1609.34; // Convert miles to meters
 
         const jobs = await Job.findAll({
             where: {
-                status: 'pending',
+                status: 'approved',
                 latitude: { [Op.ne]: null },
                 longitude: { [Op.ne]: null }
             },
