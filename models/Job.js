@@ -27,6 +27,10 @@ const Job = sequelize.define('Job', {
         type: DataTypes.DOUBLE,
         allowNull: true
     },
+    radius: {
+        type: DataTypes.FLOAT,
+        defaultValue: 10
+    },
     images: {
         type: DataTypes.ARRAY(DataTypes.STRING), 
         allowNull: false,

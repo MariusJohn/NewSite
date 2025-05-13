@@ -32,13 +32,18 @@ Bodyshop.init({
     },
     radius: {
         type: DataTypes.FLOAT,
-        defaultValue: 10
+        allowNull: false,
+        defaultValue: 100
     },
     verificationToken: {
         type: DataTypes.STRING,
         allowNull: true
     },
     verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    adminApproved: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },

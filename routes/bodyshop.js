@@ -179,14 +179,15 @@ router.get('/login', (req, res) => {
 
 // === POST: Handle Bodyshop Login ===
 router.post('/login', async (req, res) => {
-    const { email, password,area } = req.body;
+    const { email, password, area } = req.body;
     
-
     if (!email || !password || !area) {
-        return res.status(400).send('Email, password and postcode are required');
+        return res.status(400).send('Email, password, and postcode are required');
     }
+
+    const formattedArea = area.toUpperCase().replace(/\s+/g, '');
     const postcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
-    if (!postcodeRegex.test(area)) {
+    if (!postcodeRegex.test(formattedArea)) {
         return res.status(400).send('Invalid postcode format');
     }
 
@@ -197,8 +198,10 @@ router.post('/login', async (req, res) => {
             return res.status(401).send('Invalid credentials or account not verified');
         }
 
-        const valid = await bcrypt.compare(password, bodyshop.password);
-        if (!valid || bodyshop.area !== area.toUpperCase()) {
+        const validPassword = await bcrypt.compare(password, bodyshop.password);
+        const formattedStoredArea = bodyshop.area.replace(/\s+/g, '');
+
+        if (!validPassword || formattedStoredArea !== formattedArea) {
             return res.status(401).render('bodyshop-login-error', {
                 error: 'Invalid credentials. Please check your email, password, and postcode.'
             });
@@ -350,7 +353,7 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
             return res.status(400).send('Bodyshop location not set.');
         }
 
-        const radiusInMeters = bodyshop.radius * 1609.34; // Convert miles to meters
+        const radiusInMeters = (bodyshop.radius || 10) * 1609.34; // Convert miles to meters
 
         const jobs = await Job.findAll({
             where: {
@@ -375,14 +378,14 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
                 ) / 1609.34`), 'distance']
             ],
             order: sequelize.literal('distance ASC'),
-            group: ['Job.id', 'Job.customerName', 'Job.customerEmail', 'Job.customerPhone', 'Job.location', 'Job.latitude', 'Job.longitude', 'Job.images', 'Job.status', 'Job.createdAt'],
             having: sequelize.literal(`ST_DistanceSphere(
                 ST_MakePoint("longitude", "latitude"),
                 ST_MakePoint(${bodyshop.longitude}, ${bodyshop.latitude})
-            ) <= ${radiusInMeters}`)
+            ) <= ${radiusInMeters}`),
+            group: ['Job.id', 'Job.customerName', 'Job.customerEmail', 'Job.customerPhone', 'Job.location', 'Job.latitude', 'Job.longitude', 'Job.images', 'Job.status', 'Job.createdAt']
         });
 
-        console.log("Nearby Jobs:", jobs);
+        console.log("Nearby Jobs:", jobs.map(job => job.toJSON()));
 
         res.render('bodyshop-dashboard', { headerData, footerData, jobs });
     } catch (error) {

@@ -14,7 +14,7 @@ body {
 
 /* Sidebar Styles */
 .sidebar {
-  width: 25%;
+  width: 20%;
   background-color: #102b45;
   padding: 20px;
   display: flex;
@@ -207,6 +207,84 @@ body {
   transition: transform 0.3s;
 }
 
+/* Approve and Reject Buttons */
+.job-actions button {
+    background-color: #25D366;
+    color: #ffffff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 8px;
+    margin-right: 5px;
+}
+
+.job-actions button:hover {
+    background-color: #1aa851;
+}
+
+/* Reject Button */
+.job-actions .reject-btn {
+    background-color: #fa5d28;
+}
+
+.job-actions .reject-btn:hover {
+    background-color: #c4401b;
+}
+
+/* Restore Button */
+.job-actions .restore-btn {
+    background-color: #007bff;
+}
+
+.job-actions .restore-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Archive Button */
+.job-actions .archive-btn {
+    background-color: #6c757d;
+}
+
+.job-actions .archive-btn:hover {
+    background-color: #5a6268;
+}
+
+/* Delete Button */
+.job-actions .delete-btn {
+    background-color: #d9534f;
+}
+
+.job-actions .delete-btn:hover {
+    background-color: #c9302c;
+}
+
+/* Download Button */
+.job-actions .download-zip-btn {
+    background-color: #17a2b8;
+    color: #ffffff;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 8px;
+    transition: background 0.3s;
+}
+
+.job-actions .download-zip-btn:hover {
+    background-color: #138496;
+}
+
+/* Button Spacing */
+.job-actions button + button,
+.job-actions button + .download-zip-btn {
+    margin-left: 5px;
+}
+
 .thumb-img:hover {
   transform: scale(1.05);
 }
@@ -278,6 +356,36 @@ body {
   background-color: #fa5d28 !important;
   color: #ffffff !important;
   font-weight: bold;
+}
+
+.btn-approve {
+  background-color: #25D366;
+  color: #ffffff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.btn-reject {
+  background-color: #fa5d28;
+  color: #ffffff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.btn-approve:hover {
+  background-color: #1aa851;
+}
+
+.btn-reject:hover {
+  background-color: #c4401b;
 }
 
 @media (max-width: 600px) {
