@@ -1,97 +1,317 @@
+/* Reset (already present - keep this) */
+/* General Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* A clean, professional font */
+  background-color: #f4f7f6; /* Light, neutral background */
+  color: #333;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6; /* Improved readability */
+}
+
+/* Page Wrapper (already present - keep this) */
+
+/* Header Styles */
+.dashboard-header {
+  background-color: #12324e; /* Clean white header */
+  color: #fffcfc; /* Dark text on white */
+  padding: 15px 20px; /* Slightly reduced padding */
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #ddd; /* Subtle bottom border */
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05); /* Very subtle shadow */
+}
+
+.dashboard-header h1 {
+  font-size: 1.5em; /* Moderate heading size */
+  margin: 0;
+  font-weight: 500; /* Slightly lighter font weight */
+}
+
+.dashboard-header .logo {
+  height: 40px; /* Slightly smaller logo */
+  margin-right: 15px;
+}
+
+.dashboard-header .logout-btn {
+  background-color: #e74c3c; /* Professional red for logout */
+  color: #fff;
+  padding: 8px 15px; /* Reduced padding */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 400; /* Regular font weight */
+  transition: background 0.3s ease;
+}
+
+.dashboard-header .logout-btn:hover {
+  background-color: #c0392b;
+}
+
+/* Main Content Styles */
 .dashboard-main {
-    padding: 40px 20px;
-    background-color: #f9f9f9;
-    color: #004b87;
+  flex-grow: 1;
+  padding: 80px 20px 30px; /* Adjust top padding for fixed header */
 }
 
-.dashboard-section h1 {
-    text-align: center;
-    color: #004b87;
-    margin-bottom: 30px;
+.dashboard-section {
+  max-width: 1000px; /* Slightly narrower max-width for focus */
+  margin: 0 auto 20px; /* Add margin below sections */
+  background-color: #fff;
+  border-radius: 8px; /* Softer rounded corners */
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* More subtle shadow */
 }
 
+.dashboard-section h2 {
+  font-size: 1.3em; /* Moderate section heading */
+  color: #333;
+  margin-bottom: 15px;
+  font-weight: 500;
+  border-bottom: 1px solid #eee; /* Subtle bottom border for heading */
+  padding-bottom: 8px;
+}
+
+.dashboard-section p {
+  color: #555; /* Slightly lighter text */
+}
+
+/* Radius Adjustment Section Styles */
+.radius-section {
+  background-color: #f9f9f9; /* Very light background */
+  border: 1px solid #eee; /* Very light border */
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: left; /* Align text to the left for better flow */
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Space between elements */
+}
+
+.radius-section label {
+  font-weight: 500;
+}
+
+.radius-section input[type="number"] {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 60px; /* Smaller input width */
+}
+
+.radius-section .radius-btn {
+  background-color: #5cb85c; /* Professional green */
+  color: #fff;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 400;
+  transition: background 0.3s ease;
+}
+
+.radius-section .radius-btn:hover {
+  background-color: #4cae4c;
+}
+
+.radius-section p {
+  margin-top: 0; /* Adjust paragraph margin */
+  font-size: 0.9em;
+  color: #777;
+}
+
+/* Jobs Table Styles */
 .jobs-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: rgb(90, 40, 40);
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  border: 1px solid #ddd; /* Add a border to the table */
+  border-radius: 8px;
+  overflow: hidden; /* To contain rounded corners */
 }
 
-.jobs-table th, .jobs-table td {
-    padding: 12px;
-    border: 1px solid #ddd;
-    text-align: center;
+.jobs-table thead {
+  background-color: #f8f8f8; /* Light gray header */
+  color: #333;
+  border-bottom: 1px solid #ddd;
+}
+
+.jobs-table th,
+.jobs-table td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
 }
 
 .jobs-table th {
-    background-color: #004b87;
-    color: white;
+  font-weight: 500;
+  text-transform: capitalize; /* Improve readability */
+}
+
+.jobs-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.jobs-table tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+/* Image Preview Block */
+.image-preview-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
 }
 
 .thumb-img {
-    width: 60px;
-    height: auto;
-    margin: 2px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+  width: 60px; /* Slightly smaller thumbnails */
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px; /* Softer rounded corners */
+  margin: 2px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  border: 1px solid #eee; /* Subtle border for thumbnails */
 }
 
-form input[type="number"] {
-    width: 80px;
-    padding: 5px;
+.thumb-img:hover {
+  transform: scale(1.05);
+}
+
+/* Action Buttons */
+.btn {
+  background-color: #007bff; /* Professional blue */
+  color: #fff;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 400;
+  transition: background 0.3s ease;
+  margin-bottom: 8px;
+  display: inline-block;
+  font-size: 0.9em;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+.download-zip-btn {
+  background-color: #28a745; /* Professional green */
+  color: #fff;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: 400;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 5px;
+  transition: background 0.3s ease;
+  font-size: 0.9em;
+}
+
+.download-zip-btn:hover {
+  background-color: #218838;
+}
+
+/* Quote Input */
+.quote-input {
+  width: 80px; /* Smaller input */
+  padding: 8px;
+  margin-right: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 0.9em;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.3em 0.6em;
+  font-size: 0.8em;
+  font-weight: bold;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25em;
+}
+
+.badge-success {
+  background-color: #28a745;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+}
+
+/* Footer Styles */
+.dashboard-footer {
+  background-color: #f8f8f8; /* Light gray footer */
+  color: #777;
+  text-align: center;
+  padding: 15px;
+  margin-top: 30px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid #eee; /* Subtle top border */
+  font-size: 0.85em;
+}
+
+/* GLightbox Styles (adjust if needed, but generally works well by default) */
+.glightbox-container {
+  /* You can add custom GLightbox container styles here if needed */
+}
+
+/* Responsive Styles (adjust breakpoints and styles as needed) */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .dashboard-header h1 {
+    margin-bottom: 0;
+  }
+
+  .dashboard-section {
+    padding: 15px;
+  }
+
+  .jobs-table th,
+  .jobs-table td {
+    padding: 10px;
+    font-size: 0.9em;
+  }
+
+  /* Consider making the table horizontally scrollable on small screens */
+  .jobs-table {
+    overflow-x: auto;
+  }
+
+  .radius-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .radius-section label,
+  .radius-section p {
     margin-bottom: 5px;
+  }
 }
-
-form button {
-    padding: 5px 10px;
-    background-color: #004b87;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-form button:hover {
-    background-color: #0060b7;
-}
-
-.image-preview-block {
-    display: inline-block;
-    margin: 5px;
-    text-align: center;
-  }
-  
-  .download-link {
-    font-size: 0.75rem;
-    display: block;
-    margin-top: 3px;
-    color: #004b87;
-    text-decoration: underline;
-  }
-  
-  .download-zip-btn {
-    display: inline-block;
-    margin-top: 8px;
-    color: #004b87;
-    font-size: 0.85rem;
-    text-decoration: underline;
-  }
-  .download-zip-btn:hover {
-    color: #0060b7;
-  }
-  
-  .thumb-img {
-    width: 80px;
-    height: auto;
-    margin: 5px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-  }
-  .thumb-img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 8px rgba(0,0,0,0.2);
-  }
-  
-  

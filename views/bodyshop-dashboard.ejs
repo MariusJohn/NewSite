@@ -12,10 +12,29 @@
 </head>
 
 <body>
-<div class="page-wrapper">
-<main class="dashboard-main">
-    <section class="dashboard-section">
+<div class="dashboard-container">
+    <!-- Header -->
+    <header class="dashboard-header">
+        <img src="/img/logo.png" alt="Logo" class="logo">
         <h1>Available Jobs for Quoting</h1>
+        <form action="/bodyshop/logout" method="POST">
+            <button type="submit" class="logout-btn">Log Out</button>
+        </form>
+    </header>
+
+    <!-- Radius Adjustment -->
+    <section class="radius-section">
+        <form action="/bodyshop/update-radius" method="POST">
+            <label for="radius">Adjust Search Radius (1-50 miles):</label>
+            <input type="number" name="radius" id="radius" value="<%= bodyshop.radius || 10 %>" min="1" max="50" required>
+            <button type="submit" class="radius-btn">Update Radius</button>
+        </form>
+        <p>Current Radius: <strong><%= bodyshop.radius || 10 %> miles</strong></p>
+    </section>
+
+    <!-- Job Table -->
+    <section class="dashboard-section">
+    
 
         <% if (jobs.length === 0) { %>
             <p>No jobs available at the moment. Please check back later.</p>
@@ -26,6 +45,7 @@
                         <th>Customer Location</th>
                         <th>Distance (miles)</th>
                         <th>Images</th>
+                        <th>Days Pending</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -40,15 +60,13 @@
                                         <% job.images.forEach(function(image, index) { %>
                                             <a 
                                                 href="/uploads/job-images/<%= image %>" 
-                                                class="glightbox"
-                                                data-gallery="job-<%= job.id %>"
-                                                data-title="Image <%= index + 1 %>"
-                                            >
+                                                class="glightbox" 
+                                                data-gallery="job-<%= job.id %>" 
+                                                data-title="Job Image <%= index + 1 %>">
                                                 <img 
                                                     src="/uploads/job-images/<%= image %>" 
                                                     alt="Job Image" 
-                                                    class="thumb-img"
-                                                >
+                                                    class="thumb-img">
                                             </a>
                                         <% }) %>
                                     <% } else { %>
@@ -57,11 +75,17 @@
                                 </div>
                             </td>
                             <td>
-                                <form action="/bodyshop/quote/<%= job.id %>" method="POST">
-                                    <input type="number" name="quoteAmount" placeholder="Your quote (£)" required>
+                                <% const daysPending = Math.floor((new Date() - new Date(job.createdAt)) / (1000 * 60 * 60 * 24)); %>
+                                <span class="badge <%= daysPending > 7 ? 'badge-danger' : daysPending > 3 ? 'badge-warning' : 'badge-success' %>">
+                                    <%= daysPending %> days
+                                </span>
+                            </td>
+                            <td>
+                                <form action="/bodyshop/quote/<%= job.id %>" method="POST" onsubmit="return validateQuote(this)">
+                                    <input type="number" name="quoteAmount" placeholder="Your quote (£)" required class="quote-input" min="1">
                                     <button type="submit" class="btn">Submit Quote</button>
                                 </form>
-                                <a href="/bodyshop/download/<%= job.id %>" class="download-zip-btn">📦 Download All Images</a>
+                                <a href="/bodyshop/download/<%= job.id %>" class="btn download-zip-btn">📦 Download All Images</a>
                             </td>
                         </tr>
                     <% }) %>
@@ -69,18 +93,38 @@
             </table>
         <% } %>
     </section>
-</main>
-
-<%- include('partials/footer') %>
-
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 <script>
-  const lightbox = GLightbox({
-    selector: '.glightbox'
-  });
+
+
+    // Initialize GLightbox
+    const lightbox = GLightbox({
+        selector: '.glightbox',
+        touchNavigation: true,
+        loop: true,
+        onOpen: () => {
+            document.body.style.overflow = 'hidden';
+        },
+        onClose: () => {
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    function validateQuote(form) {
+        const quoteAmount = form.quoteAmount.value;
+        if (!quoteAmount || isNaN(quoteAmount) || quoteAmount <= 0) {
+            alert('Please enter a valid quote amount.');
+            return false;
+        }
+        return true;
+    }
 </script>
 
+<footer class="dashboard-footer">
+    &copy; 2025 MC Quote. All rights reserved.
+</footer>
 </body>
 </html>
