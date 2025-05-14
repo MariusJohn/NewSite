@@ -1,4 +1,8 @@
 /* Reset (already present - keep this) */
+
+.dashboard-container {
+  padding-top: 60px; /* Add padding to the top */
+}
 /* General Styles */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* A clean, professional font */
@@ -9,12 +13,13 @@ body {
   line-height: 1.6; /* Improved readability */
 }
 
+
 /* Page Wrapper (already present - keep this) */
 
 /* Header Styles */
 .dashboard-header {
-  background-color: #12324e; /* Clean white header */
-  color: #fffcfc; /* Dark text on white */
+  background-color: rgb(7, 42, 70); 
+  color: #faf5f5; /* Dark text on white */
   padding: 15px 20px; /* Slightly reduced padding */
   position: fixed;
   width: 100%;
@@ -60,38 +65,56 @@ body {
 }
 
 .dashboard-section {
-  max-width: 1000px; /* Slightly narrower max-width for focus */
-  margin: 0 auto 20px; /* Add margin below sections */
+  max-width: 90%;
+  margin: 0 auto 20px;
   background-color: #fff;
-  border-radius: 8px; /* Softer rounded corners */
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* More subtle shadow */
+  border-radius: 8px;
+  padding:20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  display: grid; /
+  grid-template-columns: auto 1; 
+  grid-gap: 20px; /* Spacing between the columns */
+  align-items: start;
+}
+
+.dashboard-section-header {
+  grid-column: 1 / 2; /* Place the header in the first column */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align text within the header to the left */
 }
 
 .dashboard-section h2 {
-  font-size: 1.3em; /* Moderate section heading */
+  font-size: 1.3em;
   color: #333;
-  margin-bottom: 15px;
+  margin-bottom: 5px; /* Reduced margin */
   font-weight: 500;
-  border-bottom: 1px solid #eee; /* Subtle bottom border for heading */
-  padding-bottom: 8px;
+  border-bottom: none; /* Remove the bottom border from the heading */
+  padding-bottom: 0;
 }
 
-.dashboard-section p {
-  color: #555; /* Slightly lighter text */
-}
+.dashboard-section .job-count {
+  font-size: 0.9em;
+  color: #777;
 
-/* Radius Adjustment Section Styles */
+}
 .radius-section {
-  background-color: #f9f9f9; /* Very light background */
+  background-color: #95ccf4; /* Very light background */
   border: 1px solid #eee; /* Very light border */
   border-radius: 5px;
   padding: 15px;
   margin-bottom: 20px;
   text-align: left; /* Align text to the left for better flow */
-  display: flex;
-  align-items: center;
-  gap: 15px; /* Space between elements */
+  display: block; /* Ensure it's a block-level element */
+  width: 90%; /* Take up most of the container width */
+  margin: 20px auto; /* Center it horizontally with some top/bottom margin */
+}
+
+.radius-section form {
+    display: flex; /* Make the form elements align horizontally */
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px; /* Add some space below the form */
 }
 
 .radius-section label {
@@ -123,17 +146,17 @@ body {
 .radius-section p {
   margin-top: 0; /* Adjust paragraph margin */
   font-size: 0.9em;
-  color: #777;
+  color: #e54343;
 }
 
-/* Jobs Table Styles */
 .jobs-table {
+  grid-column: 2 / 3; /* Place the table in the second column */
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
-  border: 1px solid #ddd; /* Add a border to the table */
+  margin-bottom: 0; /* Remove default margin as the grid provides spacing */
+  border: 1px solid #ddd;
   border-radius: 8px;
-  overflow: hidden; /* To contain rounded corners */
+  overflow: hidden;
 }
 
 .jobs-table thead {
@@ -189,12 +212,13 @@ body {
 .btn {
   background-color: #007bff; /* Professional blue */
   color: #fff;
-  padding: 8px 15px;
+  padding: 5px 10px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: 400;
   transition: background 0.3s ease;
+  margin-top: 8px;
   margin-bottom: 8px;
   display: inline-block;
   font-size: 0.9em;
@@ -207,7 +231,7 @@ body {
 .download-zip-btn {
   background-color: #28a745; /* Professional green */
   color: #fff;
-  padding: 8px 15px;
+  padding: 5px 15px;
   border-radius: 5px;
   font-weight: 400;
   text-decoration: none;
@@ -223,8 +247,8 @@ body {
 
 /* Quote Input */
 .quote-input {
-  width: 80px; /* Smaller input */
-  padding: 8px;
+  width: 120px; /* Smaller input */
+  padding: 5px 10px;
   margin-right: 10px;
   border-radius: 4px;
   border: 1px solid #ddd;
@@ -272,46 +296,4 @@ body {
   font-size: 0.85em;
 }
 
-/* GLightbox Styles (adjust if needed, but generally works well by default) */
-.glightbox-container {
-  /* You can add custom GLightbox container styles here if needed */
-}
 
-/* Responsive Styles (adjust breakpoints and styles as needed) */
-@media (max-width: 768px) {
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .dashboard-header h1 {
-    margin-bottom: 0;
-  }
-
-  .dashboard-section {
-    padding: 15px;
-  }
-
-  .jobs-table th,
-  .jobs-table td {
-    padding: 10px;
-    font-size: 0.9em;
-  }
-
-  /* Consider making the table horizontally scrollable on small screens */
-  .jobs-table {
-    overflow-x: auto;
-  }
-
-  .radius-section {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .radius-section label,
-  .radius-section p {
-    margin-bottom: 5px;
-  }
-}

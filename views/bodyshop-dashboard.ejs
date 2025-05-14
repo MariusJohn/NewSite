@@ -17,7 +17,7 @@
     <header class="dashboard-header">
         <img src="/img/logo.png" alt="Logo" class="logo">
         <h1>Available Jobs for Quoting</h1>
-        <form action="/bodyshop/logout" method="POST">
+        <form action="/bodyshop" method="GET">
             <button type="submit" class="logout-btn">Log Out</button>
         </form>
     </header>
@@ -34,7 +34,10 @@
 
     <!-- Job Table -->
     <section class="dashboard-section">
-    
+        <div class="dashboard-section-header">
+            <h2>Available Jobs for Quoting</h2>
+            <span class="job-count">(<%= jobs.length %> Jobs Available)</span>
+        </div>
 
         <% if (jobs.length === 0) { %>
             <p>No jobs available at the moment. Please check back later.</p>
@@ -42,6 +45,7 @@
             <table class="jobs-table">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Customer Location</th>
                         <th>Distance (miles)</th>
                         <th>Images</th>
@@ -50,22 +54,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% jobs.forEach(job => { %>
+                    <% jobs.forEach((job, index) => { %>
                         <tr>
+                            <td><%= index + 1 %></td>
                             <td><%= job.location %></td>
                             <td><%= job.dataValues.distance ? job.dataValues.distance.toFixed(2) : "N/A" %></td>
                             <td>
                                 <div class="image-preview-block">
                                     <% if (job.images && job.images.length > 0) { %>
-                                        <% job.images.forEach(function(image, index) { %>
-                                            <a 
-                                                href="/uploads/job-images/<%= image %>" 
-                                                class="glightbox" 
-                                                data-gallery="job-<%= job.id %>" 
-                                                data-title="Job Image <%= index + 1 %>">
-                                                <img 
-                                                    src="/uploads/job-images/<%= image %>" 
-                                                    alt="Job Image" 
+                                        <% job.images.forEach(function(image, i) { %>
+                                            <a
+                                                href="/uploads/job-images/<%= image %>"
+                                                class="glightbox"
+                                                data-gallery="job-<%= job.id %>"
+                                                data-title="Job Image <%= i + 1 %>">
+                                                <img
+                                                    src="/uploads/job-images/<%= image %>"
+                                                    alt="Job Image"
                                                     class="thumb-img">
                                             </a>
                                         <% }) %>
@@ -93,7 +98,6 @@
             </table>
         <% } %>
     </section>
-</div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
