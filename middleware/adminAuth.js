@@ -7,6 +7,3 @@ module.exports = function (req, res, next) {
     }
   };
   
-  const fileUpload = require('express-fileupload');
-  app.use(fileUpload());
-  

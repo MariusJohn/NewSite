@@ -1,45 +1,33 @@
-<style>
-    .login-wrapper {
-        /* Your existing login wrapper styles */
-    }
+require('dotenv').config();
 
-    .login-form {
-        /* Your existing login form styles */
-    }
+const isProduction = process.env.NODE_ENV === 'production';
 
-    .error-message {
-        display: block;
-        color: red;
-        font-size: 0.8em;
-        margin-top: 5px;
-    }
-
-    .login-btn {
-        /* Your existing login button styles */
-    }
-
-    .forgot-password {
-        /* Your existing forgot password link styles */
-    }
-
-    .password-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-
-    .password-container input[type="password"],
-    .password-container input[type="text"] {
-        width: 100%;
-        padding-right: 30px; /* Make space for the toggle icon */
-    }
-
-    .password-toggle {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        user-select: none;
-    }
-</style>
+module.exports = {
+  development: {
+    url: process.env.DATABASE_URL,
+    dialect: 'postgres',
+    logging: process.env.DB_LOGGING === 'true',
+    timezone: '+00:00',
+    dialectOptions: isProduction
+      ? { ssl: { require: true, rejectUnauthorized: false } }
+      : {}
+  },
+  test: {
+    url: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
+    dialect: 'postgres',
+    logging: false,
+    timezone: '+00:00',
+    dialectOptions: isProduction
+      ? { ssl: { require: true, rejectUnauthorized: false } }
+      : {}
+  },
+  production: {
+    url: process.env.DATABASE_URL,
+    dialect: 'postgres',
+    logging: false,
+    timezone: '+00:00',
+    dialectOptions: {
+      ssl: { require: true, rejectUnauthorized: false },
+    },
+  },
+};
