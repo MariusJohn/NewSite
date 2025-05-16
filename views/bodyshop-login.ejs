@@ -15,36 +15,36 @@
   <div class="page-wrapper">
 
 
-    <main>
-      <div class="login-wrapper">
-          <h1>Bodyshop Login</h1>
-          <form id="loginForm" action="/bodyshop/login" method="POST" class="login-form">
-              <label for="bodyshopEmail">Bodyshop Email:</label>
-              <input type="email" id="bodyshopEmail" name="email" placeholder="Email" required>
-              <span class="error-message" id="email-error"></span>
+  <main>
+    <div class="login-wrapper">
+      <h1>Bodyshop Login</h1>
+      <form action="/bodyshop/login" method="POST">
+        <label for="bodyshopEmail">Bodyshop Email:</label>
+        <input type="email" name="email" placeholder="Email" required />
+
+        
+
+        <label for="password">Password:</label>
+        
+        <div class="password-container">
+        <input type="password" id="password" name="password" placeholder="Your Password" required>
+        <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
+        </div>
+
+        <label for="bodyshopArea">Postcode / Area:</label>
+        <input type="text" name="area" placeholder="Postcode / Area" required>
   
-              <label for="password">Password:</label>
-              <div class="password-container">
-                  <input type="password" id="password" name="password" placeholder="Your Password" required>
-                  <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
-                  <span class="error-message" id="password-error"></span>
-              </div>
-  
-              <label for="bodyshopArea">Postcode / Area:</label>
-              <input type="text" id="bodyshopArea" name="area" placeholder="Postcode / Area" required>
-              <span class="error-message" id="area-error"></span>
-  
-              <button type="submit" class="login-btn">Login</button>
-              <p class="forgot-password"><a href="/bodyshop/password-reset">Forgot Password?</a></p>
-              <p id="form-error-message" class="error-message" style="display: none;"></p>
-          </form>
-      </div>
+        <button type="submit">Login</button>
+        <p style="padding: 5px;"><a href="/bodyshop/password-reset">Forgot Password?</a></p>
+
+      </form>
+    </div>
   </main>
   
   <%- include('partials/footer') %>
 
  
-<script src="/js/bodyshop-login.js"></script>
-<script src="/js/navbar-toggle.js"></script>
+
+  <script src="/js/navbar-toggle.js"></script>
 </body>
 </html>
