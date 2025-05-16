@@ -16,6 +16,13 @@ body {
     border-radius: 16px;
     color: #333;
   }
+
+  .error-message {
+    display: block;
+    color: red;
+    font-size: 0.8em;
+    margin-top: 5px;
+}
   
   .login-wrapper h1 {
     font-size: 28px;
@@ -59,14 +66,14 @@ body {
   }
   .password-container {
     position: relative;
-    width: 100%;
-    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
 }
 
 .password-container input[type="password"],
 .password-container input[type="text"] {
     width: 100%;
-    padding: 10px 40px 10px 15px;
+    padding-right: 30px;
     border-radius: 5px;
     border: 1px solid #ccc;
     font-size: 14px;
