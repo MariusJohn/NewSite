@@ -2,10 +2,10 @@
 const express = require('express');
 const multer = require('multer');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
-const path = require('path');
 const dotenv = require('dotenv');
 const { randomUUID } = require('crypto');
+const path = require('path');
+const sharp = require('sharp');
 
 dotenv.config();
 
@@ -24,7 +24,12 @@ const s3Client = new S3Client({
 const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max file size
+    limits: { fileSize: 8 * 1024 * 1024 }, // 8MB max file size before compression
+});
+
+// === Serve the Job Upload Form (EJS) ===
+router.get('/upload', (req, res) => {
+    res.render('job-upload'); 
 });
 
 // Handle file uploads
@@ -35,15 +40,30 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
         const uploadedFiles = [];
 
         for (const file of req.files) {
+            // Generate a unique file name
             const uniqueFileName = `job-images/${randomUUID()}-${file.originalname}`;
+
+            // Compress and optimize the image
+            const compressedBuffer = await sharp(file.buffer)
+                .resize({
+                    width: 1920,
+                    withoutEnlargement: true
+                }) // Resize but don't enlarge small images
+                .jpeg({
+                    quality: 70,
+                    mozjpeg: true
+                }) // High-efficiency JPEG compression
+                .toBuffer();
+
+            // Prepare S3 upload parameters
             const params = {
                 Bucket: bucketName,
                 Key: uniqueFileName,
-                Body: file.buffer,
-                ContentType: file.mimetype,
-                ACL: 'public-read',
+                Body: compressedBuffer,
+                ContentType: 'image/jpeg',
             };
 
+            // Upload the compressed image to S3
             await s3Client.send(new PutObjectCommand(params));
 
             const fileUrl = `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${uniqueFileName}`;
@@ -52,8 +72,8 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
 
         console.log("Uploaded files:", uploadedFiles);
 
-        // Respond with the uploaded file URLs
-        res.json({
+        // Render the success page
+        res.render('upload-success', {
             message: 'Files uploaded successfully',
             files: uploadedFiles,
             name,
@@ -62,8 +82,12 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
             location
         });
     } catch (error) {
-        console.error("Upload error:", error);
-        res.status(500).json({ message: 'Error uploading files' });
+        console.error("upload-error:", error);
+
+        // Render the error page with a user-friendly message
+        res.render('upload-error', {
+            message: 'An error occurred while uploading the files. Please make sure each image is smaller than 8MB before compression.'
+        });
     }
 });
 
