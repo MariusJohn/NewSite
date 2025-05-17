@@ -1,1 +1,0 @@
-<form id="uploadForm" action="/uploads/upload" method="POST" enctype="multipart/form-data" class="upload-form">

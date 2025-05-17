@@ -1,3 +1,4 @@
+/* Base Styles */
 .error-main {
   display: flex;
   justify-content: center;
@@ -9,26 +10,32 @@
   text-align: center;
 }
 
+/* Error Box Styles */
 .error-box {
   background-color: #102b45;
   padding: 40px 30px;
   border-radius: 12px;
   max-width: 600px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .error-box h2 {
-  font-size: 28px;
+  font-size: 32px;
   margin-bottom: 20px;
   color: #fa5d28;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
 .error-box p {
   font-size: 18px;
   margin-bottom: 25px;
-  color: #fff;
+  color: #ffffff;
+  line-height: 1.6;
 }
 
+/* Button Styles */
 .btn-back {
   display: inline-block;
   background-color: #25D366;
@@ -37,18 +44,60 @@
   text-decoration: none;
   border-radius: 8px;
   font-weight: bold;
-  transition: background 0.3s;
+  transition: background 0.3s, transform 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .btn-back:hover {
   background-color: #1cb75e;
+  transform: scale(1.05);
 }
 
-@media screen and (max-width: 600px) {
+.btn-back:active {
+  background-color: #148d48;
+  transform: scale(0.98);
+}
+
+/* Responsive Styles */
+@media screen and (max-width: 768px) {
   .error-box {
-    display: flex;
-    flex-direction: column;
+    padding: 30px 20px;
+    max-width: 90%;
   }
-  
-  
+
+  .error-box h2 {
+    font-size: 26px;
+  }
+
+  .error-box p {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .btn-back {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .error-box {
+    padding: 20px 15px;
+    border-radius: 8px;
+  }
+
+  .error-box h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+
+  .error-box p {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+
+  .btn-back {
+    padding: 8px 18px;
+    font-size: 12px;
+  }
 }

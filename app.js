@@ -7,7 +7,7 @@ const customerRoutes = require('./routes/customer');
 const adminRoutes = require('./routes/admin');
 const adminAuth = require('./middleware/adminAuth');
 const fileUpload = require('express-fileupload');
-
+const uploadsRoutes = require('./routes/uploads');
 
 
 require('./scheduler');
@@ -54,7 +54,7 @@ const pricingRoutes = require('./routes/pricing');
 const contactRoutes = require('./routes/contact');
 const privacyRoutes = require('./routes/privacy')
 const jobsRoutes = require('./routes/jobs');
-const uploadsRoutes = require('./routes/uploads');
+
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 const adminBodyshopRoutes = require('./routes/admin-bodyshops');
 
@@ -71,8 +71,8 @@ app.use('/jobs', jobsRoutes);
 app.use('/', customerRoutes);
 app.use('/admin', adminRoutes);
 app.use('/jobs/admin', adminAuth);
-app.use('/uploads', uploadsRoutes); 
 app.use('/jobs/admin', adminBodyshopRoutes);
+app.use('/uploads', uploadsRoutes); 
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -84,3 +84,4 @@ app.use((err, req, res, next) => {
 app.listen(port, '0.0.0.0', () => {
     console.log(`✅ Server running on port ${port}`);
 });
+

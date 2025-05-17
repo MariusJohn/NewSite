@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
     const form = document.getElementById("uploadForm");
+    if (!form) return; 
+
     const nameInput = document.getElementById("name");
     const emailInput = document.getElementById("email");
     const phoneInput = document.getElementById("telephone");
@@ -12,6 +14,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const postcodeError = document.getElementById("postcode-error");
     const imagesError = document.getElementById("images-error");
     const formError = document.getElementById("form-error-message");
+
+    const MAX_FILE_SIZE_MB = 8;
+    const MIN_IMAGES = 5;
+    const MAX_IMAGES = 8;
 
     // Name Validation
     nameInput.addEventListener("input", function() {
@@ -55,17 +61,21 @@ document.addEventListener("DOMContentLoaded", function() {
     // Image Validation
     imagesInput.addEventListener("change", function() {
         const files = imagesInput.files;
-        if (files.length < 5 || files.length > 8) {
-            showError(imagesError, "Please upload between 5 to 8 images.");
-        } else {
-            for (const file of files) {
-                if (file.size > 5 * 1024 * 1024) {
-                    showError(imagesError, "Each image must be smaller than 5MB.");
-                    return;
-                }
-            }
-            clearError(imagesError);
+
+        if (files.length < MIN_IMAGES || files.length > MAX_IMAGES) {
+            showError(imagesError, `Please upload between ${MIN_IMAGES} to ${MAX_IMAGES} images.`);
+            return;
         }
+
+        for (const file of files) {
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > MAX_FILE_SIZE_MB) {
+                showError(imagesError, `Each image must be smaller than ${MAX_FILE_SIZE_MB}MB.`);
+                return;
+            }
+        }
+
+        clearError(imagesError);
     });
 
     // Form Submission Check
@@ -90,4 +100,3 @@ document.addEventListener("DOMContentLoaded", function() {
         element.style.display = "none";
     }
 });
-
