@@ -30,7 +30,6 @@ app.use(session({
 }));
 
 
-app.use(fileUpload());
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -55,6 +54,7 @@ const pricingRoutes = require('./routes/pricing');
 const contactRoutes = require('./routes/contact');
 const privacyRoutes = require('./routes/privacy')
 const jobsRoutes = require('./routes/jobs');
+const uploadsRoutes = require('./routes/uploads');
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 const adminBodyshopRoutes = require('./routes/admin-bodyshops');
 
@@ -71,6 +71,7 @@ app.use('/jobs', jobsRoutes);
 app.use('/', customerRoutes);
 app.use('/admin', adminRoutes);
 app.use('/jobs/admin', adminAuth);
+app.use('/uploads', uploadsRoutes); 
 app.use('/jobs/admin', adminBodyshopRoutes);
 
 // Error handling middleware

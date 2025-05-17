@@ -1,1 +1,1 @@
-git rev-list --objects --all | grep -E "76108b0371b640f198ef56c0e32e5b553d4087bb|a8d1e76cb8e6984c4a5c3d06104b8f70649ae292|613bfb05960c69bf242ee986dfeceb5d092abe24"
+<form id="uploadForm" action="/uploads/upload" method="POST" enctype="multipart/form-data" class="upload-form">

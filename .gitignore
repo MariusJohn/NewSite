@@ -10,6 +10,10 @@ yarn-error.log*
 
 # Environment variables file (sensitive info)
 .env
+.env.local
+.env.production
+.env.development
+.env.test
 
 # Optional npm cache folder
 .npm
@@ -30,4 +34,21 @@ Thumbs.db
 .idea/
 *.sublime-workspace
 *.sublime-project
+
+# Secrets and Keys
+*.pem
+*.key
+*.aws
+*.crt
+*.csr
+*.jks
+config.js
+
+# Ignore AWS and Azure keys
+aws-config.json
+azure-config.json
+
+# Ignore uploads and database files
+uploads/
+database.sqlite
 
