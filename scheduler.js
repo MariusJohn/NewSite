@@ -5,7 +5,6 @@ const nodemailer = require('nodemailer');
 const { Op } = require('sequelize');
 require('dotenv').config();
 
-
 // Email transporter
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -18,89 +17,152 @@ const transporter = nodemailer.createTransport({
 });
 
 // Verify the connection
-transporter.verify(function (error, success) {
+transporter.verify((error) => {
     if (error) {
         console.error("Email connection failed:", error);
-    } else {
-        console.log("Email server is ready to take messages");
     }
 });
 
 // Schedule the reminder to run every hour
 cron.schedule('0 * * * *', async () => {
-
     try {
-        // Find all jobs with at least one quote older than 24 hours
+        const now = new Date();
+        const cutoff24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);  // 24 hours ago
+        const cutoff48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);  // 48 hours ago
+
+        // Find all jobs that are still open for quotes but are nearing the 48-hour limit
         const jobs = await Job.findAll({
-            include: {
+            where: {
+                status: 'approved',
+                quoteExpiry: {
+                    [Op.gt]: now
+                }
+            },
+            include: [{
                 model: Quote,
-                where: {
-                    createdAt: {
-                        [Op.lte]: new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours
-                    }
-                },
-                required: true
-            }
+                as: 'Quotes'
+            }]
         });
 
-        console.log(`Found ${jobs.length} jobs with quotes older than 24 hours.`);
-
         for (const job of jobs) {
-            console.log(`Processing Job ID: ${job.id}, Location: ${job.location}`);
+            const quoteCount = job.quoteCount || 0;
+            const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
+            const remainingBodyshops = bodyshopsInRange - quoteCount;
 
-            // Find bodyshops in the same area that haven't quoted yet
-            const nearbyBodyshops = await Bodyshop.findAll({
-                where: {
-                    area: job.location,
-                    lastReminderSent: {
-                        [Op.or]: [
-                            null,
-                            {
-                                [Op.lte]: new Date(Date.now() - 24 * 60 * 60 * 1000)
-                            }
-                        ]
-                    }
+            // 24-hour reminder logic
+            if (job.createdAt <= cutoff24h && !job.extended) {
+                if (quoteCount === 0) {
+                    // No quotes, send final 24-hour reminder
+                    await sendCustomerNoQuotesEmail(job);
+                } else if (quoteCount === 1) {
+                    // 1 quote available, ask if they want to wait
+                    await sendCustomerSingleQuoteEmail(job, remainingBodyshops);
+                } else if (quoteCount === 2) {
+                    // 2 quotes available, ask if they want to wait
+                    await sendCustomerMultipleQuotesEmail(job, remainingBodyshops);
+                } else if (quoteCount > 2) {
+                    // 3+ quotes, direct to payment
+                    await sendCustomerPaymentEmail(job);
                 }
-            });
 
-            console.log(`Found ${nearbyBodyshops.length} bodyshops in the area without recent reminders.`);
+                // Mark as extension requested to avoid repeat reminders
+                job.extensionRequestedAt = now;
+                job.extended = true;
+                await job.save();
+            }
 
-            for (const bodyshop of nearbyBodyshops) {
-                // Check if this bodyshop has already submitted a quote
-                const hasQuoted = await Quote.findOne({
-                    where: {
-                        bodyshopId: bodyshop.id,
-                        jobId: job.id
-                    }
-                });
-
-                if (!hasQuoted) {
-                    // Send reminder email
-                    const mailOptions = {
-                        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
-                        to: bodyshop.email,
-                        subject: `New Quote Opportunity for Job #${job.id}`,
-                        text: `A new quote has been submitted in your area for Job #${job.id}. Please visit your dashboard to submit your quote.`
-                    };
-
-                    try {
-                        await transporter.sendMail(mailOptions);
-                        console.log(`Reminder sent to: ${bodyshop.email}`);
-
-                        // Update the last reminder timestamp
-                        bodyshop.lastReminderSent = new Date();
-                        await bodyshop.save();
-                    } catch (emailError) {
-                        console.error(`Failed to send email to ${bodyshop.email}:`, emailError);
-                    }
+            // 48-hour expiry logic
+            if (job.createdAt <= cutoff48h) {
+                if (quoteCount === 0) {
+                    // Delete job if no quotes after 48 hours
+                    await sendCustomerJobDeletedEmail(job);
+                    await job.destroy();
                 } else {
-                    console.log(`Bodyshop ${bodyshop.name} has already quoted for Job ID: ${job.id}, skipping...`);
+                    // Direct to payment if at least 1 quote is available
+                    await sendCustomerPaymentEmail(job);
                 }
             }
         }
 
-        console.log("Hourly reminders processed.");
     } catch (error) {
-        console.error("Error sending reminders:", error);
+        console.error("Error in scheduler:", error);
     }
 });
+
+// Helper functions for customer emails
+async function sendCustomerNoQuotesEmail(job) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - No Quotes Available`,
+        text: `Unfortunately, no bodyshops have provided quotes for your job #${job.id} within 24 hours. You can choose to extend the job for another 24 hours or let it expire. Reply YES to extend or NO to delete the job.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+        console.error(`Failed to send no quotes email for Job ID ${job.id}:`, emailError);
+    }
+}
+
+async function sendCustomerSingleQuoteEmail(job, remainingBodyshops) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - 1 Quote Available`,
+        text: `Your job #${job.id} has received 1 quote within the first 24 hours. There are still ${remainingBodyshops} bodyshops that have not responded. Would you like to extend the job for another 24 hours? Reply YES to extend or NO to proceed to payment.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+        console.error(`Failed to send single quote email for Job ID ${job.id}:`, emailError);
+    }
+}
+
+async function sendCustomerMultipleQuotesEmail(job, remainingBodyshops) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - Multiple Quotes Available`,
+        text: `Your job #${job.id} has received 2 quotes within the first 24 hours. There are still ${remainingBodyshops} bodyshops that have not responded. Would you like to extend the job for another 24 hours to potentially receive more quotes? Reply YES to extend or NO to proceed to payment.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+        console.error(`Failed to send multiple quotes email for Job ID ${job.id}:`, emailError);
+    }
+}
+
+async function sendCustomerPaymentEmail(job) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - Proceed to Payment`,
+        text: `Your job #${job.id} has received enough quotes. Please proceed to the payment page to unlock the details of the bodyshops that have quoted.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        job.status = 'pending_payment';
+        await job.save();
+    } catch (emailError) {
+        console.error(`Failed to send payment email for Job ID ${job.id}:`, emailError);
+    }
+}
+
+async function sendCustomerJobDeletedEmail(job) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - Job Deleted`,
+        text: `Your job #${job.id} has expired and has been automatically deleted as no quotes were received within 48 hours.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+        console.error(`Failed to send job deleted email for Job ID ${job.id}:`, emailError);
+    }
+}

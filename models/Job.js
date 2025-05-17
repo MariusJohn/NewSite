@@ -49,7 +49,6 @@ const Job = sequelize.define('Job', {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },
-    // New Fields for Quotes Submenu
     description: {
         type: DataTypes.TEXT,
         allowNull: true,
@@ -77,14 +76,45 @@ const Job = sequelize.define('Job', {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0
+    },
+    quoteExpiry: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: () => new Date(Date.now() + 48 * 60 * 60 * 1000)  // 48 hours from job creation
+    },
+    extensionRequestedAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+    },
+    extended: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    quoteCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+    },
+    extensionCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+    },
+    customerDecision: {
+        type: DataTypes.ENUM('waiting', 'accepted', 'rejected', 'pending_payment'),
+        defaultValue: 'waiting',
+        allowNull: false
     }
 }, {
     timestamps: true,
     hooks: {
-        beforeUpdate: (job, options) => {
-            if (!job.approvalDate && job.status === 'approved') {
-                job.approvalDate = new Date();
+        beforeCreate: (job, options) => {
+  
+            if (!job.quoteExpiry) {
+                job.quoteExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000);
             }
+        },
+        beforeUpdate: (job, options) => {
             job.lastActionDate = new Date();
         }
     }
@@ -92,8 +122,15 @@ const Job = sequelize.define('Job', {
 
 // Associations
 Job.associate = (models) => {
-    Job.hasMany(models.Quote, { foreignKey: 'jobId', onDelete: 'CASCADE' });
-    Job.belongsTo(models.Bodyshop, { foreignKey: 'selectedBodyshopId', as: 'selectedBodyshop' });
+    Job.hasMany(models.Quote, {
+        foreignKey: 'jobId',
+        as: 'quotes',
+        onDelete: 'CASCADE'
+    });
+    Job.belongsTo(models.Bodyshop, {
+        foreignKey: 'selectedBodyshopId',
+        as: 'selectedBodyshop',
+        onDelete: 'SET NULL'
+    });
 };
-
 module.exports = Job;

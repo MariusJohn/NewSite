@@ -1,6 +1,7 @@
 // models/Quote.js
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/database');
+const Job = require('./Job');
 
 class Quote extends Model {}
 
@@ -55,16 +56,6 @@ Quote.init({
         type: DataTypes.DATE,
         allowNull: true,
         defaultValue: DataTypes.NOW
-    },
-    createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
-    },
-    updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
     }
 }, {
     sequelize,
@@ -74,8 +65,47 @@ Quote.init({
 
 // Associations
 Quote.associate = (models) => {
-    Quote.belongsTo(models.Job, { foreignKey: 'jobId', onDelete: 'CASCADE' });
-    Quote.belongsTo(models.Bodyshop, { foreignKey: 'bodyshopId', onDelete: 'CASCADE' });
+    Quote.belongsTo(models.Job, { foreignKey: 'jobId', as: 'Job', onDelete: 'CASCADE' });
+    Quote.belongsTo(models.Bodyshop, { foreignKey: 'bodyshopId', as: 'Bodyshop', onDelete: 'CASCADE' });
 };
+
+// Hooks to update job quote count and status
+Quote.addHook('afterCreate', async (quote, options) => {
+    const job = await Job.findByPk(quote.jobId);
+    if (job) {
+        // Update the quote count
+        const quoteCount = await Quote.count({ where: { jobId: job.id } });
+        job.quoteCount = quoteCount;
+
+        // Update the quote status
+        if (quoteCount === 1) {
+            job.quoteStatus = 'quoted';
+        } else if (quoteCount > 1) {
+            job.quoteStatus = 'actioned';
+        }
+
+        await job.save();
+    }
+});
+
+Quote.addHook('afterDestroy', async (quote, options) => {
+    const job = await Job.findByPk(quote.jobId);
+    if (job) {
+        // Update the quote count
+        const quoteCount = await Quote.count({ where: { jobId: job.id } });
+        job.quoteCount = quoteCount;
+
+        // Reset the quote status if no quotes remain
+        if (quoteCount === 0) {
+            job.quoteStatus = 'no_quotes';
+        } else if (quoteCount === 1) {
+            job.quoteStatus = 'quoted';
+        } else {
+            job.quoteStatus = 'actioned';
+        }
+
+        await job.save();
+    }
+});
 
 module.exports = Quote;
