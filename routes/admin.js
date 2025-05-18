@@ -1,13 +1,21 @@
 // routes/admin.js
-const express = require('express');
+import express from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 const router = express.Router();
 
-require('dotenv').config();
-
+// === Admin Login Page ===
 router.get('/login', (req, res) => {
+  // Prevent already logged-in admins from accessing the login page
+  if (req.session.isAdmin) {
+    return res.redirect('/jobs/admin');
+  }
   res.render('admin-login', { error: null });
 });
 
+// === Admin Login Handler ===
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -16,16 +24,27 @@ router.post('/login', (req, res) => {
 
   if (email === adminEmail && password === adminPassword) {
     req.session.isAdmin = true;
-    return res.redirect('/jobs/admin');
+    req.session.save(err => {
+      if (err) {
+        console.error('❌ Error saving session:', err);
+        return res.render('admin-login', { error: 'Login failed. Please try again.' });
+      }
+      res.redirect('/jobs/admin');
+    });
   } else {
     return res.render('admin-login', { error: 'Invalid credentials' });
   }
 });
 
+// === Admin Logout Handler ===
 router.get('/logout', (req, res) => {
-  req.session.destroy(() => {
+  req.session.destroy(err => {
+    if (err) {
+      console.error('❌ Error destroying session:', err);
+      return res.status(500).send('Error logging out. Please try again.');
+    }
     res.redirect('/admin/login');
   });
 });
 
-module.exports = router;
+export default router;

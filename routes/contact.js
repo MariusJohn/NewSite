@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
+import bodyParser from 'body-parser';
 
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
@@ -102,4 +102,4 @@ ${message || 'No Message'}`,
         });
 });
 
-module.exports = router;
+export default router;

@@ -1,4 +1,5 @@
-const express = require('express');
+import express from 'express';
+
 const router = express.Router();
 
 // Common header and footer data
@@ -37,4 +38,4 @@ router.get('/', (req, res, next) => {
     }
 });
 
-module.exports = router;
+export default router;

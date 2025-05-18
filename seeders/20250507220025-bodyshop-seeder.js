@@ -1,11 +1,11 @@
-'use strict';
-const bcrypt = require('bcrypt');
+// seeders/20250507220025-bodyshop-seeder.js
+import bcrypt from 'bcrypt';
 
-module.exports = {
+export default {
   async up(queryInterface, Sequelize) {
     const hashedPassword = await bcrypt.hash('testpassword', 10);
     
-    await queryInterface.bulkInsert('Bodyshops', [
+    const bodyshops = [
       {
         name: 'Test Bodyshop 1',
         email: 'test1@bodyshop.com',
@@ -22,7 +22,9 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       }
-    ], {});
+    ];
+
+    await queryInterface.bulkInsert('Bodyshops', bodyshops, {});
   },
 
   async down(queryInterface, Sequelize) {

@@ -1,24 +1,19 @@
 // models/index.js
-const Sequelize = require('sequelize');
-const sequelize = require('../config/database');
+import Sequelize from 'sequelize';
+import sequelize from '../config/database.js';
+import Job from './Job.js';
+import Quote from './Quote.js';
+import Bodyshop from './Bodyshop.js';
 
-const JobModel = require('./Job');
-const QuoteModel = require('./Quote');
-const BodyshopModel = require('./Bodyshop');
+// Set up associations
+Job.hasMany(Quote, { foreignKey: 'jobId', as: 'quotes', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+Quote.belongsTo(Job, { foreignKey: 'jobId', as: 'job', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 
-const Job = JobModel;
-const Quote = QuoteModel;
-const Bodyshop = BodyshopModel;
+Bodyshop.hasMany(Quote, { foreignKey: 'bodyshopId', as: 'bodyshopQuotes', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+Quote.belongsTo(Bodyshop, { foreignKey: 'bodyshopId', as: 'bodyshop', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
 
-Job.hasMany(Quote, { foreignKey: 'jobId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-Quote.belongsTo(Job, { foreignKey: 'jobId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+Bodyshop.hasMany(Job, { foreignKey: 'selectedBodyshopId', as: 'assignedJobs', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
+Job.belongsTo(Bodyshop, { foreignKey: 'selectedBodyshopId', as: 'selectedBodyshop', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
 
-Bodyshop.hasMany(Quote, { foreignKey: 'bodyshopId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-Quote.belongsTo(Bodyshop, { foreignKey: 'bodyshopId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
-
-module.exports = {
-  sequelize,
-  Job,
-  Quote,
-  Bodyshop
-};
+// Export the models and sequelize instance
+export { sequelize, Job, Quote, Bodyshop };
