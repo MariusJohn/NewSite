@@ -1,9 +1,8 @@
-'use strict';
+// seeders/20250507220130-multiple-bodyshops-seeder.js
+import bcrypt from 'bcrypt';
 
-const bcrypt = require('bcrypt');
-
-module.exports = {
-  async up (queryInterface, Sequelize) {
+export default {
+  async up(queryInterface, Sequelize) {
     const bodyshops = [
       {
         name: 'Quick Fix Motors',
@@ -55,10 +54,10 @@ module.exports = {
       }
     ];
 
-    await queryInterface.bulkInsert('Bodyshops', bodyshops);
+    await queryInterface.bulkInsert('Bodyshops', bodyshops, {});
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('Bodyshops', null, {});
   }
 };

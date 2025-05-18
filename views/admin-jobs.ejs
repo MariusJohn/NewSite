@@ -63,15 +63,8 @@
                                 <div class="image-preview-block">
                                     <% if (job.images && job.images.length > 0) { %>
                                         <% job.images.forEach(function(image, index) { %>
-                                            <a 
-                                                href="/uploads/job-images/<%= image %>" 
-                                                class="glightbox" 
-                                                data-gallery="job-<%= job.id %>" 
-                                                data-title="Job Image <%= index + 1 %>">
-                                                <img 
-                                                    src="/uploads/job-images/<%= image %>" 
-                                                    alt="Job Image" 
-                                                    class="thumb-img">
+                                            <a href="<%= image %>" class="glightbox" data-gallery="job-<%= job.id %>" data-title="Job Image <%= index + 1 %>">
+                                                <img src="<%= image %>" alt="Job Image" class="thumb-img">
                                             </a>
                                         <% }) %>
                                     <% } else { %>

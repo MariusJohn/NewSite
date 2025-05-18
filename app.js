@@ -1,16 +1,23 @@
-const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
-const dotenv = require('dotenv');
-const session = require('express-session');
-const customerRoutes = require('./routes/customer');
-const adminRoutes = require('./routes/admin');
-const adminAuth = require('./middleware/adminAuth');
-const fileUpload = require('express-fileupload');
-const uploadsRoutes = require('./routes/uploads');
-
-
-require('./scheduler');
+// app.js
+import express from 'express';
+import path from 'path';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+import session from 'express-session';
+import customerRoutes from './routes/customer.js';
+import adminRoutes from './routes/admin.js';
+import adminAuth from './middleware/adminAuth.js';
+import fileUpload from 'express-fileupload';
+import uploadsRoutes from './routes/uploads.js';
+import indexRoutes from './routes/index.js';
+import quotationsRoutes from './routes/quotations.js';
+import bodyshopRoutes from './routes/bodyshop.js';
+import trainingRoutes from './routes/training.js';
+import pricingRoutes from './routes/pricing.js';
+import contactRoutes from './routes/contact.js';
+import privacyRoutes from './routes/privacy.js';
+import jobsRoutes from './routes/jobs.js';
+import adminBodyshopRoutes from './routes/admin-bodyshops.js';
 
 dotenv.config();
 
@@ -29,50 +36,40 @@ app.use(session({
     }
 }));
 
-
-
 // Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 // Serve uploaded images statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Body Parser Middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Set view engine
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(process.cwd(), 'views'));
 app.set('view engine', 'ejs');
 
-// Import routes
-const indexRoutes = require('./routes/index'); // <--- Import the router objects
-const quotationsRoutes = require('./routes/quotations');
-const bodyshopRoutes = require('./routes/bodyshop');
-const trainingRoutes = require('./routes/training');
-const pricingRoutes = require('./routes/pricing');
-const contactRoutes = require('./routes/contact');
-const privacyRoutes = require('./routes/privacy')
-const jobsRoutes = require('./routes/jobs');
-
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
-const adminBodyshopRoutes = require('./routes/admin-bodyshops');
+app.use((req, res, next) => {
+    console.log(`➡️ Incoming request: ${req.method} ${req.url}`);
+    next();
+});
 
 
 // Mount routes
-app.use('/', indexRoutes); // Use index routes for / path
+app.use('/', indexRoutes);
 app.use('/quotations', quotationsRoutes);
 app.use('/bodyshop', bodyshopRoutes);
 app.use('/training', trainingRoutes);
 app.use('/pricing', pricingRoutes);
 app.use('/contact', contactRoutes);
-app.use('/privacy', privacyRoutes)
-app.use('/jobs', jobsRoutes);
+app.use('/privacy', privacyRoutes);
 app.use('/', customerRoutes);
 app.use('/admin', adminRoutes);
+app.use('/jobs', jobsRoutes);
 app.use('/jobs/admin', adminAuth);
 app.use('/jobs/admin', adminBodyshopRoutes);
-app.use('/uploads', uploadsRoutes); 
+app.use('/uploads', uploadsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -81,7 +78,6 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-app.listen(port, '0.0.0.0', () => {
+app.listen(port, () => {
     console.log(`✅ Server running on port ${port}`);
 });
-

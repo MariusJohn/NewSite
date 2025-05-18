@@ -1,7 +1,8 @@
 // routes/admin-bodyshops.js
-const express = require('express');
+import express from 'express';
+import { Bodyshop } from '../models/index.js';
+
 const router = express.Router();
-const { Bodyshop } = require('../models');
 
 // Show all bodyshops pending approval
 router.get('/bodyshops', async (req, res) => {
@@ -49,4 +50,4 @@ router.post('/bodyshops/:id/reject', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

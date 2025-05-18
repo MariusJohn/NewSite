@@ -1,6 +1,7 @@
 // models/Bodyshop.js
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { Model, DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
+import Quote from './Quote.js';
 
 class Bodyshop extends Model {}
 
@@ -64,9 +65,9 @@ Bodyshop.init({
     modelName: 'Bodyshop',
     timestamps: true
 });
-// models/Bodyshop.js
-Bodyshop.associate = (models) => {
-    Bodyshop.hasMany(models.Quote, { foreignKey: 'bodyshopId', onDelete: 'CASCADE' });
-};
 
-module.exports = Bodyshop;
+// Associations (must be defined after all models are imported)
+Bodyshop.hasMany(Quote, { foreignKey: 'bodyshopId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+Quote.belongsTo(Bodyshop, { foreignKey: 'bodyshopId', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
+
+export default Bodyshop;

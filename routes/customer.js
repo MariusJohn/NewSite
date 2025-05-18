@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { Job, Quote } = require('../models');
+
 
 // === View All Quotes for a Job ===
 router.get('/quotes/:jobId', async (req, res) => {
@@ -41,4 +41,4 @@ router.post('/quotes/:jobId/select', async (req, res) => {
 });
 
 
-module.exports = router;
+export default router;
