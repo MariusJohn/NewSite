@@ -268,21 +268,55 @@ router.post('/:id/restore', adminAuth, async (req, res) => {
 
 
 
-// === Move Job from Archived to Deleted ===
+// === Move Job from Rejected to Archived ===
+router.post('/:id/archive', adminAuth, async (req, res) => {
+    const { id } = req.params;
+    try {
+        await Job.update({ status: 'archived' }, { where: { id: id } });
+        res.redirect('/jobs/admin?filter=archived');
+    } catch (err) {
+        console.error('❌ Error archiving job:', err);
+        res.status(500).send('Server error while archiving job.');
+    }
+});
+
+// === Move Job from Archived to Deleted (Soft Delete) ===
 router.post('/:id/delete', adminAuth, async (req, res) => {
     const { id } = req.params;
- 
-    
     try {
-     
         await Job.update({ status: 'deleted' }, { where: { id: id } });
-        console.log(`✅ Job ${id} moved to 'deleted' status successfully.`);
-        
-
         res.redirect('/jobs/admin?filter=deleted');
     } catch (err) {
         console.error('❌ Error moving job to deleted:', err);
         res.status(500).send('Server error while moving job to deleted.');
     }
 });
+
+
+//Restore Job (Any State to Pending)
+router.post('/:id/restore', adminAuth, async (req, res) => {
+    const { id } = req.params;
+    try {
+        await Job.update({ status: 'pending' }, { where: { id: id } });
+        res.redirect('/jobs/admin?filter=live');
+    } catch (err) {
+        console.error('❌ Error restoring job:', err);
+        res.status(500).send('Server error while restoring job.');
+    }
+});
+
+// === Permanently Delete Job from Database ===
+router.post('/:id/hard-delete', adminAuth, async (req, res) => {
+    const { id } = req.params;
+    try {
+        await Job.destroy({ where: { id: id } });
+        res.redirect('/jobs/admin?filter=deleted');
+    } catch (err) {
+        console.error('❌ Error permanently deleting job:', err);
+        res.status(500).send('Server error while permanently deleting job.');
+    }
+});
+
+
+
 export default router;

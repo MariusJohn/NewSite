@@ -1,20 +1,18 @@
-/* Reset (already present - keep this) */
-
 .dashboard-container {
-  padding-top: 60px; /* Add padding to the top */
+  padding-top: 60px; 
 }
-/* General Styles */
+
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* A clean, professional font */
-  background-color: #f4f7f6; /* Light, neutral background */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  background-color: #f4f7f6; 
   color: #333;
   margin: 0;
   padding: 0;
-  line-height: 1.6; /* Improved readability */
+  line-height: 1.6;
 }
 
 
-/* Page Wrapper (already present - keep this) */
+
 
 /* Header Styles */
 .dashboard-header {

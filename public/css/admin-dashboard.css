@@ -14,7 +14,7 @@ body {
 
 /* Sidebar Styles */
 .sidebar {
-  width: 20%;
+  width: 350px;
   background-color: #102b45;
   padding: 20px;
   display: flex;
@@ -386,30 +386,4 @@ body {
 
 .btn-reject:hover {
   background-color: #c4401b;
-}
-
-@media (max-width: 600px) {
-  .sidebar {
-      width: 100%;
-      padding: 15px;
-  }
-
-  .main-content {
-      padding: 15px;
-  }
-
-  .quotes-table th, 
-  .quotes-table td {
-      padding: 8px;
-  }
-
-  .sidebar .menu li {
-      margin-bottom: 10px;
-  }
-}
-
-/* Hover Effects */
-.quotes-table tbody tr:hover {
-  background-color: #1f4e6f;
-  cursor: pointer;
 }

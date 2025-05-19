@@ -8,7 +8,7 @@ const router = express.Router();
 
 // === Admin Login Page ===
 router.get('/login', (req, res) => {
-  // Prevent already logged-in admins from accessing the login page
+
   if (req.session.isAdmin) {
     return res.redirect('/jobs/admin');
   }
@@ -36,8 +36,8 @@ router.post('/login', (req, res) => {
   }
 });
 
-// === Admin Logout Handler ===
-router.get('/logout', (req, res) => {
+// === Admin Logout Handler(POST) ===
+router.post('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
       console.error('❌ Error destroying session:', err);
