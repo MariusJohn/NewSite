@@ -11,14 +11,21 @@
         <a href="/."><img src="/img/logo.png" alt="MC Quote Logo"></a>
         <h2>Admin Panel</h2>
         <ul class="menu">
-            <li><a href="/jobs/admin?filter=total">Total Jobs</a></li>
-            <li><a href="/jobs/admin?filter=live">Live Jobs</a></li>
-            <li><a href="/jobs/admin?filter=approved">Approved Jobs</a></li>
-            <li><a href="/jobs/admin?filter=rejected">Rejected Jobs</a></li>
-            <li><a href="/jobs/admin?filter=archived">Archived Jobs</a></li>
-            <li><a href="/jobs/admin?filter=deleted">Deleted Jobs</a></li>
+            <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=live">Live Jobs (<%= liveCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
+            <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
             <li><a href="/jobs/admin/quotes">Jobs with Quotes</a></li>
-            <li><a href="/jobs/admin/bodyshops" class="active">Bodyshops</a></li>
+            <li><a href="/jobs/admin/bodyshops">Bodyshops</a></li>
+            <li>
+                <a href="">
+                <form action="/admin/logout" method="POST" style="display: inline;">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </a>
+            </li>
         </ul>
     </div>
 

@@ -24,6 +24,11 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+
+// Body Parser Middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 // === Session Setup (No Redis) ===
 app.use(session({
     secret: process.env.SESSION_SECRET || 'SESSION_KEY',
@@ -32,6 +37,7 @@ app.use(session({
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
+        sameSite: 'lax',  
         maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week
     }
 }));
@@ -42,9 +48,7 @@ app.use(express.static(path.join(process.cwd(), 'public')));
 // Serve uploaded images statically
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Body Parser Middleware
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+
 
 // Set view engine
 app.set('views', path.join(process.cwd(), 'views'));

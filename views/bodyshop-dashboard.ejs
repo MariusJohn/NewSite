@@ -17,7 +17,7 @@
     <header class="dashboard-header">
         <img src="/img/logo.png" alt="Logo" class="logo">
         <h1>Available Jobs for Quoting</h1>
-        <form action="/bodyshop" method="GET">
+        <form action="/bodyshop/logout" method="GET">
             <button type="submit" class="logout-btn">Log Out</button>
         </form>
     </header>
@@ -58,7 +58,7 @@
                         <tr>
                             <td><%= index + 1 %></td>
                             <td><%= job.location %></td>
-                            <td><%= job.dataValues.distance ? job.dataValues.distance.toFixed(2) : "N/A" %></td>
+                            <td><%= job.distance ? job.distance.toFixed(2) : "N/A" %> miles</td>
                             <td>
                                 <div class="image-preview-block">
                                     <% if (job.images && job.images.length > 0) { %>
