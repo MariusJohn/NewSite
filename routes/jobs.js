@@ -8,30 +8,33 @@ const fs = require('fs');
 const nodemailer = require('nodemailer');
 const { Op } = require('sequelize');
 const { Job, Quote,Bodyshop } = require('../models');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { randomUUID } = require('crypto'); // For generating unique S3 filenames
+const mime = require('mime-types'); // For determining ContentType
 
 require('dotenv').config();
 
 const router = express.Router();
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
-const tempDir = path.join(__dirname, '..', 'uploads', 'temp');
-if (!fs.existsSync(tempDir)) {
-  fs.mkdirSync(tempDir, { recursive: true });
-}
-
-// === Multer Storage Config (temporary location for Sharp to process) ===
-const tempStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, '..', 'uploads', 'temp'));
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
 });
 
-const upload = multer({ storage: tempStorage });
+
+
+// === Multer Storage Config (Use memory storage for S3 uploads) ===
+const storage = multer.memoryStorage(); 
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 8 * 1024 * 1024 },
+});
+
+
 
 // === GET Upload Form ===
 router.get('/upload', (req, res) => {
@@ -39,87 +42,130 @@ router.get('/upload', (req, res) => {
 });
 
 // === POST Upload Form with Sharp Compression and Coordinates Fetching ===
-router.post('/upload', (req, res, next) => {
-  upload.array('images', 8)(req, res, async (err) => {
-      if (err) {
-          console.error('❌ Multer error:', err);
-          return res.status(500).render('upload-error', {
-              title: 'Upload Error',
-              message: 'An unexpected error occurred during file upload.'
+router.post('/upload', upload.array('images', 8), async (req, res) => {
+  try { // <-- This is the opening try block for the entire route
+      const phoneRegex = /^07\d{9}$/;
+      const { name, email, location, telephone } = req.body;
+
+      if (!phoneRegex.test(telephone)) {
+          return res.status(400).render('upload-error', {
+              title: 'Invalid telephone number',
+              message: 'Please enter a valid UK phone number (07...).'
           });
       }
 
-      try {
-          const phoneRegex = /^07\d{9}$/;
-          const { name, email, location, telephone } = req.body;
-
-          if (!phoneRegex.test(telephone)) {
-              return res.status(400).render('upload-error', {
-                  title: 'Invalid telephone number',
-                  message: 'Please enter a valid UK phone number (07...).'
-              });
+      const apiKey = process.env.OPENCAGE_API_KEY;
+      const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
+          params: {
+              q: location,
+              key: apiKey,
+              countrycode: 'gb',
+              limit: 1
           }
+      });
 
-          const apiKey = process.env.OPENCAGE_API_KEY;
-          const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
-              params: {
-                  q: location,
-                  key: apiKey,
-                  countrycode: 'gb',
-                  limit: 1
-              }
+      if (!geoRes.data || !geoRes.data.results || !geoRes.data.results.length) {
+          console.error('❌ No coordinates found for:', location);
+          return res.status(400).render('upload-error', {
+              title: 'Location Error',
+              message: 'Unable to find coordinates for the given postcode.'
           });
+      }
 
-          if (!geoRes.data || !geoRes.data.results || !geoRes.data.results.length) {
-              console.error('❌ No coordinates found for:', location);
-              return res.status(400).render('upload-error', {
-                  title: 'Location Error',
-                  message: 'Unable to find coordinates for the given postcode.'
-              });
-          }
+      const { lat, lng } = geoRes.data.results[0].geometry;
+      console.log('Latitude:', lat, 'Longitude:', lng);
 
-          const { lat, lng } = geoRes.data.results[0].geometry;
-          console.log('Latitude:', lat, 'Longitude:', lng);
+      const uploadedS3Urls = []; // This will store the full S3 URLs
 
-          const compressedFilenames = [];
-          const finalDir = path.join(__dirname, '..', 'uploads', 'job-images');
+      if (!req.files || req.files.length === 0) {
+          console.warn('⚠️ No files were submitted with the form.');
+      } else {
           for (const file of req.files) {
-              const compressedFilename = `compressed-${Date.now()}-${Math.round(Math.random() * 1e9)}.jpg`;
-              const outputPath = path.join(finalDir, compressedFilename);
+              console.log(`Processing file: ${file.originalname}`);
+              console.log(`File buffer length: ${file.buffer ? file.buffer.length : 'undefined/null'}`);
+              console.log(`File mimetype: ${file.mimetype}`);
 
-              await sharp(file.path)
-                  .resize({ width: 1920 })
-                  .jpeg({ quality: 75 })
-                  .toFile(outputPath);
+              // Ensure file.buffer exists and has data before attempting sharp
+              if (!file.buffer || file.buffer.length === 0) {
+                  console.warn(`⚠️ Skipping empty or invalid file buffer for: ${file.originalname}`);
+                  continue; // Skip to the next file
+              }
 
-              fs.unlinkSync(file.path);
-              compressedFilenames.push(compressedFilename);
+              try { // This try-catch is for the individual file processing (sharp and S3)
+                  const compressedBuffer = await sharp(file.buffer)
+                      .resize({ width: 1920, withoutEnlargement: true })
+                      .jpeg({ quality: 75 })
+                      .toBuffer();
+
+                  const uniqueFileName = `${randomUUID()}.jpg`;
+                  const s3Key = `job-images/${uniqueFileName}`;
+
+                  const command = new PutObjectCommand({
+                      Bucket: process.env.AWS_BUCKET_NAME,
+                      Key: s3Key,
+                      Body: compressedBuffer,
+                      ContentType: 'image/jpeg',
+                  });
+
+                  await s3Client.send(command);
+
+                  const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
+                  uploadedS3Urls.push(imageUrl);
+                  console.log(`✅ Successfully uploaded to S3: ${imageUrl}`);
+
+              } catch (fileProcessingError) { // Catch specific error for this file (e.g., Sharp invalid input)
+                  console.error(`❌ Error processing or uploading file ${file.originalname} to S3:`, fileProcessingError);
+                  // Crucially, we do NOT re-throw here. We log the error and allow the loop to continue.
+                  // This ensures the main job creation logic is still attempted even if one image fails.
+              }
           }
+      }
 
-          // Save job to DB
-          await Job.create({
-              customerName: name,
-              customerEmail: email,
-              customerPhone: telephone,
-              location,
-              latitude: lat,
-              longitude: lng,
-              images: compressedFilenames,
-              status: 'pending',
-              paid: false
-          });
+      // --- DATABASE SAVE SECTION (THIS IS WHAT WE WANT TO REACH) ---
+      console.log('Attempting to create job with data:', {
+          customerName: name,
+          customerEmail: email,
+          customerPhone: telephone,
+          location,
+          latitude: lat,
+          longitude: lng,
+          images: uploadedS3Urls,
+          status: 'pending',
+          paid: false
+      });
 
-          res.render('upload-success');
-      } catch (err) {
-          console.error('❌ Error in upload logic:', err);
-          res.status(500).render('upload-error', {
-              title: 'Server Error',
-              message: 'Something went wrong. Please try again later.'
+      const newJob = await Job.create({
+          customerName: name,
+          customerEmail: email,
+          customerPhone: telephone,
+          location,
+          latitude: lat,
+          longitude: lng,
+          images: uploadedS3Urls,
+          status: 'pending',
+          paid: false
+      });
+      console.log('✅ Job successfully created in DB with ID:', newJob.id);
+
+      res.render('upload-success');
+
+  } catch (routeError) { // <-- This is the catch block for the entire route's try
+      console.error('❌ Final catch - Error in jobs.js upload route:', routeError);
+      // Check if this error is a Sequelize validation error or something else
+      if (routeError.name === 'SequelizeValidationError') {
+          const messages = routeError.errors.map(err => err.message).join(', ');
+          console.error('Sequelize Validation Errors:', messages);
+          return res.status(400).render('upload-error', {
+              title: 'Validation Error',
+              message: `Data validation failed: ${messages}`
           });
       }
-  });
-});
-
+      res.status(500).render('upload-error', {
+          title: 'Server Error',
+          message: 'Something went wrong. Please try again later.'
+      });
+  } // <-- This is the closing curly brace for the catch block
+}); // <-- This is the closing curly brace for the router.post callback function
 
 // === Admin Job List with Filters and Counts ===
 router.get('/admin', async (req, res) => {
@@ -176,6 +222,7 @@ router.get('/admin', async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
 
 
 // === Approve Job ===
@@ -312,6 +359,7 @@ router.get('/admin/quotes', async (req, res) => {
       res.status(500).send('Server error');
   }
 });
+
 
 
 module.exports = router;
