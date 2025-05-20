@@ -43,7 +43,7 @@ router.get('/upload', (req, res) => {
 
 // === POST Upload Form with Sharp Compression and Coordinates Fetching ===
 router.post('/upload', upload.array('images', 8), async (req, res) => {
-  try { // <-- This is the opening try block for the entire route
+  try { 
       const phoneRegex = /^07\d{9}$/;
       const { name, email, location, telephone } = req.body;
 
@@ -115,13 +115,12 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
 
               } catch (fileProcessingError) { // Catch specific error for this file (e.g., Sharp invalid input)
                   console.error(`❌ Error processing or uploading file ${file.originalname} to S3:`, fileProcessingError);
-                  // Crucially, we do NOT re-throw here. We log the error and allow the loop to continue.
-                  // This ensures the main job creation logic is still attempted even if one image fails.
+                  
               }
           }
       }
 
-      // --- DATABASE SAVE SECTION (THIS IS WHAT WE WANT TO REACH) ---
+
       console.log('Attempting to create job with data:', {
           customerName: name,
           customerEmail: email,
@@ -149,9 +148,7 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
 
       res.render('upload-success');
 
-  } catch (routeError) { // <-- This is the catch block for the entire route's try
-      console.error('❌ Final catch - Error in jobs.js upload route:', routeError);
-      // Check if this error is a Sequelize validation error or something else
+  } catch (routeError) { 
       if (routeError.name === 'SequelizeValidationError') {
           const messages = routeError.errors.map(err => err.message).join(', ');
           console.error('Sequelize Validation Errors:', messages);
@@ -164,8 +161,8 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
           title: 'Server Error',
           message: 'Something went wrong. Please try again later.'
       });
-  } // <-- This is the closing curly brace for the catch block
-}); // <-- This is the closing curly brace for the router.post callback function
+  } 
+}); 
 
 // === Admin Job List with Filters and Counts ===
 router.get('/admin', async (req, res) => {
