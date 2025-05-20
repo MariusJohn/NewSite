@@ -68,10 +68,15 @@
                             </td>
                             <td>
                                 <div class="image-preview-block">
-                                    <% if (job.images && job.images.length > 0) { %>
-                                        <% job.images.forEach(function(image, index) { %>
-                                            <a href="<%= image %>" class="glightbox" data-gallery="job-<%= job.id %>" data-title="Job Image <%= index + 1 %>">
-                                                <img src="<%= image %>" alt="Job Image" class="thumb-img">
+                                    <% if (job.images && job.images.length > 0) { %>       
+                                        <% job.images.forEach(function(imageUrl, index) { %>
+                                            <a href="<%= imageUrl %>" 
+                                               class="glightbox" 
+                                               data-gallery="job-<%= job.id %>" 
+                                               data-title="Job Image <%= index + 1 %>">
+                                                <img src="<%= imageUrl %>" 
+                                                     alt="Job Image" 
+                                                     class="thumb-img">
                                             </a>
                                         <% }) %>
                                     <% } else { %>
