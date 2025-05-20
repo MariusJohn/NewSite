@@ -64,12 +64,12 @@
                                     <% if (job.images && job.images.length > 0) { %>
                                         <% job.images.forEach(function(image, i) { %>
                                             <a
-                                                href="/uploads/job-images/<%= image %>"
+                                                href="<%= image %>"
                                                 class="glightbox"
                                                 data-gallery="job-<%= job.id %>"
                                                 data-title="Job Image <%= i + 1 %>">
                                                 <img
-                                                    src="/uploads/job-images/<%= image %>"
+                                                    src="<%= image %>"
                                                     alt="Job Image"
                                                     class="thumb-img">
                                             </a>
