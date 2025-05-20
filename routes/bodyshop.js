@@ -1,18 +1,18 @@
 // routes/bodyshop.js
 import express from 'express';
-import path from 'path';
-import fs from 'fs';
-import archiver from 'archiver';
+import path from 'path'; // Keep if used for path manipulation (unlikely for current routes)
+// import fs from 'fs'; // Remove if not explicitly writing/reading local files
+import archiver from 'archiver'; // Keep if used for zipping files
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'; // This import is specific for dotenv
 import axios from 'axios';
 import crypto from 'crypto';
-import { Job, Quote, Bodyshop, sequelize } from '../models/index.js';
-import { requireBodyshopLogin } from '../middleware/auth.js';
+import { Job, Quote, Bodyshop, sequelize } from '../models/index.js'; // Ensure .js extension
+import { requireBodyshopLogin } from '../middleware/auth.js'; // Ensure .js extension
 
-dotenv.config();
+dotenv.config(); // Keep this as it is after the import
 
 const router = express.Router();
 
@@ -254,20 +254,24 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
         // Convert radius to meters (1 mile = 1609.34 meters)
         const maxDistance = (bodyshop.radius || 10) * 1609.34;
 
-        // Fetch jobs within the bodyshop's radius
-        const [jobs] = await sequelize.query(`
-            SELECT 
-                "Jobs".*,
-                (6371000 * acos(
-                    cos(radians(:latitude)) * cos(radians(latitude)) *
-                    cos(radians(longitude) - radians(:longitude)) +
-                    sin(radians(:latitude)) * sin(radians(latitude))
-                )) AS distance
-            FROM "Jobs"
-            WHERE status = 'pending'
-            AND latitude IS NOT NULL
-            AND longitude IS NOT NULL
-            HAVING distance <= :maxDistance
+        // Fetch jobs within the bodyshop's radius using CTE
+        const jobs = await sequelize.query(`
+            WITH JobDistances AS (
+                SELECT
+                    "Jobs".*,
+                    (6371000 * acos(
+                        cos(radians(:latitude)) * cos(radians(latitude)) *
+                        cos(radians(longitude) - radians(:longitude)) +
+                        sin(radians(:latitude)) * sin(radians(latitude))
+                    )) AS distance
+                FROM "Jobs"
+                WHERE status = 'approved'
+                AND latitude IS NOT NULL
+                AND longitude IS NOT NULL
+            )
+            SELECT *
+            FROM JobDistances
+            WHERE distance <= :maxDistance
             ORDER BY distance ASC
         `, {
             replacements: {

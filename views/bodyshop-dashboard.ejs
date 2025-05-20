@@ -58,18 +58,18 @@
                         <tr>
                             <td><%= index + 1 %></td>
                             <td><%= job.location %></td>
-                            <td><%= job.distance ? job.distance.toFixed(2) : "N/A" %> miles</td>
+                            <td><%= job.distance ? (job.distance/1609.34).toFixed(2) : "N/A" %> miles</td>
                             <td>
                                 <div class="image-preview-block">
                                     <% if (job.images && job.images.length > 0) { %>
                                         <% job.images.forEach(function(image, i) { %>
                                             <a
-                                                href="/uploads/job-images/<%= image %>"
+                                                href="<%= image %>"
                                                 class="glightbox"
                                                 data-gallery="job-<%= job.id %>"
                                                 data-title="Job Image <%= i + 1 %>">
                                                 <img
-                                                    src="/uploads/job-images/<%= image %>"
+                                                    src="<%= image %>"
                                                     alt="Job Image"
                                                     class="thumb-img">
                                             </a>
