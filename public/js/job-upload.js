@@ -85,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
             showError(formError, "Please correct the highlighted errors before submitting.");
         } else {
             clearError(formError);
+            console.log("DEBUG: Client-side validation PASSED. Allowing default form submission to:", form.action);
         }
     });
 
