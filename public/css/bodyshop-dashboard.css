@@ -295,3 +295,12 @@ body {
 }
 
 
+
+.welcome-message {
+  background-color: #e7f3ff;
+  color: #003366;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 1.2em;
+}
