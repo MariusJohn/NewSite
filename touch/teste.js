@@ -1,351 +1,172 @@
-// routes/jobs.js
-import express from 'express'; // Changed: const express = require('express');
-import multer from 'multer';     // Changed: const multer = require('multer');
-import path from 'path';       // Changed: const path = require('path');
-import axios from 'axios';     // Changed: const axios = require('axios');
-import sharp from 'sharp';     // Changed: const sharp = require('sharp');
-import fs from 'fs';           // Changed: const fs = require('fs');
+// scheduler.js
+import cron from 'node-cron';      // Changed: const cron = require('node-cron');
+import { Job, Quote, Bodyshop } from './models/index.js'; // Changed: const { Job, Quote, Bodyshop } = require('./models'); - Added /index.js and .js
 import nodemailer from 'nodemailer'; // Changed: const nodemailer = require('nodemailer');
-import { Op } from 'sequelize'; // Changed: const { Op } = require('sequelize');
-import { Job, Quote, Bodyshop } from '../models/index.js'; // Changed: const { Job, Quote, Bodyshop } = require('../models'); - Added /index.js and .js extension
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'; // Changed: const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-import { randomUUID } from 'crypto'; // Changed: const { randomUUID } = require('crypto');
-import mime from 'mime-types';   // Changed: const mime = require('mime-types');
+import { Op } from 'sequelize';     // Changed: const { Op } = require('sequelize');
 
-import dotenv from 'dotenv';    // Changed: require('dotenv').config();
-dotenv.config();              // Changed: require('dotenv').config(); is now dotenv.config();
+import dotenv from 'dotenv';      // Changed: require('dotenv').config();
+dotenv.config();                  // Changed: require('dotenv').config(); is now dotenv.config();
 
-const router = express.Router();
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
-
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
-  credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-});
-
-// === Multer Storage Config (Use memory storage for S3 uploads) ===
-const storage = multer.memoryStorage();
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 8 * 1024 * 1024 },
-});
-
-// === GET Upload Form ===
-router.get('/upload', (req, res) => {
-  res.render('job-upload');
-});
-
-// === POST Upload Form with Sharp Compression and Coordinates Fetching ===
-router.post('/upload', upload.array('images', 8), async (req, res) => {
-  try {
-      const phoneRegex = /^07\d{9}$/;
-      const { name, email, location, telephone } = req.body;
-
-      if (!phoneRegex.test(telephone)) {
-          return res.status(400).render('upload-error', {
-              title: 'Invalid telephone number',
-              message: 'Please enter a valid UK phone number (07...).'
-          });
-      }
-
-      const apiKey = process.env.OPENCAGE_API_KEY;
-      const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
-          params: {
-              q: location,
-              key: apiKey,
-              countrycode: 'gb',
-              limit: 1
-          }
-      });
-
-      if (!geoRes.data || !geoRes.data.results || !geoRes.data.results.length) {
-          console.error('❌ No coordinates found for:', location);
-          return res.status(400).render('upload-error', {
-              title: 'Location Error',
-              message: 'Unable to find coordinates for the given postcode.'
-          });
-      }
-
-      const { lat, lng } = geoRes.data.results[0].geometry;
-      console.log('Latitude:', lat, 'Longitude:', lng);
-
-      const uploadedS3Urls = []; // This will store the full S3 URLs
-
-      if (!req.files || req.files.length === 0) {
-          console.warn('⚠️ No files were submitted with the form.');
-      } else {
-          for (const file of req.files) {
-              console.log(`Processing file: ${file.originalname}`);
-              console.log(`File buffer length: ${file.buffer ? file.buffer.length : 'undefined/null'}`);
-              console.log(`File mimetype: ${file.mimetype}`);
-
-              // Ensure file.buffer exists and has data before attempting sharp
-              if (!file.buffer || file.buffer.length === 0) {
-                  console.warn(`⚠️ Skipping empty or invalid file buffer for: ${file.originalname}`);
-                  continue; // Skip to the next file
-              }
-
-              try { // This try-catch is for the individual file processing (sharp and S3)
-                  const compressedBuffer = await sharp(file.buffer)
-                      .resize({ width: 1920, withoutEnlargement: true })
-                      .jpeg({ quality: 75 })
-                      .toBuffer();
-
-                  const uniqueFileName = `${randomUUID()}.jpg`;
-                  const s3Key = `job-images/${uniqueFileName}`;
-
-                  const command = new PutObjectCommand({
-                      Bucket: process.env.AWS_BUCKET_NAME,
-                      Key: s3Key,
-                      Body: compressedBuffer,
-                      ContentType: 'image/jpeg',
-                  });
-
-                  await s3Client.send(command);
-
-                  const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${s3Key}`;
-                  uploadedS3Urls.push(imageUrl);
-                  console.log(`✅ Successfully uploaded to S3: ${imageUrl}`);
-
-              } catch (fileProcessingError) { // Catch specific error for this file (e.g., Sharp invalid input)
-                  console.error(`❌ Error processing or uploading file ${file.originalname} to S3:`, fileProcessingError);
-
-              }
-          }
-      }
-
-      console.log('Attempting to create job with data:', {
-          customerName: name,
-          customerEmail: email,
-          customerPhone: telephone,
-          location,
-          latitude: lat,
-          longitude: lng,
-          images: uploadedS3Urls,
-          status: 'pending',
-          paid: false
-      });
-
-      const newJob = await Job.create({
-          customerName: name,
-          customerEmail: email,
-          customerPhone: telephone,
-          location,
-          latitude: lat,
-          longitude: lng,
-          images: uploadedS3Urls,
-          status: 'pending',
-          paid: false
-      });
-      console.log('✅ Job successfully created in DB with ID:', newJob.id);
-
-      res.render('upload-success');
-
-  } catch (routeError) {
-      if (routeError.name === 'SequelizeValidationError') {
-          const messages = routeError.errors.map(err => err.message).join(', ');
-          console.error('Sequelize Validation Errors:', messages);
-          return res.status(400).render('upload-error', {
-              title: 'Validation Error',
-              message: `Data validation failed: ${messages}`
-          });
-      }
-      res.status(500).render('upload-error', {
-          title: 'Server Error',
-          message: 'Something went wrong. Please try again later.'
-      });
-  }
-});
-
-// === Admin Job List with Filters and Counts ===
-router.get('/admin', async (req, res) => {
-  try {
-    const filter = req.query.filter || 'total';
-    let whereClause = {};
-
-    switch (filter) {
-      case 'total':
-        break;
-      case 'live':
-        whereClause.status = { [Op.or]: ['pending', 'approved'] };
-        break;
-      case 'approved':
-        whereClause.status = 'approved';
-        break;
-      case 'rejected':
-        whereClause.status = 'rejected';
-        break;
-      case 'archived':
-        whereClause.status = 'archived';
-        break;
-      case 'deleted':
-        whereClause.status = 'deleted';
-        break;
-      default:
-        break;
+// Email transporter
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_SECURE === 'true',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
-
-    const jobs = await Job.findAll({
-      where: whereClause,
-      order: [['createdAt', 'DESC']]
-    });
-
-    const totalCount = await Job.count();
-    const liveCount = await Job.count({ where: { status: { [Op.or]: ['pending', 'approved'] } } });
-    const approvedCount = await Job.count({ where: { status: 'approved' } });
-    const rejectedCount = await Job.count({ where: { status: 'rejected' } });
-    const archivedCount = await Job.count({ where: { status: 'archived' } });
-    const deletedCount = await Job.count({ where: { status: 'deleted' } });
-
-    res.render('admin-jobs', {
-      jobs,
-      totalCount,
-      liveCount,
-      approvedCount,
-      rejectedCount,
-      archivedCount,
-      deletedCount,
-      filter
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
 });
 
-// === Approve Job ===
-router.post('/:id/approve', async (req, res) => {
-  try {
-    await Job.update({ status: 'approved' }, { where: { id: req.params.id } });
-    res.redirect('/jobs/admin?filter=live');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('❌ Error approving job.');
-  }
-});
-
-// === Reject Job ===
-router.post('/:id/reject', async (req, res) => {
-  try {
-    await Job.update({ status: 'rejected' }, { where: { id: req.params.id } });
-    res.redirect('/jobs/admin?filter=rejected');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('❌ Error rejecting job.');
-  }
-});
-
-// === Archive Job ===
-router.post('/:jobId/archive', async (req, res) => {
-  try {
-    const job = await Job.findByPk(req.params.jobId);
-    if (!job || job.status !== 'rejected') {
-      return res.status(400).send('Only rejected jobs can be archived.');
+// Verify the connection
+transporter.verify((error) => {
+    if (error) {
+        console.error("Email connection failed:", error);
     }
-
-    await job.update({ status: 'archived' });
-    res.redirect('/jobs/admin?filter=archived');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
 });
 
-// === Restore Archived & Rejected Job ===
-router.post('/:jobId/restore', async (req, res) => {
-  try {
-    const jobId = req.params.jobId;
-    const job = await Job.findByPk(jobId);
+// Schedule the reminder to run every hour
+cron.schedule('0 * * * *', async () => {
+    try {
+        const now = new Date();
+        const cutoff24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);  // 24 hours ago
+        const cutoff48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);  // 48 hours ago
 
-    if (!job || !['rejected', 'archived'].includes(job.status)) {
-      return res.status(400).send('Only archived jobs can be restored.');
+        // Find all jobs that are still open for quotes but are nearing the 48-hour limit
+        const jobs = await Job.findAll({
+            where: {
+                status: 'approved',
+                quoteExpiry: {
+                    [Op.gt]: now
+                }
+            },
+            include: [{
+                model: Quote,
+                as: 'Quotes'
+            }]
+        });
+
+        for (const job of jobs) {
+            const quoteCount = job.Quotes ? job.Quotes.length : 0; // Correctly get quote count
+            const bodyshopsInRange = await Bodyshop.count({ where: { location: job.location } }); // Assuming 'location' field for Bodyshop area
+            const remainingBodyshops = bodyshopsInRange - quoteCount;
+
+            // 24-hour reminder logic
+            // Check if 24 hours have passed since creation AND it hasn't been extended yet
+            if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) { // Changed job.extended to job.extensionRequestedAt
+                if (quoteCount === 0) {
+                    // No quotes, send final 24-hour reminder
+                    await sendCustomerNoQuotesEmail(job);
+                } else if (quoteCount === 1) {
+                    // 1 quote available, ask if they want to wait
+                    await sendCustomerSingleQuoteEmail(job, remainingBodyshops);
+                } else if (quoteCount === 2) {
+                    // 2 quotes available, ask if they want to wait
+                    await sendCustomerMultipleQuotesEmail(job, remainingBodyshops);
+                } else if (quoteCount > 2) {
+                    // 3+ quotes, direct to payment
+                    await sendCustomerPaymentEmail(job);
+                }
+
+                // Mark as extension requested to avoid repeat reminders
+                job.extensionRequestedAt = now; // Set the timestamp
+                // job.extended = true; // No need for separate boolean if timestamp indicates
+                await job.save();
+            }
+
+            // 48-hour expiry logic
+            // Check if 48 hours have passed since creation
+            if (job.createdAt <= cutoff48h) {
+                if (quoteCount === 0) {
+                    // Delete job if no quotes after 48 hours
+                    await sendCustomerJobDeletedEmail(job);
+                    await job.destroy(); // Permanently delete
+                } else {
+                    // Direct to payment if at least 1 quote is available
+                    await sendCustomerPaymentEmail(job);
+                }
+            }
+        }
+
+    } catch (error) {
+        console.error("Error in scheduler:", error);
     }
-
-    await job.update({ status: 'pending' });
-
-    res.redirect('/jobs/admin?filter=live');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
 });
 
-// === Move Job to Deleted Status (from Archived) ===
-router.post('/:jobId/delete', async (req, res) => {
-  try {
-    const job = await Job.findByPk(req.params.jobId);
-    if (!job || job.status !== 'archived') {
-      return res.status(400).send('Only archived jobs can be deleted.');
+// Helper functions for customer emails (no changes needed here for ES conversion, but I've included them for completeness)
+async function sendCustomerNoQuotesEmail(job) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - No Quotes Available`,
+        text: `Unfortunately, no bodyshops have provided quotes for your job #${job.id} within 24 hours. You can choose to extend the job for another 24 hours or let it expire. Reply YES to extend or NO to delete the job.`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+        console.error(`Failed to send no quotes email for Job ID ${job.id}:`, emailError);
     }
+}
 
-    // Move to "deleted" status instead of full removal
-    await job.update({ status: 'deleted' });
+async function sendCustomerSingleQuoteEmail(job, remainingBodyshops) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - 1 Quote Available`,
+        text: `Your job #${job.id} has received 1 quote within the first 24 hours. There are still ${remainingBodyshops} bodyshops that have not responded. Would you like to extend the job for another 24 hours? Reply YES to extend or NO to proceed to payment.`
+    };
 
-    res.redirect('/jobs/admin?filter=deleted');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
-});
-
-// === Restore Deleted Job ===
-router.post('/:jobId/restore-deleted', async (req, res) => {
-  try {
-    const job = await Job.findByPk(req.params.jobId);
-
-    if (!job || job.status !== 'deleted') {
-      return res.status(400).send('Only deleted jobs can be restored.');
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+        console.error(`Failed to send single quote email for Job ID ${job.id}:`, emailError);
     }
+}
 
-    // Restore the job to 'pending' or another appropriate status
-    await job.update({ status: 'pending' });
+async function sendCustomerMultipleQuotesEmail(job, remainingBodyshops) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - Multiple Quotes Available`,
+        text: `Your job #${job.id} has received 2 quotes within the first 24 hours. There are still ${remainingBodyshops} bodyshops that have not responded. Would you like to extend the job for another 24 hours to potentially receive more quotes? Reply YES to extend or NO to proceed to payment.`
+    };
 
-    res.redirect('/jobs/admin?filter=deleted');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
-});
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+        console.error(`Failed to send multiple quotes email for Job ID ${job.id}:`, emailError);
+    }
+}
 
-// === Jobs with Quotes (Admin) ===
-router.get('/admin/quotes', async (req, res) => {
-  try {
-      const jobs = await Job.findAll({
-          include: [
-              {
-                  model: Quote,
-                  include: [Bodyshop]
-              }
-          ],
-          order: [['createdAt', 'DESC']]
-      });
+async function sendCustomerPaymentEmail(job) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - Proceed to Payment`,
+        text: `Your job #${job.id} has received enough quotes. Please proceed to the payment page to unlock the details of the bodyshops that have quoted.`
+    };
 
-      // Count jobs by status
-      const totalCount = await Job.count();
-      const liveCount = await Job.count({ where: { status: { [Op.or]: ['pending', 'approved'] } } });
-      const approvedCount = await Job.count({ where: { status: 'approved' } });
-      const rejectedCount = await Job.count({ where: { status: 'rejected' } });
-      const archivedCount = await Job.count({ where: { status: 'archived' } });
-      const deletedCount = await Job.count({ where: { status: 'deleted' } });
+    try {
+        await transporter.sendMail(mailOptions);
+        job.status = 'pending_payment'; // Update job status
+        await job.save();
+    } catch (emailError) {
+        console.error(`Failed to send payment email for Job ID ${job.id}:`, emailError);
+    }
+}
 
-      console.log("Fetched Jobs with Quotes:", jobs); // Debug line
+async function sendCustomerJobDeletedEmail(job) {
+    const mailOptions = {
+        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+        to: job.customerEmail,
+        subject: `Your Job #${job.id} - Job Deleted`,
+        text: `Your job #${job.id} has expired and has been automatically deleted as no quotes were received within 48 hours.`
+    };
 
-      res.render('admin-jobs-quotes', {
-          jobs,
-          totalCount,
-          liveCount,
-          approvedCount,
-          rejectedCount,
-          archivedCount,
-          deletedCount
-      });
-  } catch (err) {
-      console.error(err);
-      res.status(500).send('Server error');
-  }
-});
-
-export default router; // Changed: module.exports = router;
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (emailError) {
+        console.error(`Failed to send job deleted email for Job ID ${job.id}:`, emailError);
+    }
+}

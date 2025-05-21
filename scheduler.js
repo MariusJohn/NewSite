@@ -1,9 +1,11 @@
 // scheduler.js
-const cron = require('node-cron');
-const { Job, Quote, Bodyshop } = require('./models');
-const nodemailer = require('nodemailer');
-const { Op } = require('sequelize');
-require('dotenv').config();
+import cron from 'node-cron';  
+import { Job, Quote, Bodyshop } from './models/index.js'; 
+import nodemailer from 'nodemailer'; 
+import { Op } from 'sequelize'; 
+
+import dotenv from 'dotenv';    
+dotenv.config();    
 
 // Email transporter
 const transporter = nodemailer.createTransport({
@@ -45,12 +47,12 @@ cron.schedule('0 * * * *', async () => {
         });
 
         for (const job of jobs) {
-            const quoteCount = job.quoteCount || 0;
+            const quoteCount = job.Quotes ? job.Quotes.length : 0;
             const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
             const remainingBodyshops = bodyshopsInRange - quoteCount;
 
             // 24-hour reminder logic
-            if (job.createdAt <= cutoff24h && !job.extended) {
+            if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) { // Changed job.extended to job.extensionRequestedAt
                 if (quoteCount === 0) {
                     // No quotes, send final 24-hour reminder
                     await sendCustomerNoQuotesEmail(job);
@@ -65,9 +67,9 @@ cron.schedule('0 * * * *', async () => {
                     await sendCustomerPaymentEmail(job);
                 }
 
+
                 // Mark as extension requested to avoid repeat reminders
                 job.extensionRequestedAt = now;
-                job.extended = true;
                 await job.save();
             }
 

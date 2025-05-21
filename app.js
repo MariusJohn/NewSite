@@ -4,6 +4,7 @@ import path from 'path';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import session from 'express-session';
+
 import customerRoutes from './routes/customer.js';
 import adminRoutes from './routes/admin.js';
 import adminAuth from './middleware/adminAuth.js';
@@ -18,6 +19,7 @@ import contactRoutes from './routes/contact.js';
 import privacyRoutes from './routes/privacy.js';
 import jobsRoutes from './routes/jobs.js';
 import adminBodyshopRoutes from './routes/admin-bodyshops.js';
+import './scheduler.js'; 
 
 dotenv.config();
 
@@ -25,9 +27,9 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 
-// Body Parser Middleware
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+// For serving static files relative to the project root
+const __filename = new URL(import.meta.url).pathname;
+const __dirname = path.dirname(__filename);
 
 // === Session Setup (No Redis) ===
 app.use(session({
@@ -48,16 +50,20 @@ app.use(express.static(path.join(process.cwd(), 'public')));
 // Serve uploaded images statically
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-
+// Body Parser Middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Set view engine
 app.set('views', path.join(process.cwd(), 'views'));
 app.set('view engine', 'ejs');
 
+// Logging middleware
 app.use((req, res, next) => {
     console.log(`➡️ Incoming request: ${req.method} ${req.url}`);
     next();
 });
+
 
 
 // Mount routes
@@ -68,12 +74,12 @@ app.use('/training', trainingRoutes);
 app.use('/pricing', pricingRoutes);
 app.use('/contact', contactRoutes);
 app.use('/privacy', privacyRoutes);
+app.use('/jobs', jobsRoutes);
 app.use('/', customerRoutes);
 app.use('/admin', adminRoutes);
-app.use('/jobs', jobsRoutes);
 app.use('/jobs/admin', adminAuth);
 app.use('/jobs/admin', adminBodyshopRoutes);
-app.use('/uploads', uploadsRoutes);
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
