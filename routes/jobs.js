@@ -4,13 +4,13 @@ import multer from 'multer';
 import path from 'path';
 import axios from 'axios';
 import sharp from 'sharp';
-// import fs from 'fs'; // Removed if not used for local file operations
+import fs from 'fs'; // Removed if not used for local file operations
 import nodemailer from 'nodemailer';
 import { Op } from 'sequelize';
 import { Job, Quote, Bodyshop } from '../models/index.js'; // Ensure correct path and .js extension
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
-// import mime from 'mime-types'; // Removed if not used, as ContentType is hardcoded to image/jpeg
+import mime from 'mime-types'; // Removed if not used, as ContentType is hardcoded to image/jpeg
 
 import dotenv from 'dotenv';
 dotenv.config();
