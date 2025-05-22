@@ -19,7 +19,7 @@ import contactRoutes from './routes/contact.js';
 import privacyRoutes from './routes/privacy.js';
 import jobsRoutes from './routes/jobs.js';
 import adminBodyshopRoutes from './routes/admin-bodyshops.js';
-import './scheduler.js'; 
+
 
 dotenv.config();
 

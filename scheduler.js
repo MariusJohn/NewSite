@@ -1,170 +1,193 @@
-// scheduler.js
-import cron from 'node-cron';  
-import { Job, Quote, Bodyshop } from './models/index.js'; 
-import nodemailer from 'nodemailer'; 
-import { Op } from 'sequelize'; 
+import { Job, Quote, Bodyshop } from './models/index.js';
+import nodemailer from 'nodemailer';
+import { Op } from 'sequelize';
+import dotenv from 'dotenv';
 
-import dotenv from 'dotenv';    
-dotenv.config();    
+dotenv.config();
 
-// Email transporter
-const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    secure: process.env.EMAIL_SECURE === 'true',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
+// === Email transporter ===
+export const transporter = nodemailer.createTransport({
+  host: process.env.EMAIL_HOST,
+  port: process.env.EMAIL_PORT,
+  secure: process.env.EMAIL_SECURE === 'true',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
 });
 
-// Verify the connection
 transporter.verify((error) => {
-    if (error) {
-        console.error("Email connection failed:", error);
-    }
+  if (error) console.error("Email connection failed:", error);
+  else console.log("✅ Email transporter ready");
 });
 
-// Schedule the reminder to run every hour
-cron.schedule('0 * * * *', async () => {
-    try {
-        const now = new Date();
-        const cutoff24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);  // 24 hours ago
-        const cutoff48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);  // 48 hours ago
+function buildLinks(jobId, yesText = 'Extend', noText = 'Cancel') {
+  return `
+${yesText}: https://yourdomain.com/job/extend?id=${jobId}&response=yes  
+${noText}: https://yourdomain.com/job/extend?id=${jobId}&response=no`;
+}
 
-        // Find all jobs that are still open for quotes but are nearing the 48-hour limit
-        const jobs = await Job.findAll({
-            where: {
-                status: 'approved',
-                quoteExpiry: {
-                    [Op.gt]: now
-                }
-            },
-            include: [{
-                model: Quote,
-                as: 'Quotes'
-            }]
-        });
+// === Email helpers ===
+async function sendEmail(to, subject, text) {
+  const mailOptions = {
+    from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+    to,
+    subject,
+    text
+  };
 
-        for (const job of jobs) {
-            const quoteCount = job.Quotes ? job.Quotes.length : 0;
-            const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
-            const remainingBodyshops = bodyshopsInRange - quoteCount;
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✅ Email sent: ${subject} -> ${to}`);
+  } catch (err) {
+    console.error(`❌ Email failed: ${subject} -> ${to}`, err);
+  }
+}
 
-            // 24-hour reminder logic
-            if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) { // Changed job.extended to job.extensionRequestedAt
-                if (quoteCount === 0) {
-                    // No quotes, send final 24-hour reminder
-                    await sendCustomerNoQuotesEmail(job);
-                } else if (quoteCount === 1) {
-                    // 1 quote available, ask if they want to wait
-                    await sendCustomerSingleQuoteEmail(job, remainingBodyshops);
-                } else if (quoteCount === 2) {
-                    // 2 quotes available, ask if they want to wait
-                    await sendCustomerMultipleQuotesEmail(job, remainingBodyshops);
-                } else if (quoteCount > 2) {
-                    // 3+ quotes, direct to payment
-                    await sendCustomerPaymentEmail(job);
-                }
-
-
-                // Mark as extension requested to avoid repeat reminders
-                job.extensionRequestedAt = now;
-                await job.save();
-            }
-
-            // 48-hour expiry logic
-            if (job.createdAt <= cutoff48h) {
-                if (quoteCount === 0) {
-                    // Delete job if no quotes after 48 hours
-                    await sendCustomerJobDeletedEmail(job);
-                    await job.destroy();
-                } else {
-                    // Direct to payment if at least 1 quote is available
-                    await sendCustomerPaymentEmail(job);
-                }
-            }
-        }
-
-    } catch (error) {
-        console.error("Error in scheduler:", error);
-    }
-});
-
-// Helper functions for customer emails
 async function sendCustomerNoQuotesEmail(job) {
-    const mailOptions = {
-        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
-        to: job.customerEmail,
-        subject: `Your Job #${job.id} - No Quotes Available`,
-        text: `Unfortunately, no bodyshops have provided quotes for your job #${job.id} within 24 hours. You can choose to extend the job for another 24 hours or let it expire. Reply YES to extend or NO to delete the job.`
-    };
+  console.log(`Sending NO QUOTES email for Job #${job.id}`);
 
-    try {
-        await transporter.sendMail(mailOptions);
-    } catch (emailError) {
-        console.error(`Failed to send no quotes email for Job ID ${job.id}:`, emailError);
-    }
+  await sendEmail(
+    job.customerEmail,
+    `Update on Your Job #${job.id} - No Quotes Received`,
+    `Hi${job.customerName ? ` ${job.customerName}` : ''},
+
+Your job request (#${job.id}) hasn’t received any quotes yet from nearby bodyshops.
+
+Would you like to keep it active for another 24 hours to allow more time for responses?
+
+Reply YES to extend, or NO to cancel.  
+You can also click below:
+
+${buildLinks(job.id)}
+
+Thanks for using MC Quote. We're here to help you get fair, fast repair quotes.`
+  );
 }
 
-async function sendCustomerSingleQuoteEmail(job, remainingBodyshops) {
-    const mailOptions = {
-        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
-        to: job.customerEmail,
-        subject: `Your Job #${job.id} - 1 Quote Available`,
-        text: `Your job #${job.id} has received 1 quote within the first 24 hours. There are still ${remainingBodyshops} bodyshops that have not responded. Would you like to extend the job for another 24 hours? Reply YES to extend or NO to proceed to payment.`
-    };
+async function sendCustomerSingleQuoteEmail(job, remaining) {
+  console.log(`Sending SINGLE QUOTE email for Job #${job.id}`);
 
-    try {
-        await transporter.sendMail(mailOptions);
-    } catch (emailError) {
-        console.error(`Failed to send single quote email for Job ID ${job.id}:`, emailError);
-    }
+  await sendEmail(
+    job.customerEmail,
+    `1 Quote Received for Job #${job.id} – Next Steps`,
+    `Hi${job.customerName ? ` ${job.customerName}` : ''},
+
+Your job (#${job.id}) has received 1 quote so far. There are still ${remaining} local bodyshop(s) who haven't responded yet.
+
+Would you like to keep it open for another 24 hours to possibly receive more quotes, or proceed to payment to view the current offer?
+
+Reply YES to extend, or NO to go to payment.  
+Or click:
+
+${buildLinks(job.id, 'Extend & Wait', 'Go to Payment')}
+
+Thanks again for choosing MC Quote.`
+  );
 }
 
-async function sendCustomerMultipleQuotesEmail(job, remainingBodyshops) {
-    const mailOptions = {
-        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
-        to: job.customerEmail,
-        subject: `Your Job #${job.id} - Multiple Quotes Available`,
-        text: `Your job #${job.id} has received 2 quotes within the first 24 hours. There are still ${remainingBodyshops} bodyshops that have not responded. Would you like to extend the job for another 24 hours to potentially receive more quotes? Reply YES to extend or NO to proceed to payment.`
-    };
+async function sendCustomerMultipleQuotesEmail(job, remaining) {
+  console.log(`Sending MULTIPLE QUOTES email for Job #${job.id}`);
 
-    try {
-        await transporter.sendMail(mailOptions);
-    } catch (emailError) {
-        console.error(`Failed to send multiple quotes email for Job ID ${job.id}:`, emailError);
-    }
+  await sendEmail(
+    job.customerEmail,
+    `Good News! Multiple Quotes Received for Job #${job.id}`,
+    `Hi${job.customerName ? ` ${job.customerName}` : ''},
+
+Great news — you’ve received multiple quotes for your job request (#${job.id}). ${remaining > 0 ? `${remaining} more bodyshop(s) may still respond.` : `All available bodyshops have responded.`}
+
+You can now proceed to view the quotes:
+
+https://yourdomain.com/payment?jobId=${job.id}
+
+Thank you for using MC Quote. We're here to help you make the best decision.`
+  );
 }
 
 async function sendCustomerPaymentEmail(job) {
-    const mailOptions = {
-        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
-        to: job.customerEmail,
-        subject: `Your Job #${job.id} - Proceed to Payment`,
-        text: `Your job #${job.id} has received enough quotes. Please proceed to the payment page to unlock the details of the bodyshops that have quoted.`
-    };
+  console.log(`Sending PAYMENT email for Job #${job.id}`);
 
-    try {
-        await transporter.sendMail(mailOptions);
-        job.status = 'pending_payment';
-        await job.save();
-    } catch (emailError) {
-        console.error(`Failed to send payment email for Job ID ${job.id}:`, emailError);
-    }
+  await sendEmail(
+    job.customerEmail,
+    `Quotes Ready for Job #${job.id} – View Now`,
+    `Hi${job.customerName ? ` ${job.customerName}` : ''},
+
+You’ve received quotes for your job request (#${job.id}). To unlock and view them, please proceed to payment:
+
+https://yourdomain.com/payment?jobId=${job.id}
+
+Let us know if you need any help. Thank you for choosing MC Quote.`
+  );
+
+  job.status = 'pending_payment';
+  await job.save();
 }
 
 async function sendCustomerJobDeletedEmail(job) {
-    const mailOptions = {
-        from: `"MC Quote" <${process.env.EMAIL_USER}>`,
-        to: job.customerEmail,
-        subject: `Your Job #${job.id} - Job Deleted`,
-        text: `Your job #${job.id} has expired and has been automatically deleted as no quotes were received within 48 hours.`
-    };
+  console.log(`Sending DELETED email for Job #${job.id}`);
 
-    try {
-        await transporter.sendMail(mailOptions);
-    } catch (emailError) {
-        console.error(`Failed to send job deleted email for Job ID ${job.id}:`, emailError);
+  await sendEmail(
+    job.customerEmail,
+    `Job #${job.id} Removed – No Quotes Received`,
+    `Hi${job.customerName ? ` ${job.customerName}` : ''},
+
+Unfortunately, no quotes were received for your job request (#${job.id}) within 48 hours. The job has now been removed from our system.
+
+If you'd like to try again or need assistance, we're here to help.
+
+Thank you for considering MC Quote.`
+  );
+}
+
+// === Scheduler Runner ===
+export async function runSchedulerNow() {
+  console.log('=== Scheduler started ===');
+
+  try {
+    const now = new Date();
+    const cutoff24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const cutoff48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+
+    const jobs = await Job.findAll({
+      where: {
+        status: 'approved',
+        quoteExpiry: { [Op.gt]: now }
+      },
+      include: [{ model: Quote, as: 'quotes' }]
+    });
+
+    console.log('Jobs found:', jobs.length);
+
+    for (const job of jobs) {
+      const quoteCount = job.quotes?.length || 0;
+      const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
+      const remaining = Math.max(0, bodyshopsInRange - quoteCount);
+
+      // === 24h Logic ===
+      if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
+        if (quoteCount === 0) {
+          await sendCustomerNoQuotesEmail(job);
+        } else if (quoteCount === 1) {
+          await sendCustomerSingleQuoteEmail(job, remaining);
+        } else if (quoteCount >= 2) {
+          await sendCustomerMultipleQuotesEmail(job, remaining);
+        }
+
+        job.extensionRequestedAt = now;
+        await job.save();
+      }
+
+      // === 48h Logic ===
+      if (job.createdAt <= cutoff48h) {
+        if (quoteCount === 0) {
+          await sendCustomerJobDeletedEmail(job);
+          await job.destroy();
+        } else {
+          await sendCustomerPaymentEmail(job);
+        }
+      }
     }
+  } catch (err) {
+    console.error("Scheduler failed:", err);
+  }
 }
