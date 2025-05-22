@@ -2,15 +2,17 @@
 import express from 'express';
 import path from 'path'; // Keep if used for path manipulation (unlikely for current routes)
 // import fs from 'fs'; // Remove if not explicitly writing/reading local files
-import archiver from 'archiver'; // Keep if used for zipping files
+import archiver from 'archiver'; 
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
-import dotenv from 'dotenv'; // This import is specific for dotenv
+import dotenv from 'dotenv'; 
 import axios from 'axios';
 import crypto from 'crypto';
-import { Job, Quote, Bodyshop, sequelize } from '../models/index.js'; // Ensure .js extension
-import { requireBodyshopLogin } from '../middleware/auth.js'; // Ensure .js extension
+import { Job, Quote, Bodyshop, sequelize } from '../models/index.js'; 
+import { requireBodyshopLogin } from '../middleware/auth.js'; 
+import { submitQuote } from '../controllers/bodyshopController.js';
+
 
 dotenv.config(); // Keep this as it is after the import
 
@@ -225,6 +227,7 @@ router.post('/login', async (req, res) => {
         // Set session
         req.session.bodyshopId = bodyshop.id;
         req.session.bodyshopName = bodyshop.name;
+        req.session.bodyshopEmail = bodyshop.email;
         req.session.loggedIn = true;
 
         console.log(`✅ Bodyshop ${email} logged in successfully.`);
@@ -316,5 +319,7 @@ router.post('/update-radius', requireBodyshopLogin, async (req, res) => {
         res.status(500).send('Server error. Please try again later.');
     }
 });
+// ===POST: Job Quote ===
+router.post('/quote/:jobId', requireBodyshopLogin,submitQuote);
 
 export default router;
