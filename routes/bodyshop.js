@@ -46,12 +46,12 @@ router.get('/', (req, res) => {
         content3: 'Bodyshop Content 3',
         footerData
     };
-    res.render('bodyshop', pageData);
+    res.render('static/bodyshop', pageData);
 });
 
 // === GET Registration Page ===
 router.get('/register', (req, res) => {
-    res.render('bodyshop-register', { error: null });
+    res.render('bodyshop/register', { error: null });
 });
 
 // === POST Registration Handler with Password Validation ===
@@ -66,21 +66,21 @@ router.post('/register', async (req, res) => {
     const normalizedArea = area.replace(/\s+/g, '').toUpperCase();
 
     if (!passwordRegex.test(password)) {
-        return res.render('bodyshop-register', { error: 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.' });
+        return res.render('bodyshop/register', { error: 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.' });
     }
 
     if (!postcodeRegex.test(normalizedArea)) {
-        return res.render('bodyshop-register', { error: 'Please enter a valid UK postcode.' });
+        return res.render('bodyshop/register', { error: 'Please enter a valid UK postcode.' });
     }
 
     if (password !== confirmPassword) {
-        return res.render('bodyshop-register', { error: 'Passwords do not match.' });
+        return res.render('bodyshop/register', { error: 'Passwords do not match.' });
     }
 
     try {
         const existing = await Bodyshop.findOne({ where: { email } });
         if (existing) {
-            return res.render('bodyshop-register', { error: 'This email is already registered.' });
+            return res.render('bodyshop/register', { error: 'This email is already registered.' });
         }
 
         // Fetching coordinates from OpenCage API
@@ -95,7 +95,7 @@ router.post('/register', async (req, res) => {
         });
 
         if (!response.data || !response.data.results || response.data.results.length === 0) {
-            return res.render('bodyshop-register', { error: 'Unable to find coordinates for the given postcode.' });
+            return res.render('bodyshop/register', { error: 'Unable to find coordinates for the given postcode.' });
         }
 
         const { lat, lng } = response.data.results[0].geometry;
@@ -144,10 +144,10 @@ router.post('/register', async (req, res) => {
         await transporter.sendMail(mailOptions);
         console.log(`📧 Verification email sent to ${email}`);
 
-        res.render('bodyshop-register', { error: 'Registration successful! Please check your email to verify your account.' });
+        res.render('bodyshop/register', { error: 'Registration successful! Please check your email to verify your account.' });
     } catch (err) {
         console.error(err);
-        res.render('bodyshop-register', { error: 'Registration failed. Try again later.' });
+        res.render('bodyshop/register', { error: 'Registration failed. Try again later.' });
     }
 });
 
@@ -175,7 +175,7 @@ router.get('/verify/:token', async (req, res) => {
 
 // === GET: Bodyshop Login Page ===
 router.get('/login', (req, res) => {
-    res.render('bodyshop-login');
+    res.render('bodyshop/login');
 });
 
 // === GET: Bodyshop Logout ===
@@ -195,33 +195,33 @@ router.post('/login', async (req, res) => {
         const bodyshop = await Bodyshop.findOne({ where: { email } });
 
         if (!bodyshop) {
-            return res.render('bodyshop-login', { error: 'Invalid email, password, or postcode.' });
+            return res.render('bodyshop/login', { error: 'Invalid email, password, or postcode.' });
         }
 
         // Check password
         const passwordMatch = await bcrypt.compare(password, bodyshop.password);
         if (!passwordMatch) {
-            return res.render('bodyshop-login', { error: 'Invalid email, password, or postcode.' });
+            return res.render('bodyshop/login', { error: 'Invalid email, password, or postcode.' });
         }
 
         // Check if the postcode matches
         if (!postcodeRegex.test(area)) {
-            return res.render('bodyshop-login', { error: 'Invalid postcode format. Please enter a valid UK postcode.' });
+            return res.render('bodyshop/login', { error: 'Invalid postcode format. Please enter a valid UK postcode.' });
         }
 
         // Check if the area matches the registered postcode
         if (bodyshop.area.replace(/\s+/g, '').toUpperCase() !== area.replace(/\s+/g, '').toUpperCase()) {
-            return res.render('bodyshop-login', { error: 'Incorrect postcode for this account.' });
+            return res.render('bodyshop/login', { error: 'Incorrect postcode for this account.' });
         }
 
         // Check if the account is verified
         if (!bodyshop.verified) {
-            return res.render('bodyshop-login', { error: 'Please verify your email before logging in.' });
+            return res.render('bodyshop/login', { error: 'Please verify your email before logging in.' });
         }
 
         // Check if the account is admin approved
         if (!bodyshop.adminApproved) {
-            return res.render('bodyshop-login', { error: 'Your account has not been approved by the admin yet.' });
+            return res.render('bodyshop/login', { error: 'Your account has not been approved by the admin yet.' });
         }
 
         // Set session
@@ -234,7 +234,7 @@ router.post('/login', async (req, res) => {
         res.redirect('/bodyshop/dashboard');
     } catch (err) {
         console.error('❌ Error during bodyshop login:', err);
-        res.render('bodyshop-login', { error: 'Server error. Please try again later.' });
+        res.render('bodyshop/login', { error: 'Server error. Please try again later.' });
     }
 });
 
@@ -244,7 +244,7 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
         const bodyshop = await Bodyshop.findByPk(req.session.bodyshopId);
 
         if (!bodyshop.latitude || !bodyshop.longitude) {
-            return res.render('bodyshop-dashboard', {
+            return res.render('bodyshop/dashboard', {
                 title: 'Bodyshop Dashboard',
                 headerData,
                 footerData,
@@ -287,7 +287,7 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
 
         console.log(`✅ Fetched ${jobs.length} jobs within ${bodyshop.radius} miles of ${bodyshop.name}`);
 
-        res.render('bodyshop-dashboard', {
+        res.render('bodyshop/dashboard', {
             title: 'Bodyshop Dashboard',
             headerData,
             footerData,

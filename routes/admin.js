@@ -12,7 +12,7 @@ router.get('/login', (req, res) => {
   if (req.session.isAdmin) {
     return res.redirect('/jobs/admin');
   }
-  res.render('admin-login', { error: null });
+  res.render('admin/login', { error: null });
 });
 
 // === Admin Login Handler ===
@@ -27,12 +27,14 @@ router.post('/login', (req, res) => {
     req.session.save(err => {
       if (err) {
         console.error('❌ Error saving session:', err);
-        return res.render('admin-login', { error: 'Login failed. Please try again.' });
+        return res.render('admin/login', { error: 'Login failed. Please try again.' });
       }
+
+      
       res.redirect('/jobs/admin');
     });
   } else {
-    return res.render('admin-login', { error: 'Invalid credentials' });
+    return res.render('admin/login', { error: 'Invalid credentials' });
   }
 });
 

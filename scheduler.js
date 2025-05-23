@@ -21,11 +21,6 @@ transporter.verify((error) => {
   else console.log("✅ Email transporter ready");
 });
 
-function buildLinks(jobId, yesText = 'Extend', noText = 'Cancel') {
-  return `
-${yesText}: https://yourdomain.com/job/extend?id=${jobId}&response=yes  
-${noText}: https://yourdomain.com/job/extend?id=${jobId}&response=no`;
-}
 
 // === Email helpers ===
 async function sendEmail(to, subject, text) {
@@ -57,9 +52,6 @@ Your job request (#${job.id}) hasn’t received any quotes yet from nearby bodys
 Would you like to keep it active for another 24 hours to allow more time for responses?
 
 Reply YES to extend, or NO to cancel.  
-You can also click below:
-
-${buildLinks(job.id)}
 
 Thanks for using MC Quote. We're here to help you get fair, fast repair quotes.`
   );

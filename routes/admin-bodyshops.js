@@ -21,7 +21,7 @@ router.get('/bodyshops', async (req, res) => {
         const deletedCount = await Job.count({ where: { status: 'deleted' } });
 
         // Render the template
-        res.render('admin-bodyshops', {
+        res.render('admin/bodyshops', {
             bodyshops,
             totalCount,
             liveCount,

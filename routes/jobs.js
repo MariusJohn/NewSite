@@ -33,7 +33,7 @@ const upload = multer({
 });
 
 router.get('/upload', (req, res) => {
-  res.render('job-upload');
+  res.render('jobs/upload');
 });
 
 router.post('/upload', upload.array('images', 8), async (req, res) => {
@@ -137,7 +137,7 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
       });
       console.log('Job successfully created in DB with ID:', newJob.id);
 
-      res.render('upload-success');
+      res.render('jobs/upload-success');
 
   } catch (routeError) {
       console.error('Final catch - Error in jobs.js upload route:', routeError);
@@ -195,7 +195,7 @@ router.get('/admin', async (req, res) => {
     const archivedCount = await Job.count({ where: { status: 'archived' } });
     const deletedCount = await Job.count({ where: { status: 'deleted' } });
 
-    res.render('admin-jobs', {
+    res.render('admin/jobs', {
       jobs,
       totalCount,
       liveCount,
@@ -318,7 +318,7 @@ router.get('/admin/quotes', async (req, res) => {
 
       console.log("Fetched Jobs with Quotes:", jobs);
 
-      res.render('admin-jobs-quotes', {
+      res.render('admin/jobs-quotes', {
           jobs,
           totalCount,
           liveCount,
