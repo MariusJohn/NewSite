@@ -36,7 +36,7 @@ router.get('/', (req, res, next) => {
             content3: 'Contact Content 3',
             footerData
         };
-        res.render('contact', pageData);
+        res.render('static/contact', pageData);
     } catch (error) {
         next(error);
     }

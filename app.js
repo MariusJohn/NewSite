@@ -8,18 +8,15 @@ import session from 'express-session';
 import customerRoutes from './routes/customer.js';
 import adminRoutes from './routes/admin.js';
 import adminAuth from './middleware/adminAuth.js';
-//import fileUpload from 'express-fileupload';
-//import uploadsRoutes from './routes/uploads.js';
 import indexRoutes from './routes/index.js';
 import quotationsRoutes from './routes/quotations.js';
 import bodyshopRoutes from './routes/bodyshop.js';
-import trainingRoutes from './routes/training.js';
-import pricingRoutes from './routes/pricing.js';
+
 import contactRoutes from './routes/contact.js';
-import privacyRoutes from './routes/privacy.js';
+
 import jobsRoutes from './routes/jobs.js';
 import adminBodyshopRoutes from './routes/admin-bodyshops.js';
-
+import staticRoutes from './routes/static.js';
 
 dotenv.config();
 
@@ -68,18 +65,18 @@ app.use((req, res, next) => {
 
 // Mount routes
 app.use('/', indexRoutes);
+
 app.use('/quotations', quotationsRoutes);
 app.use('/bodyshop', bodyshopRoutes);
-app.use('/training', trainingRoutes);
-app.use('/pricing', pricingRoutes);
+
 app.use('/contact', contactRoutes);
-app.use('/privacy', privacyRoutes);
+
 app.use('/jobs', jobsRoutes);
 app.use('/', customerRoutes);
 app.use('/admin', adminRoutes);
 app.use('/jobs/admin', adminAuth);
 app.use('/jobs/admin', adminBodyshopRoutes);
-
+app.use('/', staticRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

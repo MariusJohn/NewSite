@@ -10,7 +10,7 @@ router.get('/quotes/:jobId', async (req, res) => {
 
     const quotes = await Quote.findAll({ where: { jobId: job.id } });
 
-    res.render('job-quotes', { job, quotes });
+    res.render('jobs/quotes', { job, quotes });
   } catch (err) {
     console.error(err);
     res.status(500).send('Error loading quotes');

@@ -31,7 +31,7 @@ router.get('/', (req, res, next) => {
             content3: 'Quotations Content 3',
             footerData: footerData
         };
-        res.render('quotations', pageData);
+        res.render('static/quotations', pageData);
     } catch (error) {
         next(error);
     }
