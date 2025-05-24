@@ -34,7 +34,7 @@ Bodyshop.init({
     radius: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        defaultValue: 100
+        defaultValue: 10
     },
     verificationToken: {
         type: DataTypes.STRING,

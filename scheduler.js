@@ -1,9 +1,22 @@
+// scheduler.js
+import cron from 'node-cron';
 import { Job, Quote, Bodyshop } from './models/index.js';
 import nodemailer from 'nodemailer';
 import { Op } from 'sequelize';
+import ejs from 'ejs';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 
 dotenv.config();
+const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+
+// === Setup __dirname and view path ===
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const EMAIL_VIEWS_PATH = path.join(__dirname, 'views', 'email');
+
 
 // === Email transporter ===
 export const transporter = nodemailer.createTransport({
@@ -21,117 +34,78 @@ transporter.verify((error) => {
   else console.log("✅ Email transporter ready");
 });
 
-
-// === Email helpers ===
-async function sendEmail(to, subject, text) {
-  const mailOptions = {
-    from: `"MC Quote" <${process.env.EMAIL_USER}>`,
-    to,
-    subject,
-    text
-  };
-
+// === Generic HTML sender ===
+async function sendHtmlEmail(to, subject, html) {
   try {
-    await transporter.sendMail(mailOptions);
+    await transporter.sendMail({
+      from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html
+    });
     console.log(`✅ Email sent: ${subject} -> ${to}`);
   } catch (err) {
     console.error(`❌ Email failed: ${subject} -> ${to}`, err);
   }
 }
 
+// === Email helpers using templates ===
 async function sendCustomerNoQuotesEmail(job) {
-  console.log(`Sending NO QUOTES email for Job #${job.id}`);
-
-  await sendEmail(
-    job.customerEmail,
-    `Update on Your Job #${job.id} - No Quotes Received`,
-    `Hi${job.customerName ? ` ${job.customerName}` : ''},
-
-Your job request (#${job.id}) hasn’t received any quotes yet from nearby bodyshops.
-
-Would you like to keep it active for another 24 hours to allow more time for responses?
-
-Reply YES to extend, or NO to cancel.  
-
-Thanks for using MC Quote. We're here to help you get fair, fast repair quotes.`
-  );
+  const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes.ejs'), {
+    customerName: job.customerName,
+    job,
+    extendUrl: `${baseUrl}/extend/${job.id}`,
+    cancelUrl: `https://yourdomain.com/cancel/${job.id}`,
+    
+  });
+  await sendHtmlEmail(job.customerEmail, `Update on Your Job #${job.id} - No Quotes Received`, html);
 }
 
 async function sendCustomerSingleQuoteEmail(job, remaining) {
-  console.log(`Sending SINGLE QUOTE email for Job #${job.id}`);
-
-  await sendEmail(
-    job.customerEmail,
-    `1 Quote Received for Job #${job.id} – Next Steps`,
-    `Hi${job.customerName ? ` ${job.customerName}` : ''},
-
-Your job (#${job.id}) has received 1 quote so far. There are still ${remaining} local bodyshop(s) who haven't responded yet.
-
-Would you like to keep it open for another 24 hours to possibly receive more quotes, or proceed to payment to view the current offer?
-
-Reply YES to extend, or NO to go to payment.  
-Or click:
-
-${buildLinks(job.id, 'Extend & Wait', 'Go to Payment')}
-
-Thanks again for choosing MC Quote.`
-  );
+  const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'single-quote.ejs'), {
+    customerName: job.customerName,
+    job,
+    remaining,
+    extendUrl: `${baseUrl}/extend/${job.id}`,
+    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
+  });
+  await sendHtmlEmail(job.customerEmail, `1 Quote Received for Job #${job.id}`, html);
 }
 
 async function sendCustomerMultipleQuotesEmail(job, remaining) {
-  console.log(`Sending MULTIPLE QUOTES email for Job #${job.id}`);
-
-  await sendEmail(
-    job.customerEmail,
-    `Good News! Multiple Quotes Received for Job #${job.id}`,
-    `Hi${job.customerName ? ` ${job.customerName}` : ''},
-
-Great news — you’ve received multiple quotes for your job request (#${job.id}). ${remaining > 0 ? `${remaining} more bodyshop(s) may still respond.` : `All available bodyshops have responded.`}
-
-You can now proceed to view the quotes:
-
-https://yourdomain.com/payment?jobId=${job.id}
-
-Thank you for using MC Quote. We're here to help you make the best decision.`
-  );
+  const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'multiple-quotes.ejs'), {
+    customerName: job.customerName,
+    job,
+    remaining,
+    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
+  });
+  await sendHtmlEmail(job.customerEmail, `Quotes Ready for Job #${job.id}`, html);
 }
 
 async function sendCustomerPaymentEmail(job) {
-  console.log(`Sending PAYMENT email for Job #${job.id}`);
-
-  await sendEmail(
-    job.customerEmail,
-    `Quotes Ready for Job #${job.id} – View Now`,
-    `Hi${job.customerName ? ` ${job.customerName}` : ''},
-
-You’ve received quotes for your job request (#${job.id}). To unlock and view them, please proceed to payment:
-
-https://yourdomain.com/payment?jobId=${job.id}
-
-Let us know if you need any help. Thank you for choosing MC Quote.`
-  );
+  const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'payment-request.ejs'), {
+    customerName: job.customerName,
+    job,
+    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
+  });
+  await sendHtmlEmail(job.customerEmail, `Quotes Ready for Job #${job.id} – View Now`, html);
 
   job.status = 'pending_payment';
   await job.save();
 }
 
 async function sendCustomerJobDeletedEmail(job) {
-  console.log(`Sending DELETED email for Job #${job.id}`);
-
-  await sendEmail(
-    job.customerEmail,
-    `Job #${job.id} Removed – No Quotes Received`,
-    `Hi${job.customerName ? ` ${job.customerName}` : ''},
-
-Unfortunately, no quotes were received for your job request (#${job.id}) within 48 hours. The job has now been removed from our system.
-
-If you'd like to try again or need assistance, we're here to help.
-
-Thank you for considering MC Quote.`
-  );
+  const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'job-deleted.ejs'), {
+    customerName: job.customerName,
+    job,
+    logoUrl: `${baseUrl}/img/logo.png`,
+    homeUrl: `${baseUrl}/`,
+    newRequestUrl: `${baseUrl}/jobs/upload`
+  });
+  await sendHtmlEmail(job.customerEmail, `Job #${job.id} Removed – No Quotes Received`, html);
 }
 
-// === Scheduler Runner ===
+// === Scheduler Logic ===
 export async function runSchedulerNow() {
   console.log('=== Scheduler started ===');
 
@@ -148,13 +122,19 @@ export async function runSchedulerNow() {
       include: [{ model: Quote, as: 'quotes' }]
     });
 
-    console.log('Jobs found:', jobs.length);
-
     for (const job of jobs) {
       const quoteCount = job.quotes?.length || 0;
       const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
       const remaining = Math.max(0, bodyshopsInRange - quoteCount);
 
+
+      // === Early Trigger if 2+ Quotes Before 24h ===
+      if (quoteCount >= 2 && !job.extensionRequestedAt) {
+        await sendCustomerMultipleQuotesEmail(job, remaining);
+        job.extensionRequestedAt = now;
+        await job.save();
+        continue;
+      }
       // === 24h Logic ===
       if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
         if (quoteCount === 0) {
@@ -182,4 +162,13 @@ export async function runSchedulerNow() {
   } catch (err) {
     console.error("Scheduler failed:", err);
   }
+}
+
+
+// === Production Cron Job (optional) ===
+cron.schedule('0 * * * *', runSchedulerNow);
+
+// Run immediately if executed directly
+if (process.argv[1].endsWith('scheduler.js')) {
+  runSchedulerNow();
 }

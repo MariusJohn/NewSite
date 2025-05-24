@@ -4,19 +4,18 @@ import path from 'path';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import session from 'express-session';
-
 import customerRoutes from './routes/customer.js';
 import adminRoutes from './routes/admin.js';
 import adminAuth from './middleware/adminAuth.js';
 import indexRoutes from './routes/index.js';
 import quotationsRoutes from './routes/quotations.js';
 import bodyshopRoutes from './routes/bodyshop.js';
-
 import contactRoutes from './routes/contact.js';
-
 import jobsRoutes from './routes/jobs.js';
 import adminBodyshopRoutes from './routes/admin-bodyshops.js';
 import staticRoutes from './routes/static.js';
+import emailPreviewRoutes from './routes/email-preview.js';//temp route for testing
+import paymentRoutes from './routes/payment.js';
 
 dotenv.config();
 
@@ -77,6 +76,10 @@ app.use('/admin', adminRoutes);
 app.use('/jobs/admin', adminAuth);
 app.use('/jobs/admin', adminBodyshopRoutes);
 app.use('/', staticRoutes);
+
+
+app.use('/preview', emailPreviewRoutes); //temp route for testing
+app.use('/payment', paymentRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

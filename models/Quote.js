@@ -55,6 +55,11 @@ Quote.init({
         type: DataTypes.DATE,
         allowNull: true,
         defaultValue: DataTypes.NOW
+    },
+    status: {
+        type: DataTypes.ENUM('pending', 'won', 'lost', 'under_review', 'expired'),
+        allowNull: false,
+        defaultValue: 'pending'
     }
 }, {
     sequelize,
