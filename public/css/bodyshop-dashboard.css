@@ -1,306 +1,165 @@
-.dashboard-container {
-  padding-top: 60px; 
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-  background-color: #f4f7f6; 
-  color: #333;
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
-}
-
-
-
-
-/* Header Styles */
-.dashboard-header {
-  background-color: rgb(7, 42, 70); 
-  color: #faf5f5; /* Dark text on white */
-  padding: 15px 20px; /* Slightly reduced padding */
-  position: fixed;
-  width: 100%;
-  top: 0;
-  z-index: 1000;
+.bodyshop-dashboard-container {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #ddd; /* Subtle bottom border */
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05); /* Very subtle shadow */
+  min-height: 100vh;
 }
 
-.dashboard-header h1 {
-  font-size: 1.5em; /* Moderate heading size */
-  margin: 0;
-  font-weight: 500; /* Slightly lighter font weight */
-}
-
-.dashboard-header .logo {
-  height: 40px; /* Slightly smaller logo */
-  margin-right: 15px;
-}
-
-.dashboard-header .logout-btn {
-  background-color: #e74c3c; /* Professional red for logout */
+.sidebar {
+  width: 260px;
+  background-color: rgb(7, 42, 70);
   color: #fff;
-  padding: 8px 15px; /* Reduced padding */
+  padding: 20px;
+  flex-shrink: 0;
+}
+
+.sidebar img {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.sidebar h2 {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+.sidebar .radius-form {
+  margin-bottom: 20px;
+}
+
+.sidebar input,
+.sidebar button {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 4px;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 400; /* Regular font weight */
-  transition: background 0.3s ease;
 }
 
-.dashboard-header .logout-btn:hover {
-  background-color: #c0392b;
+.radius-btn {
+  background-color: #28a745;
+  color: #fff;
 }
 
-/* Main Content Styles */
-.dashboard-main {
+.logout-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.main-content {
   flex-grow: 1;
-  padding: 80px 20px 30px; /* Adjust top padding for fixed header */
+  background: #f4f7f6;
+  padding: 40px 30px;
 }
 
 .dashboard-section {
-  max-width: 90%;
-  margin: 0 auto 20px;
-  background-color: #fff;
+  margin-bottom: 40px;
+  background: #fff;
   border-radius: 8px;
-  padding:20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  display: grid; /
-  grid-template-columns: auto 1; 
-  grid-gap: 20px; /* Spacing between the columns */
-  align-items: start;
-}
-
-.dashboard-section-header {
-  grid-column: 1 / 2; /* Place the header in the first column */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align text within the header to the left */
-}
-
-.dashboard-section h2 {
-  font-size: 1.3em;
-  color: #333;
-  margin-bottom: 5px; /* Reduced margin */
-  font-weight: 500;
-  border-bottom: none; /* Remove the bottom border from the heading */
-  padding-bottom: 0;
-}
-
-.dashboard-section .job-count {
-  font-size: 0.9em;
-  color: #777;
-
-}
-.radius-section {
-  background-color: #95ccf4; /* Very light background */
-  border: 1px solid #eee; /* Very light border */
-  border-radius: 5px;
-  padding: 15px;
-  margin-bottom: 20px;
-  text-align: left; /* Align text to the left for better flow */
-  display: block; /* Ensure it's a block-level element */
-  width: 90%; /* Take up most of the container width */
-  margin: 20px auto; /* Center it horizontally with some top/bottom margin */
-}
-
-.radius-section form {
-    display: flex; /* Make the form elements align horizontally */
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 10px; /* Add some space below the form */
-}
-
-.radius-section label {
-  font-weight: 500;
-}
-
-.radius-section input[type="number"] {
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 60px; /* Smaller input width */
-}
-
-.radius-section .radius-btn {
-  background-color: #5cb85c; /* Professional green */
-  color: #fff;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 400;
-  transition: background 0.3s ease;
-}
-
-.radius-section .radius-btn:hover {
-  background-color: #4cae4c;
-}
-
-.radius-section p {
-  margin-top: 0; /* Adjust paragraph margin */
-  font-size: 0.9em;
-  color: #e54343;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .jobs-table {
-  grid-column: 2 / 3; /* Place the table in the second column */
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 0; /* Remove default margin as the grid provides spacing */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.jobs-table thead {
-  background-color: #f8f8f8; /* Light gray header */
-  color: #333;
-  border-bottom: 1px solid #ddd;
 }
 
 .jobs-table th,
 .jobs-table td {
-  padding: 12px 15px;
-  text-align: center;
+  padding: 12px;
   border-bottom: 1px solid #eee;
+  text-align: center;
 }
 
-.jobs-table th {
-  font-weight: 500;
-  text-transform: capitalize; /* Improve readability */
-}
-
-.jobs-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.jobs-table tbody tr:hover {
+.jobs-table thead {
   background-color: #f0f0f0;
 }
 
-/* Image Preview Block */
 .image-preview-block {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 4px;
   justify-content: center;
 }
 
 .thumb-img {
-  width: 60px; /* Slightly smaller thumbnails */
+  width: 60px;
   height: 60px;
   object-fit: cover;
-  border-radius: 4px; /* Softer rounded corners */
-  margin: 2px;
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
-  border: 1px solid #eee; /* Subtle border for thumbnails */
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
-.thumb-img:hover {
-  transform: scale(1.05);
+.quote-input {
+  width: 80px;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
-/* Action Buttons */
 .btn {
-  background-color: #007bff; /* Professional blue */
+  background-color: #007bff;
   color: #fff;
   padding: 5px 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
-  font-weight: 400;
-  transition: background 0.3s ease;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  display: inline-block;
-  font-size: 0.9em;
+  margin-top: 4px;
 }
 
 .btn:hover {
   background-color: #0056b3;
 }
 
-.download-zip-btn {
-  background-color: #28a745; /* Professional green */
-  color: #fff;
-  padding: 5px 15px;
-  border-radius: 5px;
-  font-weight: 400;
-  text-decoration: none;
-  display: inline-block;
-  margin-top: 5px;
-  transition: background 0.3s ease;
-  font-size: 0.9em;
-}
-
-.download-zip-btn:hover {
-  background-color: #218838;
-}
-
-/* Quote Input */
-.quote-input {
-  width: 120px; /* Smaller input */
-  padding: 5px 10px;
-  margin-right: 10px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  font-size: 0.9em;
-}
-
-/* Badges */
 .badge {
-  display: inline-block;
-  padding: 0.3em 0.6em;
-  font-size: 0.8em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
   font-weight: bold;
-  line-height: 1;
+  color: white;
+}
+
+.badge-success { background-color: #28a745; }
+.badge-warning { background-color: #ffc107; color: #000; }
+.badge-danger  { background-color: #dc3545; }
+.badge-info    { background-color: #17a2b8; }
+.badge-allocated { background-color: #007bff; margin-left: 5px; }
+
+.allocated-row {
+  background-color: #e6f0ff;
+}
+
+.sidebar ul.menu {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.sidebar ul.menu li {
+  margin-bottom: 10px;
+}
+
+.sidebar ul.menu li a {
+  display: block;
+  background-color: #0b3c5d;
   color: #fff;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: 0.25em;
+  padding: 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
 }
 
-.badge-success {
-  background-color: #28a745;
+.sidebar ul.menu li a.active {
+  background-color: #fff;
+  color: #0b3c5d;
+  font-weight: bold;
 }
 
-.badge-warning {
-  background-color: #ffc107;
-  color: #212529;
+.sidebar ul.menu li a:hover:not(.active) {
+  background-color: #114d70;
 }
 
-.badge-danger {
-  background-color: #dc3545;
-}
-
-/* Footer Styles */
-.dashboard-footer {
-  background-color: #f8f8f8; /* Light gray footer */
-  color: #777;
-  text-align: center;
-  padding: 15px;
-  margin-top: 30px;
-  position: relative;
-  bottom: 0;
-  width: 100%;
-  border-top: 1px solid #eee; /* Subtle top border */
-  font-size: 0.85em;
-}
-
-
-
-.welcome-message {
-  background-color: #e7f3ff;
-  color: #003366;
-  padding: 10px 15px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 1.2em;
+.badge-secondary {
+  background-color: #6c757d;
+  color: white;
 }

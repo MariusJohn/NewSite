@@ -1,137 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Bodyshop Dashboard - Available Jobs</title>
-    <link rel="stylesheet" href="/css/navbar.css">
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/reset.css">
-    <link rel="stylesheet" href="/css/footer.css">
-    <link rel="stylesheet" href="/css/bodyshop-dashboard.css">
-    <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Bodyshop Dashboard</title>
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/bodyshop-dashboard.css">
+  <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
 </head>
-
 <body>
-<div class="dashboard-container">
-    <!-- Header -->
-    <header class="dashboard-header">
-        <img src="/img/logo.png" alt="Logo" class="logo">
-        <h1>Available Jobs for Quoting</h1>
-        <form action="/bodyshop/bodyshop/logout" method="GET">
-            <button type="submit" class="logout-btn">Log Out</button>
-        </form>
-    </header>
+<div class="bodyshop-dashboard-container">
 
-    <!-- Radius Adjustment -->
-    <section class="radius-section">
-        <form action="/bodyshop/update-radius" method="POST">
-            <label for="radius">Adjust Search Radius (1-50 miles):</label>
-            <input type="number" name="radius" id="radius" value="<%= bodyshop.radius || 10 %>" min="1" max="50" required>
-            <button type="submit" class="radius-btn">Update Radius</button>
-        </form>
-        <p>Current Radius: <strong><%= bodyshop.radius || 10 %> miles</strong></p>
-    </section>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="/."><img src="/img/logo.png" alt="Logo"></a>
+    <h2>Welcome, <%= bodyshopName %></h2>
 
-    <!-- Job Table -->
-    <section class="dashboard-section">
-        <div class="dashboard-section-header">
-            <div class="welcome-message">
-                Welcome, <strong><%= bodyshopName %></strong>!
-              </div>
-       
-            <span class="job-count">(<%= jobs.length %> Jobs Available)</span>
-        </div>
+    <ul class="menu">
+      <li><a href="/bodyshop/dashboard?tab=available" class="<%= tab === 'available' ? 'active' : '' %>">Available Jobs</a></li>
+      <li><a href="/bodyshop/dashboard?tab=quoted" class="<%= tab === 'quoted' ? 'active' : '' %>">Quoted Jobs</a></li>
+    </ul>
 
+    <form action="/bodyshop/update-radius" method="POST" class="radius-form">
+      <label for="radius">Radius (mi):</label>
+      <input type="number" name="radius" value="<%= bodyshop.radius || 10 %>" min="1" max="50">
+      <button type="submit" class="btn radius-btn">Update</button>
+    </form>
+
+    <form action="/bodyshop/logout" method="GET">
+      <button type="submit" class="btn logout-btn">Logout</button>
+    </form>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <% if (tab === 'available') { %>
+      <section class="dashboard-section">
+        <h1>Available Jobs (<%= jobs.length %>)</h1>
         <% if (jobs.length === 0) { %>
-            <p>No jobs available at the moment. Please check back later.</p>
+          <p>No available jobs at the moment.</p>
         <% } else { %>
-            <table class="jobs-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Customer Location</th>
-                        <th>Distance (miles)</th>
-                        <th>Images</th>
-                        <th>Days Pending</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% jobs.forEach((job, index) => { %>
-                        <tr>
-                            <td><%= index + 1 %></td>
-                            <td><%= job.location %></td>
-                            <td><%= job.distance ? (job.distance/1609.34).toFixed(2) : "N/A" %> miles</td>
-                            <td>
-                                <div class="image-preview-block">
-                                    <% if (job.images && job.images.length > 0) { %>
-                                        <% job.images.forEach(function(image, i) { %>
-                                            <a
-                                                href="<%= image %>"
-                                                class="glightbox"
-                                                data-gallery="job-<%= job.id %>"
-                                                data-title="Job Image <%= i + 1 %>">
-                                                <img
-                                                    src="<%= image %>"
-                                                    alt="Job Image"
-                                                    class="thumb-img">
-                                            </a>
-                                        <% }) %>
-                                    <% } else { %>
-                                        <em>No Images</em>
-                                    <% } %>
-                                </div>
-                            </td>
-                            <td>
-                                <% const daysPending = Math.floor((new Date() - new Date(job.createdAt)) / (1000 * 60 * 60 * 24)); %>
-                                <span class="badge <%= daysPending > 7 ? 'badge-danger' : daysPending > 3 ? 'badge-warning' : 'badge-success' %>">
-                                    <%= daysPending %> days
-                                </span>
-                            </td>
-                            <td>
-                                <form action="/bodyshop/quote/<%= job.id %>" method="POST" onsubmit="return validateQuote(this)">
-                                    <input type="number" name="quoteAmount" placeholder="Your quote (£)" required class="quote-input" min="1">
-                                    <button type="submit" class="btn">Submit Quote</button>
-                                </form>
-                                <a href="/bodyshop/download/<%= job.id %>" class="btn download-zip-btn">📦 Download All Images</a>
-                            </td>
-                        </tr>
-                    <% }) %>
-                </tbody>
-            </table>
+          <table class="jobs-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Location</th>
+                <th>Distance</th>
+                <th>Images</th>
+                <th>Days</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% jobs.forEach((job, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= job.location %></td>
+                  <td><%= (job.distance / 1609.34).toFixed(2) %> mi</td>
+                  <td>
+                    <div class="image-preview-block">
+                      <% job.images.forEach((img, i) => { %>
+                        <a href="<%= img %>" class="glightbox" data-gallery="job-<%= job.id %>">
+                          <img src="<%= img %>" class="thumb-img">
+                        </a>
+                      <% }) %>
+                    </div>
+                  </td>
+                  <td>
+                    <% const days = Math.floor((new Date() - new Date(job.createdAt)) / (1000 * 60 * 60 * 24)); %>
+                    <span class="badge <%= days > 7 ? 'badge-danger' : days > 3 ? 'badge-warning' : 'badge-success' %>"><%= days %></span>
+                  </td>
+                  <td>
+                    <form action="/bodyshop/quote/<%= job.id %>" method="POST">
+                      <input type="number" name="price" placeholder="£" class="quote-input" required>
+                      <button class="btn">Submit</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
         <% } %>
-    </section>
+      </section>
 
+    <% } else if (tab === 'quoted') { %>
+      <section class="dashboard-section">
+        <h1>Quoted Jobs (<%= quotedJobs.length %>)</h1>
+        <% if (quotedJobs.length === 0) { %>
+          <p>No submitted quotes yet.</p>
+        <% } else { %>
+          <table class="jobs-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Location</th>
+                <th>Distance</th>
+                <th>Images</th>
+                <th>Quoted</th>
+                <th>Your Quote</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% quotedJobs.forEach((job, index) => { %>
+                <tr class="<%= job.allocated ? 'allocated-row' : '' %>">
+                  <td><%= index + 1 %></td>
+                  <td><%= job.location %></td>
+                  <td><%= (job.distance / 1609.34).toFixed(2) %> mi</td>
+                  <td>
+                    <div class="image-preview-block">
+                      <% job.images.forEach((img, i) => { %>
+                        <a href="<%= img %>" class="glightbox" data-gallery="quoted-<%= job.id %>">
+                          <img src="<%= img %>" class="thumb-img">
+                        </a>
+                      <% }) %>
+                    </div>
+                  </td>
+                  <td>
+                    <% const quotedDays = Math.floor((new Date() - new Date(job.quoteDate)) / (1000 * 60 * 60 * 24)); %>
+                    <span class="badge badge-info"><%= quotedDays %> days</span>
+                  </td>
+                  <td>
+                    £<%= job.quoteAmount %>
+                  
+                    <% if (job.allocated) { %>
+                      <span class="badge badge-allocated">Allocated</span>
+                    <% } %>
+                  
+                    <% if (job.quoteStatus === 'won') { %>
+                      <span class="badge badge-success">Won</span>
+                    <% } else if (job.quoteStatus === 'lost') { %>
+                      <span class="badge badge-danger">Lost</span>
+                    <% } else if (job.quoteStatus === 'expired') { %>
+                      <span class="badge badge-secondary">Expired</span>
+                    <% } else if (job.quoteStatus === 'under_review') { %>
+                      <span class="badge badge-warning">Under Review</span>
+                    <% } else { %>
+                      <span class="badge badge-info">Pending</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } %>
+      </section>
+    <% } %>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 <script>
-
-
-    // Initialize GLightbox
-    const lightbox = GLightbox({
-        selector: '.glightbox',
-        touchNavigation: true,
-        loop: true,
-        onOpen: () => {
-            document.body.style.overflow = 'hidden';
-        },
-        onClose: () => {
-            document.body.style.overflow = 'auto';
-        }
-    });
-
-    function validateQuote(form) {
-        const quoteAmount = form.quoteAmount.value;
-        if (!quoteAmount || isNaN(quoteAmount) || quoteAmount <= 0) {
-            alert('Please enter a valid quote amount.');
-            return false;
-        }
-        return true;
-    }
+  const lightbox = GLightbox({ selector: '.glightbox' });
 </script>
-
-<footer class="dashboard-footer">
-    &copy; 2025 MC Quote. All rights reserved.
-</footer>
 </body>
 </html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Expired – MC Quote</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      color: #333;
+    }
+
+    .box {
+      max-width: 720px;
+      width: 100%;
+      margin: auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 50px 40px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+
+    .btn-group {
+      margin-top: 25px;
+    }
+
+    .btn {
+      display: inline-block;
+      margin: 8px;
+      padding: 12px 24px;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 16px;
+      min-width: 160px;
+    }
+
+    .btn-exit {
+      background: #6c757d;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #777;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 600px) {
+      .box {
+        padding: 30px 20px;
+        border-radius: 0;
+      }
+
+      h2 {
+        font-size: 22px;
+      }
+
+      p {
+        font-size: 17px;
+      }
+
+      .btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        font-size: 18px;
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div style="text-align:center; margin-bottom: 20px;">
+    <img src="<%= logoUrl || 'http://localhost:3000/img/logo.png' %>" alt="MC Quote Logo" style="max-width: 150px;">
+  </div>
+
+  <div class="box">
+    <h2>Hello<%= customerName ? ' ' + customerName : '' %>,</h2>
+    <p>Unfortunately, your job request <strong>#<%= job.id %></strong> did not receive any quotes within 48 hours and has now been removed from our system.</p>
+    <p>If you'd like to try again, you're welcome to submit a new request at any time.</p>
+
+    <div class="btn-group">
+      <a class="btn" href="<%= newRequestUrl %>">Submit New Request</a>
+      <a class="btn btn-exit" href="<%= homeUrl %>">Exit</a>
+    </div>
+
+    <p class="small">Thank you for using MC Quote.</p>
+  </div>
+</body>
+</html>

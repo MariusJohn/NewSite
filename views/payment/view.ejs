@@ -1,0 +1,23 @@
+<h2>Quotes for Job #<%= job.id %></h2>
+
+<% quotes.forEach(q => { %>
+  <div class="quote-box">
+    <p>Quote: £<%= q.price %></p>
+    <p>Notes: <%= q.notes %></p>
+
+    <% if (paid && q.Bodyshop) { %>
+      <p>Bodyshop: <%= q.Bodyshop.name %> (<%= q.Bodyshop.email %>)</p>
+    <% } else { %>
+      <p><em>Bodyshop details will be shown after payment.</em></p>
+    <% } %>
+  </div>
+<% }) %>
+
+<% if (!paid) { %>
+  <form action="/payment/confirm" method="POST">
+    <input type="hidden" name="jobId" value="<%= job.id %>">
+    <button type="submit">Pay £<%= quotes[0]?.price %></button>
+  </form>
+<% } else { %>
+  <p class="paid">Payment complete. Quotes unlocked.</p>
+<% } %>

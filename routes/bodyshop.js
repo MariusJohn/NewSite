@@ -16,6 +16,24 @@ import { submitQuote } from '../controllers/bodyshopController.js';
 
 dotenv.config(); // Keep this as it is after the import
 
+
+// === Haversine distance calculator ===
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const toRad = deg => deg * (Math.PI / 180);
+    const R = 6371; // Radius of Earth in km
+  
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+  
+    const a = Math.sin(dLat / 2) ** 2 +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+              Math.sin(dLon / 2) ** 2;
+  
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return (R * c) * 0.621371; // Convert to miles
+  }
+
+
 const router = express.Router();
 
 const headerData = {
@@ -241,6 +259,7 @@ router.post('/login', async (req, res) => {
 // === GET: Bodyshop Dashboard ===
 router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
     try {
+        const tab = req.query.tab || 'available';
         const bodyshop = await Bodyshop.findByPk(req.session.bodyshopId);
 
         if (!bodyshop.latitude || !bodyshop.longitude) {
@@ -250,7 +269,8 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
                 footerData,
                 bodyshopName: bodyshop.name,
                 bodyshop,
-                jobs: []
+                jobs: [],
+                quotedJobs: []
             });
         }
 
@@ -258,7 +278,7 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
         const maxDistance = (bodyshop.radius || 10) * 1609.34;
 
         // Fetch jobs within the bodyshop's radius using CTE
-        const jobs = await sequelize.query(`
+        const allJobs = await sequelize.query(`
             WITH JobDistances AS (
                 SELECT
                     "Jobs".*,
@@ -285,15 +305,33 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
             type: sequelize.QueryTypes.SELECT
         });
 
-        console.log(`✅ Fetched ${jobs.length} jobs within ${bodyshop.radius} miles of ${bodyshop.name}`);
-
+        const jobs = [];
+        const quotedJobs = [];
+    
+        for (const job of allJobs) {
+          const quote = await Quote.findOne({
+            where: { bodyshopId: bodyshop.id, jobId: job.id }
+          });
+    
+          if (quote) {
+            job.quoteAmount = quote.price;
+            job.quoteDate = quote.createdAt;
+            job.allocated = quote.allocated || false;
+            quotedJobs.push(job);
+          } else {
+            jobs.push(job);
+          }
+        }
+    
         res.render('bodyshop/dashboard', {
             title: 'Bodyshop Dashboard',
             headerData,
             footerData,
             bodyshopName: bodyshop.name,
             bodyshop,
-            jobs
+            jobs,
+            quotedJobs,
+            tab
         });
     } catch (err) {
         console.error('❌ Error loading dashboard:', err);
@@ -319,7 +357,187 @@ router.post('/update-radius', requireBodyshopLogin, async (req, res) => {
         res.status(500).send('Server error. Please try again later.');
     }
 });
-// ===POST: Job Quote ===
-router.post('/quote/:jobId', requireBodyshopLogin,submitQuote);
+// === POST: Job Quote (with distance calculation) ===
+router.post('/quote/:jobId', requireBodyshopLogin, async (req, res) => {
+    const { jobId } = req.params;
+    const { price, notes } = req.body;
+  
+    try {
+      const bodyshopId = req.session.bodyshopId;
+      const bodyshop = await Bodyshop.findByPk(bodyshopId);
+      const job = await Job.findByPk(jobId);
+  
+      if (!job || !bodyshop) {
+        return res.status(404).send('Job or Bodyshop not found.');
+      }
+  
+      // Calculate distance
+      let distance = null;
+      if (job.latitude && job.longitude && bodyshop.latitude && bodyshop.longitude) {
+        distance = calculateDistance(job.latitude, job.longitude, bodyshop.latitude, bodyshop.longitude);
+      }
+  
+      // Save quote with distance
+      await Quote.create({
+        bodyshopId,
+        jobId,
+        price,
+        notes,
+        email: bodyshop.email,
+        distance,
+        status: 'pending'
+      });
+  
+      res.redirect('/bodyshop/dashboard');
+    } catch (err) {
+      console.error('❌ Error submitting quote:', err);
+      res.status(500).send('Server error while submitting quote.');
+    }
+  });
+
+
+// === GET: Request Password Reset Page ===
+router.get('/forgot-password', (req, res) => {
+    res.render('bodyshop/forgot-password', { error: null });
+  });
+  
+  // === POST: Send Reset Email ===
+  router.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      const bodyshop = await Bodyshop.findOne({ where: { email } });
+      if (!bodyshop) {
+        return res.render('bodyshop/forgot-password', { error: 'No account with that email.' });
+      }
+  
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // expires in 1 hour
+      
+      await Bodyshop.update(
+        { resetToken, resetTokenExpiry },
+        { where: { email } }
+      );
+      const resetLink = `http://${req.headers.host}/bodyshop/reset-password/${token}`;
+  
+      const transporter = nodemailer.createTransport({
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
+        secure: process.env.EMAIL_SECURE === 'true',
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+  
+      await transporter.sendMail({
+        to: bodyshop.email,
+        from: process.env.EMAIL_USER,
+        subject: 'Reset Your Password',
+        html: `<p>Click to reset your password:</p><a href="${resetLink}">${resetLink}</a>`
+      });
+  
+      res.send('Reset link sent to your email.');
+    } catch (err) {
+      console.error(err);
+      res.render('bodyshop/forgot-password', { error: 'Something went wrong.' });
+    }
+  });
+  
+  // === GET: Show Password Reset Request Page ===
+router.get('/password-reset', (req, res) => {
+    res.render('bodyshop/password-reset', { error: null });
+});
+
+// === POST: Send Password Reset Link ===
+router.post('/password-reset', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const bodyshop = await Bodyshop.findOne({ where: { email } });
+
+        if (!bodyshop) {
+            return res.render('bodyshop/password-reset', { error: 'No account found with that email.' });
+        }
+
+        const token = crypto.randomBytes(32).toString('hex');
+        bodyshop.resetToken = token;
+        bodyshop.resetTokenExpiry = Date.now() + 3600000; // 1 hour
+        await bodyshop.save();
+
+        const resetLink = `http://${req.headers.host}/bodyshop/reset-password/${token}`;
+
+        const transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: process.env.EMAIL_PORT,
+            secure: process.env.EMAIL_SECURE === 'true',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
+        });
+
+        await transporter.sendMail({
+            to: email,
+            from: process.env.EMAIL_USER,
+            subject: 'Reset Your Bodyshop Password',
+            html: `
+                <p>To reset your password, click the link below:</p>
+                <a href="${resetLink}">${resetLink}</a>
+                <p>This link will expire in 1 hour.</p>
+            `
+        });
+
+        res.render('bodyshop/password-reset', { error: 'Reset link sent. Please check your inbox.' });
+    } catch (err) {
+        console.error(err);
+        res.render('bodyshop/password-reset', { error: 'Something went wrong.' });
+    }
+});
+
+// === GET: Password Reset Form ===
+router.get('/reset-password/:token', async (req, res) => {
+    const bodyshop = await Bodyshop.findOne({
+        where: {
+            resetToken: req.params.token,
+            resetTokenExpiry: { [Op.gt]: Date.now() }
+        }
+    });
+
+    if (!bodyshop) return res.send('Reset link expired or invalid.');
+
+    res.render('bodyshop/reset-password', { token: req.params.token, error: null });
+});
+
+// === POST: Submit New Password ===
+router.post('/reset-password/:token', async (req, res) => {
+    const { password, confirmPassword } = req.body;
+
+    try {
+        const bodyshop = await Bodyshop.findOne({
+            where: {
+                resetToken: req.params.token,
+                resetTokenExpiry: { [Op.gt]: Date.now() }
+            }
+        });
+
+        if (!bodyshop) return res.send('Token expired or invalid.');
+
+        if (password !== confirmPassword) {
+            return res.render('bodyshop/reset-password', { token: req.params.token, error: 'Passwords do not match.' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        bodyshop.password = hashedPassword;
+        bodyshop.resetToken = null;
+        bodyshop.resetTokenExpiry = null;
+        await bodyshop.save();
+
+        res.send('✅ Password updated. You can now log in.');
+    } catch (err) {
+        console.error(err);
+        res.send('❌ Error resetting password.');
+    }
+});
 
 export default router;

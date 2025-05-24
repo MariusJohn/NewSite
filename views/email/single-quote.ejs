@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1 Quote Received – MC Quote</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; color: #333; }
+    .box { max-width: 600px; margin: auto; background: #fff; border-radius: 8px; padding: 30px; box-sizing: border-box; }
+    h2 { font-size: 24px; margin-bottom: 20px; }
+    p { font-size: 16px; margin-bottom: 16px; line-height: 1.6; }
+    .btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 20px;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      white-space: nowrap;
+      max-width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .btn-success { background: #28a745; }
+    .small { font-size: 12px; color: #666; margin-top: 30px; }
+
+    @media (max-width: 600px) {
+      .btn {
+        display: block;
+        width: 100%;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Hello<%= customerName ? ` ${customerName}` : '' %>,</h2>
+    <p>Your job request <strong>#<%= job.id %></strong> has received 1 quote.</p>
+    <p><%= remaining %> more bodyshop(s) may still respond.</p>
+
+    <a class="btn" href="<%= extendUrl || ('http://localhost:3000/extend/' + job.id) %>">Yes, Extend & Wait</a>
+    <a class="btn btn-success" href="<%= paymentUrl || ('http://localhost:3000/payment?jobId=' + job.id) %>">No, Proceed to Payment</a>
+
+    <p class="small">Thank you for using MC Quote.</p>
+  </div>
+</body>
+</html>

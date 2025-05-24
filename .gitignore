@@ -51,4 +51,4 @@ azure-config.json
 # Ignore uploads and database files
 uploads/
 database.sqlite
-
+cors.json
