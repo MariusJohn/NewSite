@@ -16,25 +16,36 @@
 <div class="register-container">
   <h2>Register Your Bodyshop</h2>
   <% if (error) { %><p class="error-msg"><%= error %></p><% } %>
-  <form action="/bodyshop/register" method="POST">
+  <form id="registerForm" action="/bodyshop/register" method="POST">
     <input type="text" name="name" placeholder="Bodyshop Name" required>
-    <input type="email" name="email" placeholder="Email" required>
+
+    <input type="email" name="email" placeholder="Email Address" required>
+
+    <input type="tel" name="phone" placeholder="Phone Number" id="phone" required pattern="^07\d{9}$" title="Enter a valid UK phone number (07...)">
+    <span class="error-message" id="phone-error"></span>
+
     <div class="password-container">
-    <input type="password" name="password" placeholder="Password" required autocomplete="new-password">
-    <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
+      <input type="password" name="password" placeholder="Password" required autocomplete="new-password" id="password">
+      <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
     </div>
+
     <div class="password-container">
-    <input type="password" name="confirmPassword" placeholder="Confirm Password" required autocomplete="new-password">
-    <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>  
+      <input type="password" name="confirmPassword" placeholder="Confirm Password" required autocomplete="new-password" id="confirmPassword">
+      <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
     </div>
+
+    <span class="error-message" id="password-error"></span>
+
     <input type="text" name="area" placeholder="Postcode / Area" required>
     <button type="submit">Register</button>
   </form>
+
   <p>Already registered? <a href="/bodyshop/login">Login here</a>.</p>
 </div>
 
 <%- include('../partials/footer') %>
 
 <script src="/js/navbar-toggle.js"></script>
+<script src="/js/bodyshop-register.js"></script>
 </body>
 </html>

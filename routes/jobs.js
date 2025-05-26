@@ -41,12 +41,49 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
       const phoneRegex = /^07\d{9}$/;
       const { name, email, location, telephone } = req.body;
 
+      const sanitize = (text) => text.trim().replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const safeName = sanitize(name);
+      const safeEmail = sanitize(email);
+      const safeLocation = sanitize(location);
+
       if (!phoneRegex.test(telephone)) {
           return res.status(400).render('upload-error', {
               title: 'Invalid telephone number',
               message: 'Please enter a valid UK phone number (07...).'
           });
       }
+
+        const token = req.body['g-recaptcha-response'];
+
+        if (!token) {
+          return res.status(400).render('upload-error', {
+            title: 'Captcha Error',
+            message: 'Captcha verification failed. Please try again.'
+          });
+        }
+
+        const captchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
+        const verifyResponse = await axios.post(captchaVerifyUrl, null, {
+          params: {
+            secret: RECAPTCHA_SECRET_KEY,
+            response: token
+          }
+        });
+
+        if (!verifyResponse.data.success) {
+          return res.status(400).render('upload-error', {
+            title: 'Captcha Error',
+            message: 'Captcha failed verification. Please try again.'
+          });
+        }
+
+                const isBodyshop = await Bodyshop.findOne({ where: { email } });
+        if (isBodyshop) {
+          return res.status(403).render('upload-error', {
+            title: 'Access Denied',
+            message: 'You are not allowed to upload jobs using a bodyshop account.'
+          });
+        }
 
       const apiKey = process.env.OPENCAGE_API_KEY;
       const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
@@ -330,6 +367,73 @@ router.get('/admin/quotes', async (req, res) => {
   } catch (err) {
       console.error(err);
       res.status(500).send('Server error');
+  }
+});
+
+router.get('/extend/:jobId', async (req, res) => {
+  try {
+    const job = await Job.findByPk(req.params.jobId);
+
+    if (!job) {
+      return res.status(404).send('Job not found.');
+    }
+
+    // Optional: Prevent multiple extensions
+    if (job.extended) {
+      return res.send('This job has already been extended once.');
+    }
+
+    // Extend quote expiry by 24 hours
+    const newExpiry = new Date(job.quoteExpiry.getTime() + 24 * 60 * 60 * 1000);
+
+    await job.update({
+      quoteExpiry: newExpiry,
+      extensionRequestedAt: new Date(),
+      extensionCount: job.extensionCount + 1,
+      extended: true
+    });
+
+    res.render('jobs/extension-confirmation', { job });
+
+  } catch (err) {
+    console.error('Error extending job:', err);
+    res.status(500).send('Server error.');
+  }
+});
+
+// Cancel quote
+router.get('/cancel/:jobId', async (req, res) => {
+  try {
+    const job = await Job.findByPk(req.params.jobId);
+
+    if (!job) {
+      return res.status(404).send('Job not found.');
+    }
+
+    // Confirm cancel: just in case someone clicks accidentally
+    res.render('jobs/cancel-confirm', { job });
+
+  } catch (err) {
+    console.error('Error loading cancel confirmation:', err);
+    res.status(500).send('Server error.');
+  }
+});
+
+//POST: Cancel quote
+router.post('/cancel/:jobId', async (req, res) => {
+  try {
+    const job = await Job.findByPk(req.params.jobId);
+
+    if (!job) {
+      return res.status(404).send('Job not found.');
+    }
+
+    await job.update({ status: 'deleted' }); 
+    res.render('jobs/deleted', { job });
+
+  } catch (err) {
+    console.error('Error cancelling job:', err);
+    res.status(500).send('Server error.');
   }
 });
 

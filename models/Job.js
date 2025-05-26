@@ -1,3 +1,4 @@
+// models/job.js
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
 
@@ -41,7 +42,16 @@ const Job = sequelize.define('Job', {
     defaultValue: ''
   },
   status: {
-    type: DataTypes.ENUM('pending', 'approved', 'allocated', 'completed', 'rejected', 'archived', 'deleted'),
+    type: DataTypes.ENUM(
+      'pending',
+      'approved',
+      'allocated',
+      'completed',
+      'rejected',
+      'archived',
+      'deleted',
+      'paid' 
+    ),
     defaultValue: 'pending',
     allowNull: false
   },
@@ -79,7 +89,7 @@ const Job = sequelize.define('Job', {
   quoteExpiry: {
     type: DataTypes.DATE,
     allowNull: false,
-    defaultValue: () => new Date(Date.now() + 48 * 60 * 60 * 1000) // 48 hours from creation
+    defaultValue: () => new Date(Date.now() + 48 * 60 * 60 * 1000)
   },
   extensionRequestedAt: {
     type: DataTypes.DATE,
@@ -111,16 +121,20 @@ const Job = sequelize.define('Job', {
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0
+  },
+  emailSentAt: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
 }, {
   timestamps: true,
   hooks: {
-    beforeCreate: (job, options) => {
+    beforeCreate: (job) => {
       if (!job.quoteExpiry) {
         job.quoteExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000);
       }
     },
-    beforeUpdate: (job, options) => {
+    beforeUpdate: (job) => {
       job.lastActionDate = new Date();
     }
   }

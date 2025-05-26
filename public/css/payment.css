@@ -1,0 +1,157 @@
+/* Base Styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  margin: 0;
+  background-color: #f0f2f5;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.quote-box {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  font-size: 18px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Payment Button */
+form {
+  text-align: center;
+  margin-top: 20px;
+  padding: 20px;
+}
+
+form button {
+  padding: 14px 32px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  min-width: 200px;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+.paid {
+  color: green;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 25px;
+  font-size: 18px;
+}
+
+form small {
+  display: block;
+  margin-top: 14px;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+  max-width: 100%;
+  padding: 0 20px;
+  text-align: center;
+}
+
+/* Selection Confirmation Styles */
+.selection-confirmation {
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 30px 25px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.06);
+  text-align: center;
+}
+
+.selection-confirmation h2 {
+  color: #007bff;
+  margin-bottom: 20px;
+  font-size: 26px;
+}
+
+.selection-confirmation p {
+  font-size: 17px;
+  margin: 12px 0;
+}
+
+.selection-confirmation .bodyshop-contact {
+  margin-top: 20px;
+  padding: 15px;
+  background: #eef2f7;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.selection-confirmation .btn-home {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 12px 24px;
+  background: #007bff;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  .quote-box {
+    font-size: 15px;
+  }
+
+  form button {
+    width: 100%;
+    font-size: 18px;
+    padding: 16px;
+    min-width: auto;
+  }
+
+  form small {
+    font-size: 16px;
+    padding: 0 10px;
+  
+  }
+
+  .selection-confirmation {
+    padding: 20px 15px;
+    margin-top: 40px;
+  }
+
+  .selection-confirmation h2 {
+    font-size: 22px;
+  }
+
+  .selection-confirmation p,
+  .selection-confirmation .bodyshop-contact {
+    font-size: 15px;
+  }
+
+  .selection-confirmation .btn-home {
+    width: 100%;
+    font-size: 16px;
+    padding: 14px;
+  }
+}
+
+
+
+}
