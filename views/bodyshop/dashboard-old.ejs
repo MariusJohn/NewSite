@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bodyshop Dashboard</title>
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/bodyshop-dashboard.css">
+  <link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="bodyshop-dashboard-container">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="/."><img src="/img/logo.png" alt="Logo"></a>
+    <h2>Welcome, <%= bodyshopName %></h2>
+
+    <ul class="menu">
+      <li><a href="/bodyshop/dashboard?tab=available" class="<%= tab === 'available' ? 'active' : '' %>">Available Jobs</a></li>
+      <li><a href="/bodyshop/dashboard?tab=quoted" class="<%= tab === 'quoted' ? 'active' : '' %>">Quoted Jobs</a></li>
+      <li><a href="/bodyshop/dashboard?tab=selected" class="<%= tab === 'selected' ? 'active' : '' %>">Selected Jobs</a></li>
+    </ul>
+
+    <form action="/bodyshop/update-radius" method="POST" class="radius-form">
+      <label for="radius">Radius (mi):</label>
+      <input type="number" name="radius" value="<%= bodyshop.radius || 10 %>" min="1" max="50">
+      <button type="submit" class="btn radius-btn">Update</button>
+    </form>
+
+    <form action="/bodyshop/logout" method="GET">
+      <button type="submit" class="btn logout-btn">Logout</button>
+    </form>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <% if (tab === 'available') { %>
+      <section class="dashboard-section">
+        <h1>Available Jobs (<%= jobs.length %>)</h1>
+        <% if (jobs.length === 0) { %>
+          <p>No available jobs at the moment.</p>
+        <% } else { %>
+          <table class="jobs-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Location<br> Job Creation Date</th>
+                <th>Distance</th>
+                <th>Images</th>
+                <th>Days</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% jobs.forEach((job, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td>
+                    <%= job.location.toUpperCase().replace(/\s+/g, '').replace(/(.{3})$/, ' $1') %><br>
+                    <%= new Date(job.createdAt).toLocaleDateString('en-GB', {
+                      day: '2-digit', month: '2-digit', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit',
+                      hour12: false,
+                      timeZone: 'Europe/London'
+                    }) %><br>
+                    <small>(<%= Math.floor((Date.now() - new Date(job.createdAt)) / (1000 * 60 * 60 * 24)) %> days ago)</small>
+                  </td>
+                  <td><%= (job.distance / 1609.34).toFixed(2) %> mi</td>
+                  <td>
+                    <div class="image-preview-block">
+                      <% job.images.forEach((img, i) => { %>
+                        <a href="<%= img %>" class="glightbox" data-gallery="job-<%= job.id %>">
+                          <img src="<%= img %>" class="thumb-img">
+                        </a>
+                      <% }) %>
+                    </div>
+                  </td>
+                  <td>
+                    <% const days = Math.floor((new Date() - new Date(job.createdAt)) / (1000 * 60 * 60 * 24)); %>
+                    <span class="badge <%= days > 7 ? 'badge-danger' : days > 3 ? 'badge-warning' : 'badge-success' %>"><%= days %></span>
+                  </td>
+                  <td>
+                    <form action="/bodyshop/quote/<%= job.id %>" method="POST">
+                      <input type="number" name="price" placeholder="£" class="quote-input" required>
+                      <button class="btn">Submit</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } %>
+      </section>
+
+    <% } else if (tab === 'quoted') { %>
+      <section class="dashboard-section">
+        <h1>Quoted Jobs (<%= quotedJobs.length %>)</h1>
+        <% if (quotedJobs.length === 0) { %>
+          <p>No submitted quotes yet.</p>
+        <% } else { %>
+          <table class="jobs-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Location<br> Job Creation Date</th>
+                <th>Distance</th>
+                <th>Images</th>
+                <th>Quoted</th>
+                <th>Your Quote</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% quotedJobs.forEach((job, index) => { %>
+                <tr class="<%= job.allocated ? 'allocated-row' : '' %>">
+                  <td><%= index + 1 %></td>
+                  <td>
+                    <%= job.location.toUpperCase().replace(/\s+/g, '').replace(/(.{3})$/, ' $1') %><br>
+                    <%= new Date(job.createdAt).toLocaleDateString('en-GB', {
+                      day: '2-digit', month: '2-digit', year: 'numeric',
+                      hour: '2-digit', minute: '2-digit',
+                      hour12: false,
+                      timeZone: 'Europe/London'
+                    }) %>
+                  </td>
+                  <td><%= (job.distance / 1609.34).toFixed(2) %> mi</td>
+                  <td>
+                    <div class="image-preview-block">
+                      <% job.images.forEach((img, i) => { %>
+                        <a href="<%= img %>" class="glightbox" data-gallery="quoted-<%= job.id %>">
+                          <img src="<%= img %>" class="thumb-img">
+                        </a>
+                      <% }) %>
+                    </div>
+                  </td>
+                  <td>
+                    <% const quotedDays = Math.floor((new Date() - new Date(job.quoteDate)) / (1000 * 60 * 60 * 24)); %>
+                    <span class="badge badge-info"><%= quotedDays %> days</span>
+                  </td>
+                  <td>
+                    £<%= job.quoteAmount %>
+                    <% if (job.allocated) { %>
+                      <span class="badge badge-allocated">Allocated</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+        </table>
+        <% } %>
+        </section>
+
+
+      <% } else if (tab === 'selected') { %>  
+        <section class="dashboard-section">
+        <h1>Selected Jobs (<%= selectedJobs.length %>)</h1>
+        <% if (selectedJobs.length === 0) { %>
+          <p>No jobs where the customer selected you yet.</p>
+        <% } else { %>
+          <table class="jobs-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Location</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Images</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% selectedJobs.forEach((job, index) => { %>
+                <tr>
+                  <td><%= index + 1 %></td>
+                  <td><%= job.location %></td>
+                  <td><%= job.customerName %></td>
+                  <td><%= job.customerPhone %></td>
+                  <td><%= job.customerEmail %></td>
+                  <td>
+                    <div class="image-preview-block">
+                      <% job.images.forEach((img, i) => { %>
+                        <a href="<%= img %>" class="glightbox" data-gallery="selected-<%= job.id %>">
+                          <img src="<%= img %>" class="thumb-img">
+                        </a>
+                      <% }) %>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } %>
+      </section>
+      <% } %>
+  </div> 
+
+</div> 
+
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+  const lightbox = GLightbox({ selector: '.glightbox' });
+</script>
+</body>
+</html>

@@ -74,14 +74,19 @@ router.get('/register', (req, res) => {
 
 // === POST Registration Handler with Password Validation ===
 router.post('/register', async (req, res) => {
-    const { name, email, password, confirmPassword, area } = req.body;
+    const { name, email, password, phone, confirmPassword, area } = req.body;
 
     // Password strength check
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     const postcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
+    const phoneRegex = /^07\d{9}$/;
 
     // Normalize postcode for consistent storage
     const normalizedArea = area.replace(/\s+/g, '').toUpperCase();
+
+    if (!phoneRegex.test(phone)) {
+        return res.render('bodyshop/register', { error: 'Please enter a valid UK phone number (07...)' });
+    }
 
     if (!passwordRegex.test(password)) {
         return res.render('bodyshop/register', { error: 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.' });
@@ -125,6 +130,7 @@ router.post('/register', async (req, res) => {
         await Bodyshop.create({
             name,
             email,
+            phone,
             password: hashedPassword,
             area: normalizedArea,
             latitude: lat,
@@ -258,6 +264,7 @@ router.post('/login', async (req, res) => {
 
 // === GET: Bodyshop Dashboard ===
 router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
+    console.log('Logged in bodyshopId:', req.session.bodyshopId);
     try {
         const tab = req.query.tab || 'available';
         const bodyshop = await Bodyshop.findByPk(req.session.bodyshopId);
@@ -270,7 +277,9 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
                 bodyshopName: bodyshop.name,
                 bodyshop,
                 jobs: [],
-                quotedJobs: []
+                quotedJobs: [],
+                selectedJobs:[],
+                tab
             });
         }
 
@@ -322,22 +331,41 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
             jobs.push(job);
           }
         }
+
+    // Fetch jobs where this bodyshop was selected and the customer paid
+    let selectedJobs = [];
+
+    if (tab === 'selected') {
+      selectedJobs = await Job.findAll({
+        where: {
+          selectedBodyshopId: bodyshop.id,
+          paid: true
+        },
+        attributes: ['id', 'location', 'customerName', 'customerEmail', 'customerPhone', 'images', 'createdAt'],
+        order: [['createdAt', 'DESC']]
+      });
+    }
     
-        res.render('bodyshop/dashboard', {
-            title: 'Bodyshop Dashboard',
-            headerData,
-            footerData,
-            bodyshopName: bodyshop.name,
-            bodyshop,
-            jobs,
-            quotedJobs,
-            tab
-        });
+    res.render('bodyshop/dashboard', {
+      title: 'Bodyshop Dashboard',
+      headerData,
+      footerData,
+      bodyshopName: bodyshop.name,
+      bodyshop,
+      jobs,
+      quotedJobs,
+      selectedJobs,
+      tab
+    });
+
+
     } catch (err) {
         console.error('❌ Error loading dashboard:', err);
         res.status(500).send('Server error. Please try again later.');
     }
 });
+
+
 
 // === POST: Update Radius ===
 router.post('/update-radius', requireBodyshopLogin, async (req, res) => {

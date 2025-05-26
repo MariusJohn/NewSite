@@ -1,9 +1,10 @@
+//==Index route==
 import express from 'express';
 const router = express.Router();
 
 
 const headerData = {
-    logoPath: '/public/img/logo.png',  
+    logoPath: 'img/logo.png',
     navLinks: [
         { url: '/', text: 'Home' },
         { url: '/quotations', text: 'Private Quotations' },

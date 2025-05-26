@@ -7,7 +7,7 @@ import ejs from 'ejs';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
+import fs from 'fs';
 
 dotenv.config();
 const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
@@ -108,6 +108,21 @@ async function sendCustomerJobDeletedEmail(job) {
 // === Scheduler Logic ===
 export async function runSchedulerNow() {
   console.log('=== Scheduler started ===');
+  
+  const dryRun = process.argv.includes('--dry-run');
+  if (dryRun) {
+    console.log('=== DRY RUN MODE ENABLED ===');
+  }
+
+  const summary = {
+    earlyEmails: [],
+    noQuotes: [],
+    oneQuote: [],
+    multiQuotes: [],
+    paymentRequested: [],
+    jobsDeleted: []
+  };
+
 
   try {
     const now = new Date();
@@ -127,38 +142,83 @@ export async function runSchedulerNow() {
       const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
       const remaining = Math.max(0, bodyshopsInRange - quoteCount);
 
+      console.log(`Job ${job.id} | Quotes: ${quoteCount} | Extension requested: ${job.extensionRequestedAt}`);
 
       // === Early Trigger if 2+ Quotes Before 24h ===
-      if (quoteCount >= 2 && !job.extensionRequestedAt) {
-        await sendCustomerMultipleQuotesEmail(job, remaining);
+      if (quoteCount >= 2 && !job.extensionRequestedAt && job.createdAt > cutoff24h) {
+        console.log(`>>> Triggering early email for job ${job.id} (${quoteCount} quotes)`);
+        if (dryRun) {
+          console.log(`[DRY RUN] Would send early multi-quote email for job ${job.id}`);
+        } else {
+          await sendCustomerMultipleQuotesEmail(job, remaining);
+        }
         job.extensionRequestedAt = now;
+        job.emailSentAt = null;
         await job.save();
+        summary.earlyEmails.push(job.id);
         continue;
       }
-      // === 24h Logic ===
-      if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
+
+
+    // === 24h Logic ===
+    if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
+      console.log(`>>> Processing 24h logic for job ${job.id} (${quoteCount} quotes)`);
+
+      try {
         if (quoteCount === 0) {
           await sendCustomerNoQuotesEmail(job);
+          summary.noQuotes.push(job.id);
         } else if (quoteCount === 1) {
           await sendCustomerSingleQuoteEmail(job, remaining);
+          summary.oneQuote.push(job.id);
         } else if (quoteCount >= 2) {
           await sendCustomerMultipleQuotesEmail(job, remaining);
+          summary.multiQuotes.push(job.id);
         }
 
         job.extensionRequestedAt = now;
+        job.emailSentAt = now;
         await job.save();
+      } catch (err) {
+        console.error(`❌ Failed to process 24h logic for job ${job.id}:`, err);
       }
 
+      continue;
+    }
+
+    
       // === 48h Logic ===
       if (job.createdAt <= cutoff48h) {
         if (quoteCount === 0) {
-          await sendCustomerJobDeletedEmail(job);
+          if (!dryRun) await sendCustomerJobDeletedEmail(job);
           await job.destroy();
+          summary.jobsDeleted.push(job.id);
         } else {
-          await sendCustomerPaymentEmail(job);
+          if (!dryRun) await sendCustomerPaymentEmail(job);
+          summary.paymentRequested.push(job.id);
         }
       }
     }
+    console.log('\n=== Scheduler Summary ===');
+    for (const [category, jobs] of Object.entries(summary)) {
+      const jobList = jobs.length ? ` => ${jobs.join(', ')}` : '';
+      console.log(`${category}: ${jobs.length} job(s)${jobList}`);
+    }
+
+    // === Log file ===
+const summaryText = `Scheduler Run at ${now.toISOString()}\n` + 
+Object.entries(summary).map(
+  ([key, jobs]) => `${key}: ${jobs.length} job(s)${jobs.length ? ` => ${jobs.join(', ')}` : ''}`
+).join('\n');
+
+fs.writeFileSync(
+  path.join(__dirname, 'logs', `scheduler-summary-${Date.now()}.log`),
+  summaryText
+);
+
+
+
+
   } catch (err) {
     console.error("Scheduler failed:", err);
   }
@@ -168,7 +228,8 @@ export async function runSchedulerNow() {
 // === Production Cron Job (optional) ===
 cron.schedule('0 * * * *', runSchedulerNow);
 
+
 // Run immediately if executed directly
 if (process.argv[1].endsWith('scheduler.js')) {
-  runSchedulerNow();
+ runSchedulerNow();
 }

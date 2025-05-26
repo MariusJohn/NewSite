@@ -56,30 +56,31 @@ app.set('view engine', 'ejs');
 
 // Logging middleware
 app.use((req, res, next) => {
-    console.log(`➡️ Incoming request: ${req.method} ${req.url}`);
-    next();
+     next();
 });
 
 
 
 // Mount routes
-app.use('/', indexRoutes);
+// Protected admin routes
+app.use('/admin',  adminRoutes);
+app.use('/jobs/admin', adminAuth, adminBodyshopRoutes);
 
+// Public routes
+app.use('/', indexRoutes);
 app.use('/quotations', quotationsRoutes);
 app.use('/bodyshop', bodyshopRoutes);
-
 app.use('/contact', contactRoutes);
-
 app.use('/jobs', jobsRoutes);
 app.use('/', customerRoutes);
-app.use('/admin', adminRoutes);
-app.use('/jobs/admin', adminAuth);
-app.use('/jobs/admin', adminBodyshopRoutes);
 app.use('/', staticRoutes);
-
-
-app.use('/preview', emailPreviewRoutes); //temp route for testing
 app.use('/payment', paymentRoutes);
+
+// Development-only routes
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/preview', emailPreviewRoutes);
+}
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -9,6 +9,7 @@ router.get('/bodyshops', async (req, res) => {
     try {
         // Fetch bodyshops
         const bodyshops = await Bodyshop.findAll({
+            attributes: ['id', 'name', 'email', 'phone', 'area', 'verified', 'adminApproved'],
             order: [['createdAt', 'DESC']]
         });
 

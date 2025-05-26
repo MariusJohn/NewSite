@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bodyshop Selected - MC Quote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/payment.css">
+</head>
+<body>
+  <div class="selection-confirmation">
+    <h2>Thank You!</h2>
+    <p>You selected <strong><%= quote.Bodyshop.name %></strong> as your preferred repairer.</p>
+    <p>We’ve shared your contact details with them.</p>
+    <p>If they don’t reach out within 24 hours, you can contact them directly at:</p>
+    <div class="bodyshop-contact">
+      <p><strong>Name:</strong> <%= quote.Bodyshop.name %></p>
+      <p><strong>Email:</strong> <%= quote.Bodyshop.email %></p>
+      <p><strong>Phone:</strong> <%= quote.Bodyshop.phone %></p>
+    </div>
+    <a href="/" class="btn-home">Return to Home</a>
+  </div>
+</body>
+</html>
