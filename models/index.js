@@ -15,5 +15,7 @@ Quote.belongsTo(Bodyshop, { foreignKey: 'bodyshopId', as: 'bodyshop', onDelete: 
 Bodyshop.hasMany(Job, { foreignKey: 'selectedBodyshopId', as: 'assignedJobs', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
 Job.belongsTo(Bodyshop, { foreignKey: 'selectedBodyshopId', as: 'selectedBodyshop', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
 
+
+
 // Export the models and sequelize instance
 export { sequelize, Job, Quote, Bodyshop };

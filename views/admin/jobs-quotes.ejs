@@ -9,7 +9,6 @@
 </head>
 <body>
     <div class="admin-dashboard-container">
-        <!-- Sidebar -->
         <div class="sidebar">
             <a href="/."><img src="/img/logo.png" alt="MC Quote Logo"></a>
             <h2>Admin Panel</h2>
@@ -25,7 +24,6 @@
             </ul>
         </div>
     
-        <!-- Main Content -->
         <div class="main-content">
             <h1>Submitted Jobs with Quotes</h1>
     
@@ -50,7 +48,7 @@
                     </thead>
                     <tbody>
                         <% jobs.forEach(job => { %>
-                            <% if (job.Quotes.length === 0) { %>
+                            <% if (job.quotes && job.quotes.length === 0) { %>
                                 <tr class="no-quotes">
                                     <td><%= job.id %></td>
                                     <td>
@@ -68,8 +66,8 @@
                                         <a href="/jobs/<%= job.id %>/remind" class="btn btn-remind">Remind</a>
                                     </td>
                                 </tr>
-                            <% } else { %>
-                                <% job.Quotes.forEach(quote => { %>
+                            <% } else if (job.quotes) { %>
+                                <% job.quotes.forEach(quote => { %>
                                     <tr>
                                         <td><%= job.id %></td>
                                         <td>
@@ -79,9 +77,9 @@
                                             <strong>Location:</strong> <%= job.location %>
                                         </td>
                                         <td>
-                                            <%= quote.Bodyshop ? quote.Bodyshop.name : 'Unknown Bodyshop' %><br>
-                                            <%= quote.Bodyshop ? quote.Bodyshop.email : 'No Email' %><br>
-                                            <%= quote.Bodyshop ? quote.Bodyshop.area : 'No Area' %>
+                                            <%= quote.bodyshop ? quote.bodyshop.name : 'Unknown Bodyshop' %><br>
+                                            <%= quote.bodyshop ? quote.bodyshop.email : 'No Email' %><br>
+                                            <%= quote.bodyshop ? quote.bodyshop.area : 'No Area' %>
                                         </td>
                                         <td>£<%= quote.price.toFixed(2) %></td>
                                         <td><%= quote.notes || 'No notes provided' %></td>

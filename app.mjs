@@ -1,9 +1,14 @@
-// app.js
+// app.mjs (This is the file PM2 is running!)
 import express from 'express';
 import path from 'path';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import session from 'express-session';
+
+// --- IMPORTANT: Import sequelize and models here ---
+import { sequelize } from './models/index.js'; // Import sequelize instance
+// You don't need to import Job, Bodyshop, Quote here directly as long as models/index.js does its job
+
 import customerRoutes from './routes/customer.js';
 import adminRoutes from './routes/admin.js';
 import adminAuth from './middleware/adminAuth.js';
@@ -59,8 +64,6 @@ app.use((req, res, next) => {
      next();
 });
 
-
-
 // Mount routes
 // Protected admin routes
 app.use('/admin',  adminRoutes);
@@ -81,14 +84,20 @@ if (process.env.NODE_ENV !== 'production') {
   app.use('/preview', emailPreviewRoutes);
 }
 
-
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err);
     res.status(500).send('Internal Server Error');
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`✅ Server running on port ${port}`);
-});
+// --- IMPORTANT: Connect to DB and Sync Models BEFORE starting server ---
+sequelize.sync() // Use { force: true } only in development if you want to drop tables
+    .then(() => {
+        app.listen(port, () => {
+            console.log(`✅ Server running on port ${port}`);
+            // console.log("Database synced and server started."); // Optional log
+        });
+    })
+    .catch(err => {
+        console.error('❌ Failed to sync database or start server:', err);
+    });

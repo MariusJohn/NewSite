@@ -50,7 +50,7 @@ const Job = sequelize.define('Job', {
       'rejected',
       'archived',
       'deleted',
-      'paid' 
+      'paid'
     ),
     defaultValue: 'pending',
     allowNull: false
@@ -140,18 +140,6 @@ const Job = sequelize.define('Job', {
   }
 });
 
-// Associations
-Job.associate = (models) => {
-  Job.hasMany(models.Quote, {
-    foreignKey: 'jobId',
-    as: 'quotes',
-    onDelete: 'CASCADE'
-  });
-  Job.belongsTo(models.Bodyshop, {
-    foreignKey: 'selectedBodyshopId',
-    as: 'selectedBodyshop',
-    onDelete: 'SET NULL'
-  });
-};
+
 
 export default Job;
