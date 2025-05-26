@@ -7,9 +7,12 @@ import sharp from 'sharp';
 
 import nodemailer from 'nodemailer';
 import { Op } from 'sequelize';
-import { Job, Quote, Bodyshop } from '../models/index.js'; // Ensure correct path and .js extension
+import { Job, Quote, Bodyshop } from '../models/index.js'; // Keep this line for other routes in this file
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
+
+// --- NEW: Import the helper functions ---
+import { getJobFilterOptions, getJobCounts } from '../controllers/jobController.js';
 
 
 import dotenv from 'dotenv';
@@ -77,7 +80,7 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
           });
         }
 
-                const isBodyshop = await Bodyshop.findOne({ where: { email } });
+        const isBodyshop = await Bodyshop.findOne({ where: { email } });
         if (isBodyshop) {
           return res.status(403).render('upload-error', {
             title: 'Access Denied',
@@ -193,58 +196,30 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
   }
 });
 
+
 router.get('/admin', async (req, res) => {
   try {
     const filter = req.query.filter || 'total';
-    let whereClause = {};
-
-    switch (filter) {
-      case 'total':
-        break;
-      case 'live':
-        whereClause.status = { [Op.or]: ['pending', 'approved'] };
-        break;
-      case 'approved':
-        whereClause.status = 'approved';
-        break;
-      case 'rejected':
-        whereClause.status = 'rejected';
-        break;
-      case 'archived':
-        whereClause.status = 'archived';
-        break;
-      case 'deleted':
-        whereClause.status = 'deleted';
-        break;
-      default:
-        break;
-    }
+     const { whereClause, includeClause } = getJobFilterOptions(filter);
 
     const jobs = await Job.findAll({
       where: whereClause,
+      include: includeClause,
       order: [['createdAt', 'DESC']]
     });
 
-    const totalCount = await Job.count();
-    const liveCount = await Job.count({ where: { status: { [Op.or]: ['pending', 'approved'] } } });
-    const approvedCount = await Job.count({ where: { status: 'approved' } });
-    const rejectedCount = await Job.count({ where: { status: 'rejected' } });
-    const archivedCount = await Job.count({ where: { status: 'archived' } });
-    const deletedCount = await Job.count({ where: { status: 'deleted' } });
+    // --- Use helper function for counts ---
+    const counts = await getJobCounts();
 
-    res.render('admin/jobs', {
+    res.render('admin/jobs-dashboard', {
       jobs,
-      totalCount,
-      liveCount,
-      approvedCount,
-      rejectedCount,
-      archivedCount,
-      deletedCount,
+      ...counts, // Spread the counts object into the render context
       filter
     });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
+    console.error('❌ Admin dashboard error:', err);
+    res.status(500).send('Internal Server Error');
   }
 });
 
@@ -279,7 +254,7 @@ router.post('/:jobId/archive', async (req, res) => {
     res.redirect('/jobs/admin?filter=archived');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server error');
+    res.status(500).send('Server error.');
   }
 });
 
@@ -297,7 +272,7 @@ router.post('/:jobId/restore', async (req, res) => {
     res.redirect('/jobs/admin?filter=live');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server error');
+    res.status(500).send('Server error.');
   }
 });
 
@@ -313,7 +288,7 @@ router.post('/:jobId/delete', async (req, res) => {
     res.redirect('/jobs/admin?filter=deleted');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server error');
+    res.status(500).send('Server error.');
   }
 });
 
@@ -330,9 +305,11 @@ router.post('/:jobId/restore-deleted', async (req, res) => {
     res.redirect('/jobs/admin?filter=deleted');
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server error');
+    res.status(500).send('Server error.');
   }
 });
+
+// routes/jobs.js (within the router.get('/admin/quotes') route)
 
 router.get('/admin/quotes', async (req, res) => {
   try {
@@ -340,29 +317,25 @@ router.get('/admin/quotes', async (req, res) => {
           include: [
               {
                   model: Quote,
-                  include: [Bodyshop]
+                  as: 'quotes',
+                  include: [
+                      {
+                          model: Bodyshop,
+                          as: 'bodyshop' 
+                      }
+                  ]
               }
           ],
           order: [['createdAt', 'DESC']]
       });
 
-      const totalCount = await Job.count();
-      const liveCount = await Job.count({ where: { status: { [Op.or]: ['pending', 'approved'] } } });
-      const approvedCount = await Job.count({ where: { status: 'approved' } });
-      const rejectedCount = await Job.count({ where: { status: 'rejected' } });
-      const archivedCount = await Job.count({ where: { status: 'archived' } });
-      const deletedCount = await Job.count({ where: { status: 'deleted' } });
+      const counts = await getJobCounts(); 
 
       console.log("Fetched Jobs with Quotes:", jobs);
 
       res.render('admin/jobs-quotes', {
           jobs,
-          totalCount,
-          liveCount,
-          approvedCount,
-          rejectedCount,
-          archivedCount,
-          deletedCount
+          ...counts
       });
   } catch (err) {
       console.error(err);
