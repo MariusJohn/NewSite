@@ -9,13 +9,13 @@
 <body>
   <div class="selection-confirmation">
     <h2>Thank You!</h2>
-    <p>You selected <strong><%= quote.Bodyshop.name %></strong> as your preferred repairer.</p>
+    <p>You selected <strong><%= selectedBodyshop.name %></strong> as your preferred repairer.</p>
     <p>We’ve shared your contact details with them.</p>
     <p>If they don’t reach out within 24 hours, you can contact them directly at:</p>
     <div class="bodyshop-contact">
-      <p><strong>Name:</strong> <%= quote.Bodyshop.name %></p>
-      <p><strong>Email:</strong> <%= quote.Bodyshop.email %></p>
-      <p><strong>Phone:</strong> <%= quote.Bodyshop.phone %></p>
+      <p><strong>Name:</strong> <%= selectedBodyshop.name %></p>
+      <p><strong>Email:</strong> <%= selectedBodyshop.email %></p>
+      <p><strong>Phone:</strong> <%= selectedBodyshop.phone %></p>
     </div>
     <a href="/" class="btn-home">Return to Home</a>
   </div>

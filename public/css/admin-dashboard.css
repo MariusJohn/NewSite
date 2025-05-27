@@ -1,7 +1,7 @@
 /* General Styles */
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: rgb(7, 42, 70);
+  background-color: rgb(7, 42, 70); /* Dark blue background */
   color: white;
   margin: 0;
   padding: 0;
@@ -15,7 +15,7 @@ body {
 /* Sidebar Styles */
 .sidebar {
   width: 350px;
-  background-color: #102b45;
+  background-color: #102b45; /* Darker blue for sidebar */
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -29,7 +29,7 @@ body {
 }
 
 .sidebar h2 {
-  color: #25D366;
+  color: #25D366; /* Green accent */
   font-weight: 600;
   font-size: 28px;
   margin-bottom: 20px;
@@ -58,7 +58,7 @@ body {
 
 .sidebar .menu li a:hover,
 .sidebar .menu li a.active {
-  background-color: #25D366;
+  background-color: #25D366; /* Green accent on hover/active */
   color: #ffffff;
   font-weight: bold;
 }
@@ -67,38 +67,38 @@ body {
 .main-content {
   flex-grow: 1;
   padding: 40px;
-  background-color: #0b3c5d;
-  overflow-x: auto;
+  background-color: #0b3c5d; /* Main content background blue */
+  overflow-x: auto; /* Ensures horizontal scrolling if content overflows */
 }
 
 .main-content h1 {
   margin-bottom: 20px;
-  color: #25D366;
+  color: #25D366; /* Green accent for headings */
   text-align: center;
   font-weight: 700;
   font-size: 32px;
 }
 
-/* Quotes Table Styles */
+/* Base Quotes Table Styles */
 .quotes-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
   background-color: #0b3c5d;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: hidden; /* Helps with border-radius visually */
   color: #ffffff;
 }
 
 .quotes-table thead {
-  background-color: #102b45;
+  background-color: #102b45; /* Darker blue for table header */
   color: white;
 }
 
 .quotes-table th, .quotes-table td {
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid #444; /* Darker border for internal cells */
   vertical-align: middle;
   color: white;
 }
@@ -108,22 +108,102 @@ body {
   text-align: center;
 }
 
+/* Collapsible Table Structure Styles */
+.job-row {
+    cursor: pointer;
+    background-color: #102b45; /* Matches existing even/odd row backgrounds */
+    transition: background-color 0.2s ease;
+}
+.job-row:hover {
+    background-color: #1f4e6f; /* Matches existing hover background */
+}
+
+/* Overrides for specific alternating rows to ensure job-row consistency */
 .quotes-table tbody tr:nth-child(even) {
-  background-color: #122f45;
+  background-color: #122f45; /* Still apply to the overall rows */
 }
 
 .quotes-table tbody tr:nth-child(odd) {
-  background-color: #102b45;
+  background-color: #102b45; /* Still apply to the overall rows */
 }
 
-.quotes-table tbody tr:hover {
-  background-color: #1f4e6f;
-  cursor: pointer;
+/* Ensure job-row takes precedence for its specific background */
+.quotes-table tbody .job-row {
+  background-color: #102b45; /* Base color for job rows */
 }
+.quotes-table tbody .job-row:nth-child(odd) {
+  background-color: #102b45; /* Specific for odd job rows */
+}
+.quotes-table tbody .job-row:nth-child(even) {
+  background-color: #122f45; /* Specific for even job rows */
+}
+
+
+.quote-details-row {
+    display: none; /* Hidden by default */
+    background-color: #0d324d; /* Slightly lighter background for details */
+}
+.quote-details-row td {
+    padding: 0; /* Remove padding from the main cell holding nested table */
+}
+
+.nested-quotes-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0; /* No margin here, as the parent td has its own spacing */
+}
+.nested-quotes-table th,
+.nested-quotes-table td {
+    padding: 8px;
+    border: 1px solid #333; /* Adjusted for dark theme */
+    text-align: left;
+    font-size: 0.9em;
+    color: #ffffff; /* Ensure text color for nested table */
+}
+.nested-quotes-table thead {
+    background-color: #153856; /* Slightly different header for nested table */
+}
+
+.winning-quote {
+    background-color: #25D366 !important; /* Green accent for winning quote */
+    color: #000000 !important; /* Black text for contrast on green */
+    font-weight: bold;
+}
+.toggle-icon {
+    margin-right: 5px;
+    display: inline-block;
+    width: 1em; /* Ensure consistent width */
+    text-align: center;
+}
+
+/* Responsive Table Styling (from EJS inline style, now here) */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.quotes-table th,
+.quotes-table td {
+    white-space: nowrap; /* Apply to all cells initially for responsive scroll */
+}
+.quotes-table td:nth-child(2), /* Customer Details column */
+.quotes-table td:nth-child(4), /* Location column */
+.quotes-table td:nth-child(8) /* Winning Bodyshop column */
+{
+    white-space: normal; /* Allows text to wrap for these columns */
+    word-break: break-word; /* Breaks long words if necessary */
+    max-width: 200px; /* Adjust max-width as needed for readability */
+}
+/* For notes in nested table */
+.nested-quotes-table td:nth-child(3) {
+    white-space: normal;
+    word-break: break-word;
+    max-width: 200px;
+}
+
 
 /* No Quotes Row */
 .no-quotes {
-  background-color: #ffa500;
+  background-color: #ffa500; /* Orange for warning */
   color: #333;
   font-weight: bold;
   text-align: center;
@@ -141,29 +221,29 @@ body {
 }
 
 .status-pending {
-  background-color: #ffa500;
+  background-color: #ffa500; /* Orange */
 }
 
 .status-viewed {
-  background-color: #25D366;
+  background-color: #25D366; /* Green */
 }
 
 .status-not-viewed {
-  background-color: #f39c12;
+  background-color: #f39c12; /* Darker orange */
 }
 
 .status-archived {
-  background-color: #6c757d;
+  background-color: #6c757d; /* Grey */
 }
 
 .status-deleted {
-  background-color: #444;
+  background-color: #444; /* Dark grey */
 }
 
 /* Pending Days */
 .days-pending {
   font-weight: bold;
-  color: #f39c12;
+  color: #f39c12; /* Darker orange */
 }
 
 /* Action Buttons */
@@ -181,21 +261,20 @@ body {
 }
 
 .btn-view {
-  background-color: #007bff;
+  background-color: #007bff; /* Blue */
 }
 
 .btn-archive {
-  background-color: #6c757d;
+  background-color: #6c757d; /* Grey */
 }
 
 .btn-remind {
-  background-color: #28a745;
+  background-color: #28a745; /* Green */
 }
 
 .btn:hover {
   opacity: 0.9;
 }
-
 
 .thumb-img {
   width: 80px;
@@ -209,7 +288,7 @@ body {
 
 /* Approve and Reject Buttons */
 .job-actions button {
-    background-color: #25D366;
+    background-color: #25D366; /* Green */
     color: #ffffff;
     border: none;
     padding: 8px 15px;
@@ -228,7 +307,7 @@ body {
 
 /* Reject Button */
 .job-actions .reject-btn {
-    background-color: #fa5d28;
+    background-color: #fa5d28; /* Orange-red */
 }
 
 .job-actions .reject-btn:hover {
@@ -237,7 +316,7 @@ body {
 
 /* Restore Button */
 .job-actions .restore-btn {
-    background-color: #007bff;
+    background-color: #007bff; /* Blue */
 }
 
 .job-actions .restore-btn:hover {
@@ -246,7 +325,7 @@ body {
 
 /* Archive Button */
 .job-actions .archive-btn {
-    background-color: #6c757d;
+    background-color: #6c757d; /* Grey */
 }
 
 .job-actions .archive-btn:hover {
@@ -255,7 +334,7 @@ body {
 
 /* Delete Button */
 .job-actions .delete-btn {
-    background-color: #d9534f;
+    background-color: #d9534f; /* Red */
 }
 
 .job-actions .delete-btn:hover {
@@ -264,7 +343,7 @@ body {
 
 /* Download Button */
 .job-actions .download-zip-btn {
-    background-color: #17a2b8;
+    background-color: #17a2b8; /* Teal */
     color: #ffffff;
     padding: 8px 15px;
     border-radius: 5px;
@@ -300,7 +379,7 @@ body {
       padding: 20px;
   }
 
-  .quotes-table th, 
+  .quotes-table th,
   .quotes-table td {
       padding: 10px;
       font-size: 12px;
@@ -316,13 +395,13 @@ body {
       font-size: 12px;
   }
 }
-/* Job Table Row Separation */
+/* Job Table Row Separation (Original styles for .jobs-table, keeping but less relevant now) */
 .jobs-table tbody tr {
   border-bottom: 2px solid #333;
   border-top: 2px solid #333;
 }
 
-/* Make the headers stand out */
+/* Make the headers stand out (Original styles for .jobs-table, keeping but less relevant now) */
 .jobs-table thead th {
   background-color: #102b45;
   color: #ffffff;
@@ -330,7 +409,7 @@ body {
   text-align: center;
 }
 
-/* Even and Odd Row Styling */
+/* Even and Odd Row Styling (Original styles for .jobs-table, keeping but less relevant now) */
 .jobs-table tbody tr:nth-child(even) {
   background-color: #122f45;
 }
@@ -353,13 +432,13 @@ body {
 
 /* Overdue Job Highlight */
 .overdue {
-  background-color: #fa5d28 !important;
+  background-color: #fa5d28 !important; /* Orange-red */
   color: #ffffff !important;
   font-weight: bold;
 }
 
 .btn-approve {
-  background-color: #25D366;
+  background-color: #25D366; /* Green */
   color: #ffffff;
   padding: 8px 16px;
   border: none;
@@ -370,7 +449,7 @@ body {
 }
 
 .btn-reject {
-  background-color: #fa5d28;
+  background-color: #fa5d28; /* Orange-red */
   color: #ffffff;
   padding: 8px 16px;
   border: none;

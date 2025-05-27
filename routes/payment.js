@@ -2,6 +2,7 @@
 import express from 'express';
 import { Job, Quote, Bodyshop } from '../models/index.js';
 import { createCheckoutSession } from '../controllers/paymentController.js';
+import { sendFinalEmails } from '../controllers/emailController.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -17,7 +18,10 @@ router.get('/', async (req, res) => {
       include: [{
         model: Quote,
         as: 'quotes',
-        include: [Bodyshop] 
+        include: [{
+          model: Bodyshop,
+        as: 'bodyshop'
+      }] 
       }]
     });
 
@@ -87,7 +91,10 @@ router.post('/select', async (req, res) => {
       include: {
         model: Quote,
         as: 'quotes',
-        include: [Bodyshop]
+      include: [{
+        model: Bodyshop,
+        as: 'bodyshop'
+      }]
       }
     });
 
@@ -102,8 +109,13 @@ router.post('/select', async (req, res) => {
     if (!quote) {
       return res.status(404).send('Selected quote not found.');
     }
+    //Final Email
+    await sendFinalEmails(job, quote);
 
-    res.render('payment/selected-confirmation', { job, quote });
+
+    res.render('payment/selected-confirmation', { 
+      job, 
+      selectedBodyshop: quote.bodyshop });
   } catch (err) {
     console.error('❌ Error selecting bodyshop:', err);
     res.status(500).send('Server error');
@@ -116,7 +128,10 @@ router.get('/selected/:jobId', async (req, res) => {
     const job = await Job.findByPk(req.params.jobId, {
       include: [{
         model: Quote,
-        include: [Bodyshop]
+        include: [{
+          model: Bodyshop,
+          as: 'bodyshop'
+      }]
       }]
     });
 
@@ -124,7 +139,7 @@ router.get('/selected/:jobId', async (req, res) => {
 
     res.render('payment/selected-confirmation', {
       job,
-     quote: selectedQuote
+     selectedBodyshop: selectedQuote.bodyshop
     });
   } catch (err) {
     console.error('❌ Error loading selection confirmation:', err);

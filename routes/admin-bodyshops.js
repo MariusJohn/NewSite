@@ -5,7 +5,7 @@ import { Bodyshop, Job } from '../models/index.js';
 const router = express.Router();
 
 // Show all bodyshops pending approval
-router.get('/bodyshops', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         // Fetch bodyshops
         const bodyshops = await Bodyshop.findAll({
@@ -38,7 +38,7 @@ router.get('/bodyshops', async (req, res) => {
 });
 
 // Approve bodyshop
-router.post('/bodyshops/:id/approve', async (req, res) => {
+router.post('/:id/approve', async (req, res) => {
     try {
         const bodyshop = await Bodyshop.findByPk(req.params.id);
         if (bodyshop) {
@@ -55,7 +55,7 @@ router.post('/bodyshops/:id/approve', async (req, res) => {
 });
 
 // Reject bodyshop
-router.post('/bodyshops/:id/reject', async (req, res) => {
+router.post('/:id/reject', async (req, res) => {
     try {
         const bodyshop = await Bodyshop.findByPk(req.params.id);
         if (bodyshop) {

@@ -7,10 +7,10 @@
     <div class="quote-box">
       <p>Quote: £<%= q.price %></p>
       <p>Notes: <%= q.notes %></p>
-
-      <% if (paid && q.Bodyshop) { %>
-        <p>Bodyshop: <%= q.Bodyshop.name %> (<%= q.Bodyshop.email %> | <%= q.Bodyshop.phone %>)</p>
-
+      <% if (paid && q.bodyshop) { %>
+       
+        <p>Bodyshop: <%= q.bodyshop.name %> (<%= q.bodyshop.email %> | <%= q.bodyshop.phone %>)</p>
+      
         <% if (!job.selectedBodyshopId) { %>
           <form action="/payment/select" method="POST">
             <input type="hidden" name="jobId" value="<%= job.id %>">
@@ -22,7 +22,8 @@
         <% } %>
       <% } else { %>
         <p><em>Bodyshop details will be shown after payment.</em></p>
-      <% } %>
+      <% } %>      
+ 
     </div>
   <% }) %>
 <% } else { %>

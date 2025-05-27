@@ -1,5 +1,7 @@
 // routes/jobs.js
 import express from 'express';
+const router = express.Router();
+
 import multer from 'multer';
 import path from 'path';
 import axios from 'axios';
@@ -11,14 +13,40 @@ import { Job, Quote, Bodyshop } from '../models/index.js'; // Keep this line for
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
 
+import {
+  extendJobQuoteTime,
+  showCancelJobPage,
+  cancelJob
+} from '../controllers/customerJobActionsController.js';
+
+
+
+import {
+  renderJobsWithQuotes,
+  exportJobsWithQuotesCSV,
+  remindUnselectedJobs
+} from '../controllers/jobsWithQuotesController.js';
+
+
 // --- NEW: Import the helper functions ---
 import { getJobFilterOptions, getJobCounts } from '../controllers/jobController.js';
+
+import { getBaseUrl } from '../helpers/url.js';
+
+router.get('/extend/:jobId', async (req, res) => {
+  const jobId = req.params.jobId;
+  const baseUrl = getBaseUrl();
+  const extendLink = `${baseUrl}/extend/${jobId}`;
+
+
+});
+
 
 
 import dotenv from 'dotenv';
 dotenv.config();
 
-const router = express.Router();
+
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
 const s3Client = new S3Client({
@@ -35,6 +63,8 @@ const upload = multer({
     limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB limit
 });
 
+
+
 router.get('/upload', (req, res) => {
   res.render('jobs/upload');
 });
@@ -50,7 +80,7 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
       const safeLocation = sanitize(location);
 
       if (!phoneRegex.test(telephone)) {
-          return res.status(400).render('upload-error', {
+          return res.status(400).render('jobs/upload-error', {
               title: 'Invalid telephone number',
               message: 'Please enter a valid UK phone number (07...).'
           });
@@ -59,7 +89,7 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
         const token = req.body['g-recaptcha-response'];
 
         if (!token) {
-          return res.status(400).render('upload-error', {
+          return res.status(400).render('jobs/upload-error', {
             title: 'Captcha Error',
             message: 'Captcha verification failed. Please try again.'
           });
@@ -74,19 +104,19 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
         });
 
         if (!verifyResponse.data.success) {
-          return res.status(400).render('upload-error', {
+          return res.status(400).render('jobs/upload-error', {
             title: 'Captcha Error',
             message: 'Captcha failed verification. Please try again.'
           });
         }
 
-        const isBodyshop = await Bodyshop.findOne({ where: { email } });
-        if (isBodyshop) {
-          return res.status(403).render('upload-error', {
-            title: 'Access Denied',
-            message: 'You are not allowed to upload jobs using a bodyshop account.'
-          });
-        }
+        // const isBodyshop = await Bodyshop.findOne({ where: { email } });
+        // if (isBodyshop) {
+        //   return res.status(403).render('jobs/upload-error', {
+        //     title: 'Access Denied',
+        //     message: 'You are not allowed to upload jobs using a bodyshop account.'
+        //   });
+        // }
 
       const apiKey = process.env.OPENCAGE_API_KEY;
       const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
@@ -100,7 +130,7 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
 
       if (!geoRes.data || !geoRes.data.results || !geoRes.data.results.length) {
           console.error('No coordinates found for:', location);
-          return res.status(400).render('upload-error', {
+          return res.status(400).render('jobs/upload-error', {
               title: 'Location Error',
               message: 'Unable to find coordinates for the given postcode.'
           });
@@ -184,12 +214,12 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
       if (routeError.name === 'SequelizeValidationError') {
           const messages = routeError.errors.map(err => err.message).join(', ');
           console.error('Sequelize Validation Errors:', messages);
-          return res.status(400).render('upload-error', {
+          return res.status(400).render('<jobs/upload-error', {
               title: 'Validation Error',
               message: `Data validation failed: ${messages}`
           });
       }
-      res.status(500).render('upload-error', {
+      res.status(500).render('jobs/upload-error', {
           title: 'Server Error',
           message: 'Something went wrong. Please try again later.'
       });
@@ -331,7 +361,7 @@ router.get('/admin/quotes', async (req, res) => {
 
       const counts = await getJobCounts(); 
 
-      console.log("Fetched Jobs with Quotes:", jobs);
+
 
       res.render('admin/jobs-quotes', {
           jobs,
@@ -343,71 +373,19 @@ router.get('/admin/quotes', async (req, res) => {
   }
 });
 
-router.get('/extend/:jobId', async (req, res) => {
-  try {
-    const job = await Job.findByPk(req.params.jobId);
 
-    if (!job) {
-      return res.status(404).send('Job not found.');
-    }
+// === Customer Actions ===
+router.get('/extend/:jobId', extendJobQuoteTime);
+router.get('/cancel/:jobId', showCancelJobPage);
+router.post('/cancel/:jobId', cancelJob);
 
-    // Optional: Prevent multiple extensions
-    if (job.extended) {
-      return res.send('This job has already been extended once.');
-    }
 
-    // Extend quote expiry by 24 hours
-    const newExpiry = new Date(job.quoteExpiry.getTime() + 24 * 60 * 60 * 1000);
 
-    await job.update({
-      quoteExpiry: newExpiry,
-      extensionRequestedAt: new Date(),
-      extensionCount: job.extensionCount + 1,
-      extended: true
-    });
+//Jobs with Quotes 
+router.get('/admin/quotes', renderJobsWithQuotes);
+router.get('/admin/quotes/export', exportJobsWithQuotesCSV);
+router.get('/admin/quotes/remind', remindUnselectedJobs);
 
-    res.render('jobs/extension-confirmation', { job });
 
-  } catch (err) {
-    console.error('Error extending job:', err);
-    res.status(500).send('Server error.');
-  }
-});
-
-// Cancel quote
-router.get('/cancel/:jobId', async (req, res) => {
-  try {
-    const job = await Job.findByPk(req.params.jobId);
-
-    if (!job) {
-      return res.status(404).send('Job not found.');
-    }
-
-    // Confirm cancel: just in case someone clicks accidentally
-    res.render('jobs/cancel-confirm', { job });
-
-  } catch (err) {
-    console.error('Error loading cancel confirmation:', err);
-    res.status(500).send('Server error.');
-  }
-});
-
-//POST: Cancel quote
-router.post('/cancel/:jobId', async (req, res) => {
-  try {
-    const job = await Job.findByPk(req.params.jobId);
-
-    if (!job) {
-      return res.status(404).send('Job not found.');
-    }
-
-    await job.update({ status: 'deleted' }); 
-    res.render('jobs/deleted', { job });
-
-  } catch (err) {
-    console.error('Error cancelling job:', err);
-    res.status(500).send('Server error.');
-  }
-});
 
 export default router;
