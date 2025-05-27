@@ -78,7 +78,7 @@ export const getJobFilterOptions = (filter) => {
       break;
   }
 
-  console.log(`DEBUG: getJobFilterOptions for filter '${filter}' returning includeClause:`, JSON.stringify(includeClause, null, 2));
+  
 
   return { whereClause, includeClause };
 };

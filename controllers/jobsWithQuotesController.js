@@ -1,0 +1,94 @@
+// controllers/jobsWithQuotesController.js
+import { Job, Quote, Bodyshop } from '../models/index.js';
+import { Parser } from 'json2csv'; // npm install json2csv
+import sendMail from '../utils/sendMail.js';
+
+export async function renderJobsWithQuotes(req, res) {
+  try {
+    const jobs = await Job.findAll({
+      include: [{
+        model: Quote,
+        required: true,
+        include: [{ model: Bodyshop }]
+      }]
+    });
+
+    res.render('admin/jobs-quotes', { jobs });
+  } catch (err) {
+    console.error('❌ Error loading jobs with quotes:', err);
+    res.status(500).send('Server error');
+  }
+}
+
+export async function exportJobsWithQuotesCSV(req, res) {
+  try {
+    const jobs = await Job.findAll({
+      include: [{
+        model: Quote,
+        required: true,
+        include: [{ model: Bodyshop }]
+      }]
+    });
+
+    const data = [];
+
+    jobs.forEach(job => {
+      job.quotes.forEach(quote => {
+        data.push({
+          JobID: job.id,
+          CustomerName: job.customerName,
+          CustomerEmail: job.customerEmail,
+          Location: job.location,
+          QuotePrice: quote.price,
+          QuoteNotes: quote.notes,
+          QuoteDate: quote.createdAt,
+          Selected: job.selectedBodyshopId === quote.bodyshopId ? 'Yes' : '',
+          Bodyshop: quote.bodyshop?.name,
+          BodyshopEmail: quote.bodyshop?.email,
+        });
+      });
+    });
+
+    const parser = new Parser();
+    const csv = parser.parse(data);
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment('jobs-with-quotes.csv');
+    res.send(csv);
+  } catch (err) {
+    console.error('❌ Failed to export CSV:', err);
+    res.status(500).send('Failed to generate CSV');
+  }
+}
+
+export async function remindUnselectedJobs(req, res) {
+  try {
+    const jobs = await Job.findAll({
+      include: [{
+        model: Quote,
+        required: true,
+        include: [{ model: Bodyshop }]
+      }],
+      where: {
+        selectedBodyshopId: null
+      }
+    });
+
+    for (const job of jobs) {
+      for (const quote of job.quotes) {
+        if (quote.bodyshop?.email) {
+          await sendMail(
+            quote.bodyshop.email,
+            `Reminder: Job #${job.id} still open for customer`,
+            `The customer has not yet selected a bodyshop. Please follow up or review your quote.\n\nQuote: £${quote.price}\nNotes: ${quote.notes}`
+          );
+        }
+      }
+    }
+
+    res.send('Reminders sent to bodyshops for unselected jobs.');
+  } catch (err) {
+    console.error('❌ Failed to send reminders:', err);
+    res.status(500).send('Reminder job failed');
+  }
+}

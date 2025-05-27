@@ -1,6 +1,5 @@
 // scheduler.js
 import cron from 'node-cron';
-import { Job, Quote, Bodyshop } from './models/index.js';
 import nodemailer from 'nodemailer';
 import { Op } from 'sequelize';
 import ejs from 'ejs';
@@ -8,9 +7,30 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
+import { DeletedJob, Job, Quote, Bodyshop } from './models/index.js';
 
 dotenv.config();
+
+
+
 const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+
+
+// === Generic HTML sender ===
+async function sendHtmlEmail(to, subject, html) {
+  try {
+    await transporter.sendMail({
+      from: `"MC Quote" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html
+    });
+    console.log(`✅ Email sent: ${subject} -> ${to}`);
+  } catch (err) {
+    console.error(`❌ Email failed: ${subject} -> ${to}`, err);
+  }
+}
 
 // === Setup __dirname and view path ===
 const __filename = fileURLToPath(import.meta.url);
@@ -34,20 +54,7 @@ transporter.verify((error) => {
   else console.log("✅ Email transporter ready");
 });
 
-// === Generic HTML sender ===
-async function sendHtmlEmail(to, subject, html) {
-  try {
-    await transporter.sendMail({
-      from: `"MC Quote" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html
-    });
-    console.log(`✅ Email sent: ${subject} -> ${to}`);
-  } catch (err) {
-    console.error(`❌ Email failed: ${subject} -> ${to}`, err);
-  }
-}
+
 
 // === Email helpers using templates ===
 async function sendCustomerNoQuotesEmail(job) {
@@ -138,6 +145,10 @@ export async function runSchedulerNow() {
     });
 
     for (const job of jobs) {
+      
+      console.log(`Checking Job #${job.id} | Created At: ${job.createdAt.toISOString()} | Status: ${job.status} | Expiry: ${job.quoteExpiry}`);
+
+
       const quoteCount = job.quotes?.length || 0;
       const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
       const remaining = Math.max(0, bodyshopsInRange - quoteCount);
@@ -167,6 +178,26 @@ export async function runSchedulerNow() {
       try {
         if (quoteCount === 0) {
           await sendCustomerNoQuotesEmail(job);
+
+          const bodyshops = await Bodyshop.findAll({ where: { area: job.location } });
+
+                    for (const bs of bodyshops) {
+                      if (bs.email) {
+                        await sendHtmlEmail(
+                          bs.email,
+                          `Reminder: Quote opportunity for Job #${job.id}`,
+                          `<p>Hello ${bs.name},</p>
+                          <p>A job in your area has been open for 24 hours without receiving any quotes.</p>
+                          <p><strong>Location:</strong> ${job.location}</p>
+                          <p><a href="${baseUrl}/bodyshop/dashboard">Log in to view and quote</a></p>
+                          <p>– MC Quote</p>`
+                        );
+                        console.log(`📢 Reminder sent to ${bs.email} for job ${job.id}`);
+                      }
+                    }
+
+
+
           summary.noQuotes.push(job.id);
         } else if (quoteCount === 1) {
           await sendCustomerSingleQuoteEmail(job, remaining);
@@ -191,7 +222,48 @@ export async function runSchedulerNow() {
       if (job.createdAt <= cutoff48h) {
         if (quoteCount === 0) {
           if (!dryRun) await sendCustomerJobDeletedEmail(job);
-          await job.destroy();
+          
+          const s3Client = new S3Client({
+            region: process.env.AWS_REGION,
+            credentials: {
+              accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+              secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+            }
+          });
+          
+          async function deleteJobImagesFromS3(imageKeys = []) {
+            if (!imageKeys.length) return;
+          
+            const deleteParams = {
+              Bucket: process.env.AWS_BUCKET_NAME,
+              Delete: {
+                Objects: imageKeys.map(key => ({ Key: `job-images/${key}` }))
+              }
+            };
+          
+            try {
+              await s3Client.send(new DeleteObjectsCommand(deleteParams));
+              console.log(`🗑️ Deleted ${imageKeys.length} image(s) from S3`);
+            } catch (err) {
+              console.error('❌ Failed to delete images from S3:', err);
+            }
+          }
+
+          await DeletedJob.create({
+            jobId: job.id,
+            customerName: job.customerName,
+            customerEmail: job.customerEmail,
+            location: job.location
+          });
+          
+          await deleteJobImagesFromS3(job.images || []);
+
+
+          await job.destroy(); 
+          
+
+
+
           summary.jobsDeleted.push(job.id);
         } else {
           if (!dryRun) await sendCustomerPaymentEmail(job);
@@ -204,6 +276,8 @@ export async function runSchedulerNow() {
       const jobList = jobs.length ? ` => ${jobs.join(', ')}` : '';
       console.log(`${category}: ${jobs.length} job(s)${jobList}`);
     }
+
+
 
     // === Log file ===
 const summaryText = `Scheduler Run at ${now.toISOString()}\n` + 
