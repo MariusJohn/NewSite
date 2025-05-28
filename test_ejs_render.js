@@ -11,18 +11,6 @@ const templatePath = path.join(__dirname, 'views', 'bodyshop', 'dashboard.ejs');
 
 async function renderTestTemplate() {
     try {
-        // Ensure dashboard.ejs contains ONLY the minimal code:
-        // <!DOCTYPE html>
-        // <html>
-        // <head><title>Test</title></head>
-        // <body>
-        //   <% if (true) { %>
-        //     <p>This is true.</p>
-        //   <% } else { %>
-        //     <p>This is false.</p>
-        //   <% } %>
-        // </body>
-        // </html>
 
         const data = await fs.readFile(templatePath, 'utf8');
         const renderedHtml = ejs.render(data, { /* no data needed for this simple template */ });

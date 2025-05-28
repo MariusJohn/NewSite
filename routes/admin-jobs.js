@@ -1,7 +1,7 @@
 // routes/jobs.js
 import express from 'express';
 const router = express.Router();
-
+import crypto from 'crypto';
 import multer from 'multer';
 import path from 'path';
 import axios from 'axios';
@@ -9,15 +9,17 @@ import sharp from 'sharp';
 
 import nodemailer from 'nodemailer';
 import { Op } from 'sequelize';
-import { Job, Quote, Bodyshop } from '../models/index.js'; // Keep this line for other routes in this file
+import { Job, Quote, Bodyshop } from '../models/index.js'; 
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
+import { jobUploadLimiter } from '../middleware/rateLimiter.js';
 
-import {
-  extendJobQuoteTime,
-  showCancelJobPage,
-  cancelJob
-} from '../controllers/customerJobActionsController.js';
+import archiver from 'archiver';
+import fetch from 'node-fetch'; 
+
+
+
+import { handleJobAction } from '../controllers/customerJobActionsController.js';
 
 
 
@@ -27,19 +29,11 @@ import {
   remindUnselectedJobs
 } from '../controllers/jobsWithQuotesController.js';
 
-
 // --- NEW: Import the helper functions ---
 import { getJobFilterOptions, getJobCounts } from '../controllers/jobController.js';
 
 import { getBaseUrl } from '../helpers/url.js';
 
-router.get('/extend/:jobId', async (req, res) => {
-  const jobId = req.params.jobId;
-  const baseUrl = getBaseUrl();
-  const extendLink = `${baseUrl}/extend/${jobId}`;
-
-
-});
 
 
 
@@ -118,6 +112,10 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
         //   });
         // }
 
+        router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, res) => {
+      
+        });
+
       const apiKey = process.env.OPENCAGE_API_KEY;
       const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
           params: {
@@ -194,6 +192,11 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
           paid: false
       });
 
+
+      const extendToken = crypto.randomBytes(32).toString('hex');
+      const cancelToken = crypto.randomBytes(32).toString('hex');
+      
+
       const newJob = await Job.create({
           customerName: name,
           customerEmail: email,
@@ -203,7 +206,9 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
           longitude: lng,
           images: uploadedS3Urls,
           status: 'pending',
-          paid: false
+          paid: false,
+          extendToken,
+          cancelToken
       });
       console.log('Job successfully created in DB with ID:', newJob.id);
 
@@ -226,8 +231,8 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
   }
 });
 
-
-router.get('/admin', async (req, res) => {
+//Admin dash
+router.get('/', async (req, res) => {
   try {
     const filter = req.query.filter || 'total';
      const { whereClause, includeClause } = getJobFilterOptions(filter);
@@ -339,9 +344,39 @@ router.post('/:jobId/restore-deleted', async (req, res) => {
   }
 });
 
+
+
+// Download all images for a job as ZIP
+router.get('/download/:jobId', async (req, res) => {
+  try {
+    const jobId = req.params.jobId;
+    const job = await Job.findByPk(jobId);
+
+    if (!job || !job.images || job.images.length === 0) {
+      return res.status(404).send('No images found for this job.');
+    }
+
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    res.attachment(`job-${jobId}-images.zip`);
+    archive.pipe(res);
+
+    for (const [index, imageUrl] of job.images.entries()) {
+      const response = await fetch(imageUrl);
+      const buffer = await response.arrayBuffer();
+      archive.append(Buffer.from(buffer), { name: `image${index + 1}.jpg` });
+    }
+
+    await archive.finalize();
+  } catch (err) {
+    console.error('❌ Error generating ZIP archive:', err);
+    res.status(500).send('Internal Server Error while downloading images.');
+  }
+});
+
+
 // routes/jobs.js (within the router.get('/admin/quotes') route)
 
-router.get('/admin/quotes', async (req, res) => {
+router.get('/quotes', async (req, res) => {
   try {
       const jobs = await Job.findAll({
           include: [
@@ -375,16 +410,13 @@ router.get('/admin/quotes', async (req, res) => {
 
 
 // === Customer Actions ===
-router.get('/extend/:jobId', extendJobQuoteTime);
-router.get('/cancel/:jobId', showCancelJobPage);
-router.post('/cancel/:jobId', cancelJob);
-
+router.get('/jobs/action/:jobId/:token', handleJobAction);
 
 
 //Jobs with Quotes 
-router.get('/admin/quotes', renderJobsWithQuotes);
-router.get('/admin/quotes/export', exportJobsWithQuotesCSV);
-router.get('/admin/quotes/remind', remindUnselectedJobs);
+router.get('/quotes', renderJobsWithQuotes);
+router.get('/quotes/export', exportJobsWithQuotesCSV);
+router.get('/quotes/remind', remindUnselectedJobs);
 
 
 

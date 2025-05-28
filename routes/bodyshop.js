@@ -1,5 +1,7 @@
 // routes/bodyshop.js
 import express from 'express';
+const router = express.Router();
+
 import path from 'path'; // Keep if used for path manipulation (unlikely for current routes)
 // import fs from 'fs'; // Remove if not explicitly writing/reading local files
 import archiver from 'archiver'; 
@@ -34,7 +36,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   }
 
 
-const router = express.Router();
+
 
 const headerData = {
     logo: '/public/img/logo.png',

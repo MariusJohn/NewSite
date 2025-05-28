@@ -1,10 +1,12 @@
 // routes/admin.js
 import express from 'express';
+const router = express.Router();
+
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const router = express.Router();
+
 
 // === Admin Login Page ===
 router.get('/login', (req, res) => {

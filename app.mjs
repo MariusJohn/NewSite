@@ -14,7 +14,12 @@ import indexRoutes from './routes/index.js';
 import quotationsRoutes from './routes/quotations.js';
 import bodyshopRoutes from './routes/bodyshop.js';
 import contactRoutes from './routes/contact.js';
-import jobsRoutes from './routes/jobs.js';
+
+import publicJobsRoutes from './routes/public-jobs.js';
+import adminJobsRoutes from './routes/admin-jobs.js';
+
+
+
 import adminBodyshopRoutes from './routes/admin-bodyshops.js';
 import staticRoutes from './routes/static.js';
 import emailPreviewRoutes from './routes/email-preview.js';
@@ -56,8 +61,11 @@ app.use((req, res, next) => {
 // Mount routes
 app.use('/admin', adminRoutes);
 
-// Apply adminAuth to all jobs admin routes defined in jobsRoutes
-app.use('/jobs/admin', adminAuth, jobsRoutes);
+//Admin routes 
+app.use('/jobs/admin', adminAuth, adminJobsRoutes);
+
+
+
 
 // Apply adminAuth to adminBodyshopRoutes if it has specific routes under /jobs/admin/bodyshops
 app.use('/jobs/admin/bodyshops', adminAuth, adminBodyshopRoutes);
@@ -68,7 +76,7 @@ app.use('/bodyshop', bodyshopRoutes);
 app.use('/contact', contactRoutes);
 
 // General /jobs routes for public facing or non-admin actions
-app.use('/jobs', jobsRoutes);
+app.use('/jobs', publicJobsRoutes);
 
 app.use('/', customerRoutes);
 app.use('/', staticRoutes);

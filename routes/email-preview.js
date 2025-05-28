@@ -1,5 +1,7 @@
 // routes/email-preview.js
 import express from 'express';
+const router = express.Router();
+
 import ejs from 'ejs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -7,7 +9,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const router = express.Router();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const EMAIL_VIEWS_PATH = path.join(__dirname, '../views/email');

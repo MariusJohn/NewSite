@@ -125,7 +125,16 @@ const Job = sequelize.define('Job', {
   emailSentAt: {
     type: DataTypes.DATE,
     allowNull: true
-  }
+  },
+  cancelToken: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  extendToken: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  
 }, {
   timestamps: true,
   hooks: {

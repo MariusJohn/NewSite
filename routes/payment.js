@@ -1,5 +1,8 @@
 // routes/payment.js
 import express from 'express';
+const router = express.Router();
+
+
 import { Job, Quote, Bodyshop } from '../models/index.js';
 import { createCheckoutSession } from '../controllers/paymentController.js';
 import { sendFinalEmails } from '../controllers/emailController.js';
@@ -7,7 +10,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const router = express.Router();
 
 // === GET Payment Page ===
 router.get('/', async (req, res) => {

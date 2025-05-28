@@ -1,3 +1,4 @@
+<!--no-quotes.ejs email page-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -53,8 +54,9 @@
     <p>Your job request <strong>#<%= job.id %></strong> hasn’t received any quotes yet.</p>
     <p>Would you like to keep it active for another 24 hours to give local bodyshops more time to respond?</p>
 
-    <a class="btn" href="<%= extendUrl || ('http://localhost:3000/extend/' + job.id) %>">Yes, Extend My Job</a>
-    <a class="btn btn-danger" href="<%= cancelUrl || ('http://localhost:3000/cancel/' + job.id) %>">No, Cancel My Job</a>
+    <a class="btn" href="${baseUrl}/jobs/action/${job.id}/${job.token}?action=extend">Yes, Extend My Job</a>
+    <a class="btn btn-danger"  href="${baseUrl}/jobs/action/${job.id}/${job.token}?action=cancel">No, Cancel My Job</a>
+    
 
     <p class="small">Thanks for using MC Quote — helping you get fast, fair repair quotes.</p>
   </div>

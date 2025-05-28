@@ -103,52 +103,48 @@
 
                             <td>
                                 <%= job.quoteStatus || 'no_quotes' %>
-                                <td class="job-actions">
+                                <t<td class="job-actions">
                                     <% if (job.status === 'pending') { %>
-                                        <!-- Approve and Reject for Pending Jobs -->
-                                        <form action="/jobs/<%= job.id %>/approve" method="POST">
+                                        <form action="/jobs/admin/<%= job.id %>/approve" method="POST">
                                             <button type="submit">Approve</button>
                                         </form>
-                                        <form action="/jobs/<%= job.id %>/reject" method="POST">
+                                        <form action="/jobs/admin/<%= job.id %>/reject" method="POST">
                                             <button type="submit">Reject</button>
                                         </form>
-                                    
+                                
                                     <% } else if (job.status === 'approved') { %>
-                                        <!-- Approved Jobs -->
                                         <em>Approved</em>
-                                    
+                                
                                     <% } else if (job.status === 'rejected') { %>
-                                        <!-- Rejected Jobs -->
-                                        <form action="/jobs/<%= job.id %>/restore" method="POST">
+                                        <form action="/jobs/admin/<%= job.id %>/restore" method="POST">
                                             <button type="submit" class="restore-btn">Restore</button>
                                         </form>
-                                        <form action="/jobs/<%= job.id %>/archive" method="POST" onsubmit="return confirm('Are you sure you want to archive this job? This action can be reversed.')">
+                                        <form action="/jobs/admin/<%= job.id %>/archive" method="POST" onsubmit="return confirm('Are you sure you want to archive this job? This action can be reversed.')">
                                             <button type="submit">Archive</button>
                                         </form>
                                 
                                     <% } else if (job.status === 'archived') { %>
-                                        <!-- Archived Jobs -->
-                                        <form action="/jobs/<%= job.id %>/restore" method="POST">
+                                        <form action="/jobs/admin/<%= job.id %>/restore" method="POST">
                                             <button type="submit" class="restore-btn">Restore</button>
                                         </form>
-                                        <form action="/jobs/<%= job.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to move this job to the deleted section? This action can still be reversed.')">
+                                        <form action="/jobs/admin/<%= job.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to move this job to the deleted section? This action can still be reversed.')">
                                             <button type="submit" class="delete-btn">Move to Deleted</button>
                                         </form>
                                 
                                     <% } else if (job.status === 'deleted') { %>
-                                        <!-- Deleted Jobs -->
-                                        <form action="/jobs/<%= job.id %>/restore" method="POST">
+                                        <form action="/jobs/admin/<%= job.id %>/restore-deleted" method="POST">
                                             <button type="submit" class="restore-btn">Restore</button>
                                         </form>
-                                        <form action="/jobs/<%= job.id %>/hard-delete" method="POST" onsubmit="return confirm('Are you absolutely sure you want to permanently delete this job? This action cannot be undone.')">
+                                        <form action="/jobs/admin/<%= job.id %>/hard-delete" method="POST" onsubmit="return confirm('Are you absolutely sure you want to permanently delete this job? This action cannot be undone.')">
                                             <button type="submit" class="hard-delete-btn">Permanently Delete</button>
                                         </form>
-                                
                                     <% } %>
                                 
-                                    <!-- Download Images Button (Available in All States) -->
-                                    <a href="/bodyshop/download/<%= job.id %>" class="download-zip-btn">📦 Download Images</a>
+                                    <!-- Download button always shown -->
+                                    <a href="/jobs/admin/download/<%= job.id %>" class="download-zip-btn">📦 Download Images</a>
+
                                 </td>
+                                
                         </tr>
                     <% }) %>
                 </tbody>
