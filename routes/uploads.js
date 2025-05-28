@@ -1,5 +1,8 @@
 // routes/uploads.js
 import express from 'express';
+const router = express.Router();
+
+
 import multer from 'multer';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
@@ -10,7 +13,7 @@ import mime from 'mime-types';
 
 dotenv.config();
 
-const router = express.Router();
+
 
 const s3Client = new S3Client({
     region: process.env.AWS_REGION,

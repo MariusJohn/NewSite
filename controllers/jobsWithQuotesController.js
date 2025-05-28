@@ -1,7 +1,7 @@
 // controllers/jobsWithQuotesController.js
 import { Job, Quote, Bodyshop } from '../models/index.js';
-import { Parser } from 'json2csv'; // npm install json2csv
-import sendMail from '../utils/sendMail.js';
+import { Parser } from 'json2csv';
+import { sendHtmlMail } from '../utils/sendMail.js';
 
 export async function renderJobsWithQuotes(req, res) {
   try {
@@ -77,10 +77,13 @@ export async function remindUnselectedJobs(req, res) {
     for (const job of jobs) {
       for (const quote of job.quotes) {
         if (quote.bodyshop?.email) {
-          await sendMail(
+          await sendHtmlMail(
             quote.bodyshop.email,
             `Reminder: Job #${job.id} still open for customer`,
-            `The customer has not yet selected a bodyshop. Please follow up or review your quote.\n\nQuote: £${quote.price}\nNotes: ${quote.notes}`
+            `<p>The customer has not yet selected a bodyshop.</p>
+             <p><strong>Quote:</strong> £${quote.price}</p>
+             <p><strong>Notes:</strong> ${quote.notes}</p>
+             <p><a href="${process.env.BASE_URL}/bodyshop/dashboard">Review or update your quote</a></p>`
           );
         }
       }

@@ -14,7 +14,8 @@ dotenv.config();
 
 
 
-const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+
+
 
 
 // === Generic HTML sender ===
@@ -58,23 +59,34 @@ transporter.verify((error) => {
 
 // === Email helpers using templates ===
 async function sendCustomerNoQuotesEmail(job) {
+
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+
   const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes.ejs'), {
     customerName: job.customerName,
     job,
-    extendUrl: `${baseUrl}/extend/${job.id}`,
-    cancelUrl: `https://yourdomain.com/cancel/${job.id}`,
-    
+    extendUrl: `${baseUrl}/jobs/extend/${job.id}`,
+    cancelUrl: `${baseUrl}/jobs/cancel/${job.id}`,
   });
-  await sendHtmlEmail(job.customerEmail, `Update on Your Job #${job.id} - No Quotes Received`, html);
+
+  await sendHtmlEmail(
+    job.customerEmail,
+    `Update on Your Job #${job.id} - No Quotes Received`,
+    html
+  );
 }
+
 
 async function sendCustomerSingleQuoteEmail(job, remaining) {
   const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'single-quote.ejs'), {
     customerName: job.customerName,
     job,
     remaining,
-    extendUrl: `${baseUrl}/extend/${job.id}`,
-    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
+    extendUrl: `${baseUrl}/jobs/action/${job.id}/${job.extendToken}?action=extend`,
+    cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`,
+  
+    
+    
   });
   await sendHtmlEmail(job.customerEmail, `1 Quote Received for Job #${job.id}`, html);
 }
@@ -216,6 +228,34 @@ export async function runSchedulerNow() {
 
       continue;
     }
+
+    // === Trigger bodyshop reminders for manually extended jobs
+if (job.extended && job.extensionRequestedAt && !job.emailSentAt) {
+  console.log(`>>> Sending reminder emails for manually extended job ${job.id}`);
+
+  const bodyshops = await Bodyshop.findAll({ where: { area: job.location } });
+
+  for (const bs of bodyshops) {
+    if (bs.email) {
+      await sendHtmlEmail(
+        bs.email,
+        `Reminder: Extended Quote Opportunity for Job #${job.id}`,
+        `<p>Hello ${bs.name},</p>
+         <p>A nearby job has been extended by the customer and is still open for quoting.</p>
+         <p><strong>Location:</strong> ${job.location}</p>
+         <p><a href="${baseUrl}/bodyshop/dashboard">Log in to quote now</a></p>
+         <p>– MC Quote</p>`
+      );
+      console.log(`📨 Reminder sent to ${bs.email} for extended job ${job.id}`);
+    }
+  }
+
+  job.emailSentAt = new Date();
+  await job.save();
+}
+
+
+
 
     
       // === 48h Logic ===
