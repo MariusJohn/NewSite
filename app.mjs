@@ -70,13 +70,15 @@ app.use('/jobs/admin', adminAuth, adminJobsRoutes);
 // Apply adminAuth to adminBodyshopRoutes if it has specific routes under /jobs/admin/bodyshops
 app.use('/jobs/admin/bodyshops', adminAuth, adminBodyshopRoutes);
 
+// General /jobs routes for public facing or non-admin actions
+app.use('/jobs', publicJobsRoutes);
+
 app.use('/', indexRoutes);
 app.use('/quotations', quotationsRoutes);
 app.use('/bodyshop', bodyshopRoutes);
 app.use('/contact', contactRoutes);
 
-// General /jobs routes for public facing or non-admin actions
-app.use('/jobs', publicJobsRoutes);
+
 
 app.use('/', customerRoutes);
 app.use('/', staticRoutes);

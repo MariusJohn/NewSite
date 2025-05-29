@@ -65,8 +65,9 @@ async function sendCustomerNoQuotesEmail(job) {
   const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes.ejs'), {
     customerName: job.customerName,
     job,
-    extendUrl: `${baseUrl}/jobs/extend/${job.id}`,
-    cancelUrl: `${baseUrl}/jobs/cancel/${job.id}`,
+    extendUrl: `${baseUrl}/jobs/action/${job.id}/${job.extendToken}?action=extend`,
+    cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`,
+    
   });
 
   await sendHtmlEmail(

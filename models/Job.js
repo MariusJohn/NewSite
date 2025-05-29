@@ -134,6 +134,15 @@ const Job = sequelize.define('Job', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  extendTokenUsed: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  },
+  cancelTokenUsed: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  }
+
   
 }, {
   timestamps: true,
