@@ -1,15 +1,65 @@
-<!--deleted.ejs-->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Job Cancelled</title>
-  <link rel="stylesheet" href="/css/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Cancelled - MC Quote</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f4f8;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .confirmation-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 26px;
+      color: #dc3545;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      display: inline-block;
+      background: #007bff;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #0056b3;
+    }
+  </style>
 </head>
 <body>
-  <div class="confirmation-container">
+  <div class="confirmation-box">
     <h1>Job Cancelled</h1>
     <p>Your job <strong>#<%= job.id %></strong> has been cancelled and marked for deletion.</p>
-    <p>If this was a mistake, you can submit a new request any time.</p>
+    <p>If this was a mistake, you're welcome to submit a new request at any time.</p>
     <a href="/" class="btn">Return to Homepage</a>
   </div>
 </body>

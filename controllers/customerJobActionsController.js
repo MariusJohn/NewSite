@@ -1,7 +1,10 @@
 // controllers/customerJobActionsController.js
 import { Job, Bodyshop } from '../models/index.js';
 import { sendHtmlMail } from '../utils/sendMail.js';
+import { deleteImagesFromS3 } from './imageCleanupController.js';
 
+
+console.log('📦 public-jobs.js route loaded');
 
 
 function getDistanceInKm(lat1, lon1, lat2, lon2) {
@@ -18,12 +21,35 @@ function getDistanceInKm(lat1, lon1, lat2, lon2) {
 
 // Handle unified job action (extend OR cancel)
 const handleJobAction = async (req, res) => {
+
+  console.log('💡 handleJobAction triggered');
+
+
+
   try {
     const { jobId, token } = req.params;
     const job = await Job.findByPk(jobId);
     if (!job) return res.status(404).render('jobs/action-expired');
 
     const action = req.query.action;
+
+
+    console.log({
+      jobId: job.id,
+      status: job.status,
+      extendToken: job.extendToken,
+      extendTokenUsed: job.extendTokenUsed,
+      extended: job.extended,
+      cancelToken: job.cancelToken,
+      cancelTokenUsed: job.cancelTokenUsed,
+      incomingToken: token,
+      action
+    });
+
+
+
+
+    
 
     if (job.status === 'deleted' || (job.extendTokenUsed && job.cancelTokenUsed)) {
       return res.status(403).render('jobs/action-expired');
@@ -43,7 +69,7 @@ const handleJobAction = async (req, res) => {
         extendTokenUsed: true
       });
 
-      const allBodyshops = await Bodyshop.findAll({ where: { approved: true } });
+      const allBodyshops = await Bodyshop.findAll({ where: { adminApproved: true } });
       const RADIUS_KM = 16.1;
       const nearby = allBodyshops.filter(bs =>
         getDistanceInKm(job.latitude, job.longitude, bs.latitude, bs.longitude) <= RADIUS_KM
@@ -68,9 +94,12 @@ const handleJobAction = async (req, res) => {
         return res.status(403).render('jobs/action-expired');
       }
 
+      await deleteImagesFromS3(job.images);
+
       await job.update({
         status: 'deleted',
-        cancelTokenUsed: true
+        cancelTokenUsed: true,
+        images: []
       });
 
       return res.render('jobs/deleted', { job });

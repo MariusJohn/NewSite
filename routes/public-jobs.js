@@ -1,5 +1,5 @@
+// routes/public-jobs.js
 import express from 'express';
-const router = express.Router();
 import crypto from 'crypto';
 import multer from 'multer';
 import axios from 'axios';
@@ -11,12 +11,12 @@ import { Job, Bodyshop } from '../models/index.js';
 import { jobUploadLimiter } from '../middleware/rateLimiter.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
 
-
-
 dotenv.config();
 
+const router = express.Router();
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
+// === AWS S3 Client ===
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
@@ -25,18 +25,19 @@ const s3Client = new S3Client({
   },
 });
 
+// === Multer config ===
 const storage = multer.memoryStorage();
 const upload = multer({
-  storage: storage,
-  limits: { fileSize: 8 * 1024 * 1024 },
+  storage,
+  limits: { fileSize: 8 * 1024 * 1024 }, // 8MB
 });
 
-// === Job Upload Form ===
+// === GET: Upload form ===
 router.get('/upload', (req, res) => {
   res.render('jobs/upload');
 });
 
-// === Job Upload Submission ===
+// === POST: Upload form submission ===
 router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, res) => {
   try {
     const phoneRegex = /^07\d{9}$/;
@@ -119,21 +120,22 @@ router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, 
     const cancelToken = crypto.randomBytes(32).toString('hex');
 
     await Job.create({
-      customerName: name,
-      customerEmail: email,
+      customerName: safeName,
+      customerEmail: safeEmail,
       customerPhone: telephone,
-      location,
+      location: safeLocation,
       latitude: lat,
       longitude: lng,
       images: uploadedS3Urls,
       status: 'pending',
       paid: false,
       extendToken,
-      cancelToken
+      cancelToken,
+      extendTokenUsed: false,
+      cancelTokenUsed: false
     });
 
     res.render('jobs/upload-success');
-
   } catch (err) {
     console.error('❌ Upload error:', err);
     res.status(500).render('jobs/upload-error', {
@@ -143,7 +145,10 @@ router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, 
   }
 });
 
-// === Customer Action (Extend/Cancel) ===
-router.get('/action/:jobId/:token', handleJobAction);
+
+router.get('/action/:jobId/:token', (req, res, next) => {
+  console.log('🔔 Route hit:', req.originalUrl);
+  next();
+}, handleJobAction);
 
 export default router;

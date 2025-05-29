@@ -1,7 +1,5 @@
-// routes/public-jobs.js
 import express from 'express';
 const router = express.Router();
-
 import crypto from 'crypto';
 import multer from 'multer';
 import axios from 'axios';
@@ -12,6 +10,8 @@ import { randomUUID } from 'crypto';
 import { Job, Bodyshop } from '../models/index.js';
 import { jobUploadLimiter } from '../middleware/rateLimiter.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
+
+
 
 dotenv.config();
 
@@ -31,11 +31,13 @@ const upload = multer({
   limits: { fileSize: 8 * 1024 * 1024 },
 });
 
+// === Job Upload Form ===
 router.get('/upload', (req, res) => {
   res.render('jobs/upload');
 });
 
-router.post('/upload', upload.array('images', 8), async (req, res) => {
+// === Job Upload Submission ===
+router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, res) => {
   try {
     const phoneRegex = /^07\d{9}$/;
     const { name, email, location, telephone } = req.body;
@@ -60,7 +62,7 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
       });
     }
 
-    const verifyResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
+    const verifyResponse = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
       params: {
         secret: RECAPTCHA_SECRET_KEY,
         response: token
@@ -74,9 +76,13 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
       });
     }
 
-    const apiKey = process.env.OPENCAGE_API_KEY;
     const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
-      params: { q: location, key: apiKey, countrycode: 'gb', limit: 1 }
+      params: {
+        q: location,
+        key: process.env.OPENCAGE_API_KEY,
+        countrycode: 'gb',
+        limit: 1
+      }
     });
 
     if (!geoRes.data.results?.length) {
@@ -127,8 +133,9 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
     });
 
     res.render('jobs/upload-success');
+
   } catch (err) {
-    console.error('Upload error:', err);
+    console.error('❌ Upload error:', err);
     res.status(500).render('jobs/upload-error', {
       title: 'Server Error',
       message: 'Something went wrong. Please try again later.'
@@ -136,9 +143,7 @@ router.post('/upload', upload.array('images', 8), async (req, res) => {
   }
 });
 
-console.log('✅ /jobs/action route registered');
+// === Customer Action (Extend/Cancel) ===
 router.get('/action/:jobId/:token', handleJobAction);
-
-
 
 export default router;
