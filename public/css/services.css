@@ -1,0 +1,89 @@
+/*! services.css - Styles for the Bodyshop Services page */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 0;
+    color: #333;
+  }
+  
+  .bodyshop-services-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+  
+  .intro-section {
+    text-align: center;
+    padding-bottom: 2rem;
+  }
+  
+  .intro-section h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #005b9f;
+  }
+  
+  .intro-section p {
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .service-section {
+    background: #fff;
+    border-left: 5px solid #005b9f;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .service-section h2 {
+    font-size: 1.5rem;
+    color: #222;
+    margin-bottom: 0.5rem;
+  }
+  
+  .service-section p {
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.6;
+  }
+  
+  .contact-button {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .contact-button a {
+    background-color: #005b9f;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  
+  .contact-button a:hover {
+    background-color: #004478;
+  }
+  
+  @media (max-width: 768px) {
+    .intro-section h1,
+    .service-section h2 {
+      font-size: 1.4rem;
+    }
+  
+    .intro-section p,
+    .service-section p {
+      font-size: 1rem;
+    }
+  
+    .service-section {
+      padding: 1rem;
+    }
+  } 
+  

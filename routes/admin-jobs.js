@@ -1,4 +1,4 @@
-// routes/jobs.js
+// routes/admin-jobs.js
 import express from 'express';
 const router = express.Router();
 import crypto from 'crypto';

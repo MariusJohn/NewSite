@@ -141,8 +141,12 @@ const Job = sequelize.define('Job', {
   cancelTokenUsed: {
     type: DataTypes.BOOLEAN,
     defaultValue: false
+  },
+    selectedQuoteId: {
+    type: DataTypes.INTEGER,
+    allowNull: true
   }
-
+  
   
 }, {
   timestamps: true,

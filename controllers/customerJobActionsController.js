@@ -46,9 +46,7 @@ const handleJobAction = async (req, res) => {
       action
     });
 
-
-
-
+    
     
 
     if (job.status === 'deleted' || (job.extendTokenUsed && job.cancelTokenUsed)) {

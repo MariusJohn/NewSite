@@ -30,5 +30,9 @@ export async function createCheckoutSession(req, res) {
     cancel_url: `${process.env.BASE_URL}/payment?jobId=${jobId}`,
   });
 
+
+
+
+  
   res.redirect(303, session.url);
 }

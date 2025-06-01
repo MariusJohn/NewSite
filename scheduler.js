@@ -13,11 +13,6 @@ import { DeletedJob, Job, Quote, Bodyshop } from './models/index.js';
 dotenv.config();
 
 
-
-
-
-
-
 // === Generic HTML sender ===
 async function sendHtmlEmail(to, subject, html) {
   try {
@@ -58,23 +53,25 @@ transporter.verify((error) => {
 
 
 // === Email helpers using templates ===
+const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+
 async function sendCustomerNoQuotesEmail(job) {
 
-  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
 
-  const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes.ejs'), {
-    customerName: job.customerName,
-    job,
-    extendUrl: `${baseUrl}/jobs/action/${job.id}/${job.extendToken}?action=extend`,
-    cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`,
-    
-  });
 
-  await sendHtmlEmail(
-    job.customerEmail,
-    `Update on Your Job #${job.id} - No Quotes Received`,
-    html
-  );
+const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes.ejs'), {
+  customerName: job.customerName,
+  job,
+  extendUrl: `${baseUrl}/jobs/action/${job.id}/${job.extendToken}?action=extend`,
+  cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`,
+  
+});
+
+await sendHtmlEmail(
+  job.customerEmail,
+  `Update on Your Job #${job.id} - No Quotes Received`,
+  html
+);
 }
 
 
@@ -97,8 +94,11 @@ async function sendCustomerMultipleQuotesEmail(job, remaining) {
     customerName: job.customerName,
     job,
     remaining,
+    baseUrl,
     paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
   });
+
+  
   await sendHtmlEmail(job.customerEmail, `Quotes Ready for Job #${job.id}`, html);
 }
 
@@ -256,67 +256,76 @@ if (job.extended && job.extensionRequestedAt && !job.emailSentAt) {
 }
 
 
+// === Handle post-extension jobs with 2+ quotes that haven't received payment email
+if (job.extended && quoteCount >= 2 && !job.paid && job.status !== 'pending_payment') {
+  
+  console.log(`>>> DEBUG Job ${job.id} | extended: ${job.extended} | quoteCount: ${quoteCount} | paid: ${job.paid} | status: ${job.status}`);
+
+  console.log(`>>> Sending payment email after extension for job ${job.id}`);
+  if (!dryRun) await sendCustomerPaymentEmail(job);
+  summary.paymentRequested.push(job.id);
+}
 
 
     
-      // === 48h Logic ===
-      if (job.createdAt <= cutoff48h) {
-        if (quoteCount === 0) {
-          if (!dryRun) await sendCustomerJobDeletedEmail(job);
-          
-          const s3Client = new S3Client({
-            region: process.env.AWS_REGION,
-            credentials: {
-              accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-              secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-            }
-          });
-          
-          async function deleteJobImagesFromS3(imageKeys = []) {
-            if (!imageKeys.length) return;
-          
-            const deleteParams = {
-              Bucket: process.env.AWS_BUCKET_NAME,
-              Delete: {
-                Objects: imageKeys.map(key => ({ Key: `job-images/${key}` }))
-              }
-            };
-          
-            try {
-              await s3Client.send(new DeleteObjectsCommand(deleteParams));
-              console.log(`🗑️ Deleted ${imageKeys.length} image(s) from S3`);
-            } catch (err) {
-              console.error('❌ Failed to delete images from S3:', err);
-            }
-          }
-
-          await DeletedJob.create({
-            jobId: job.id,
-            customerName: job.customerName,
-            customerEmail: job.customerEmail,
-            location: job.location
-          });
-          
-          await deleteJobImagesFromS3(job.images || []);
-
-
-          await job.destroy(); 
-          
-
-
-
-          summary.jobsDeleted.push(job.id);
-        } else {
-          if (!dryRun) await sendCustomerPaymentEmail(job);
-          summary.paymentRequested.push(job.id);
+// === 48h Logic ===
+if (job.createdAt <= cutoff48h) {
+  if (quoteCount === 0) {
+    if (!dryRun) await sendCustomerJobDeletedEmail(job);
+    
+    const s3Client = new S3Client({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      }
+    });
+    
+    async function deleteJobImagesFromS3(imageKeys = []) {
+      if (!imageKeys.length) return;
+    
+      const deleteParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Delete: {
+          Objects: imageKeys.map(key => ({ Key: `job-images/${key}` }))
         }
+      };
+    
+      try {
+        await s3Client.send(new DeleteObjectsCommand(deleteParams));
+        console.log(`🗑️ Deleted ${imageKeys.length} image(s) from S3`);
+      } catch (err) {
+        console.error('❌ Failed to delete images from S3:', err);
       }
     }
-    console.log('\n=== Scheduler Summary ===');
-    for (const [category, jobs] of Object.entries(summary)) {
-      const jobList = jobs.length ? ` => ${jobs.join(', ')}` : '';
-      console.log(`${category}: ${jobs.length} job(s)${jobList}`);
-    }
+
+    await DeletedJob.create({
+      jobId: job.id,
+      customerName: job.customerName,
+      customerEmail: job.customerEmail,
+      location: job.location
+    });
+    
+    await deleteJobImagesFromS3(job.images || []);
+
+
+    await job.destroy(); 
+    
+
+
+
+    summary.jobsDeleted.push(job.id);
+  } else {
+    if (!dryRun) await sendCustomerPaymentEmail(job);
+    summary.paymentRequested.push(job.id);
+  }
+}
+}
+console.log('\n=== Scheduler Summary ===');
+for (const [category, jobs] of Object.entries(summary)) {
+const jobList = jobs.length ? ` => ${jobs.join(', ')}` : '';
+console.log(`${category}: ${jobs.length} job(s)${jobList}`);
+}
 
 
 

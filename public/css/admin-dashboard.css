@@ -466,3 +466,22 @@ body {
 .btn-reject:hover {
   background-color: #c4401b;
 }
+
+.highlight {
+  background-color: #e0ffe0;
+  font-weight: bold;
+}
+.image-gallery {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.job-image-preview {
+  width: 120px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
