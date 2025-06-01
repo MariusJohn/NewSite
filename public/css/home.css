@@ -1,4 +1,4 @@
-/* index.css – Updated Homepage Styles */
+/* index.css – Homepage Styles (cleaned‐up) */
 
 body {
   font-family: 'Poppins', sans-serif;
@@ -9,34 +9,37 @@ body {
   overflow-x: hidden;
 }
 
+/* Center content in one column up to 1200px wide */
+.page-wrapper {
+  max-width: auto;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
 /* ===== Hero Section ===== */
 .hero {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   background-color: #eef4fa;
-  padding: 2rem 1rem;
+  padding: 3rem 0;
 }
-
 .hero-text {
   flex: 1 1 400px;
   max-width: 500px;
-  padding-right: 1rem;
+  padding-right: 1.5rem;
 }
-
 .hero-text h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
   color: #002f5c;
 }
-
 .hero-text p {
   font-size: 1.2rem;
   margin-bottom: 2rem;
   color: #333;
 }
-
 .cta-button {
   background-color: #003e7e;
   color: #fff;
@@ -46,58 +49,55 @@ body {
   border-radius: 6px;
   display: inline-block;
 }
-
 .hero-image {
   flex: 0 0 300px;
   text-align: right;
 }
-
 .hero-image img {
-  width: 300px;
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* ===== Steps Section ===== */
+/* =============================
+   Steps Section (Three Cards)
+   ============================= */
 .steps-section {
-  display: flex;
-  flex-wrap: wrap;
+  display: flex !important;           /* force a row on desktop */
+  flex-wrap: nowrap;                  /* no wrapping if there’s space */
   justify-content: space-between;
+  align-items: flex-start;
   gap: 1rem;
-  max-width: 1200px;
-  margin: 3rem auto;
-  padding: 0 1rem;
+  margin: 3rem 0;
+  padding: 0;
+  width: 100%;
 }
 
 .step-card {
   background: #fff;
   border-radius: 12px;
-  padding: 1.5rem;
-  flex: 1 1 28%;
-  min-width: 220px;
-  text-align: center;
+  padding: 1.5rem 1rem;
+  flex: 1 0 30% !important;           /* basis = 30%, don’t shrink below */
+  min-width: 240px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 .step-card img {
   max-width: 80px;
   height: auto;
-  margin-bottom: 1rem;
+  margin: 0 auto 1rem auto;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
-
 .step-card h3 {
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
   color: #002f5c;
 }
-
 .step-card p {
   font-size: 1rem;
   color: #555;
+  margin: 0;
 }
 
 /* ===== How It Works Section ===== */
@@ -107,28 +107,22 @@ body {
   align-items: center;
   justify-content: space-between;
   background-color: #ffffff;
-  padding: 2rem 1rem;
-  max-width: 1200px;
-  margin: 0 auto 3rem auto;
+  padding: 3rem 0;
   gap: 2rem;
 }
-
 .how-it-works-text {
   flex: 1 1 400px;
   max-width: 500px;
 }
-
 .how-it-works-text h2 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
   color: #002f5c;
 }
-
 .how-it-works-text p {
   font-size: 1rem;
   color: #333;
 }
-
 .cta-outline {
   padding: 10px 20px;
   border: 2px solid #004b91;
@@ -139,12 +133,10 @@ body {
   display: inline-block;
   font-weight: 500;
 }
-
 .how-it-works-image {
   flex: 0 0 300px;
   text-align: center;
 }
-
 .how-it-works-image img {
   max-width: 100%;
   height: auto;
@@ -161,17 +153,16 @@ body {
 }
 
 /* ===== Footer Spacing ===== */
-body > footer {
+footer {
   margin-top: 3rem;
 }
 
-/* ===== Responsive Breakpoints ===== */
+/* ===== Responsive Stacking ===== */
 @media (max-width: 768px) {
-  /* Hero stacks vertically */
   .hero {
-    flex-direction: column;
+    flex-direction: column !important;
     text-align: center;
-
+    gap: 1.5rem;
   }
   .hero-image {
     margin-top: 1.5rem;
@@ -180,19 +171,19 @@ body > footer {
     font-size: 2rem;
   }
 
-  /* Steps stack into a column */
   .steps-section {
-    flex-direction: column;
+    flex-direction: column !important;
     align-items: center;
+    gap: 1rem;
   }
   .step-card {
-    width: 90%;
-    max-width: 350px;
+    flex: 1 0 90% !important;
+    max-width: 400px;
+    margin-bottom: 1.5rem;
   }
 
-  /* How-It-Works stacks vertically */
   .how-it-works {
-    flex-direction: column;
+    flex-direction: column !important;
     text-align: center;
   }
   .how-it-works-image {
