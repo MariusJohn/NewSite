@@ -11,7 +11,7 @@ import customerRoutes from './routes/customer.js';
 import adminRoutes from './routes/admin.js';
 import adminAuth from './middleware/adminAuth.js';
 import indexRoutes from './routes/index.js';
-import quotationsRoutes from './routes/quotations.js';
+import servicesRoutes from './routes/services.js';
 import bodyshopRoutes from './routes/bodyshop.js';
 import contactRoutes from './routes/contact.js';
 
@@ -74,7 +74,7 @@ app.use('/jobs/admin/bodyshops', adminAuth, adminBodyshopRoutes);
 app.use('/jobs', publicJobsRoutes);
 
 app.use('/', indexRoutes);
-app.use('/quotations', quotationsRoutes);
+app.use('/services', servicesRoutes);
 app.use('/bodyshop', bodyshopRoutes);
 app.use('/contact', contactRoutes);
 

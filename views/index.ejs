@@ -1,116 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>MC Quote-Home</title>
-    <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/footer.css">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-    <link rel=""  as="image" href="/img/image2.png" >
-    <link rel="" as="image" href="/img/caraccident.png" >
-    <link rel="" as="image" href="/img/carraccident.png" >
-    <link rel="" as="image" href="/img/carsaccident.png" >
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MC Quote - Home</title>
 
+  <link rel="stylesheet" href="/css/reset.css" />
+  <link rel="stylesheet" href="/css/header.css" />
 
+  <link rel="stylesheet" href="/css/footer.css" />
+  <link rel="stylesheet" href="/css/home.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script defer src="/js/mobile-menu.js"></script>
 </head>
 
 <body>
-    <div class="page-wrapper">
-        <%- include('partials/header') %>
-   
-
-
-        <div class="main-banner-hero">
-            <div class="hero-overlay"></div>
-          
-            <div class="hero-content">
-              <h1>Get Your Private Repair Quote</h1>
-              <div class="quote-buttons">
-                <a href="/jobs/upload" class="quote-btn">Upload Images for a Quote</a>
-                <p class="upload-note">No registration needed. Fast. Secure.</p>
-              </div>
-              <h2>
-                We provide bodyshop repair quotes for  your <span>private repairs</span>
-                in your area.
-              </h2>
-            </div>
-          </div>
-          
+  <div class="page-wrapper">
+    <%- include('partials/header') %>
  
-      
-        <div class="content-flex">
-          <aside class="sidebar">
-            <!-- Why Choose Us, Services, Buttons, etc. -->
-            <h1>Why  Us</h1>
-            <p>We can provide <span>bodyshops repair quotations</span> from the comfort of your home. </p>
-            <p><span>You don't need to travel to different garages</span> to obtain an written report.</p>
-            <p><span>Our quote is provided by bodyshops in your area</span>, aim to deliver quotes to suit your budget. </p>
-            <p>Depending on your damage severity and your budget <span>we can refer you</span> in our trusted bodyshop network.
-                </p>
-
-                <div class="key-services">
-                    <h1>Key Services</h1>
-               
-        
-                <div class="sidebar-bodyshop-btn">             
-        
-                    <a href="bodyshop">
-                        <h1>Bodyshop <br> VDA Solution</h1>
-                    </a>
-                    </div>
-        
-                 <div class="sidebar-quotations-btn">
-                    <a href="quotations">
-                        <h1>Private <br>Quotations</h1>
-                    </a>
-                </div>  
-                
-                <div class="sidebar-training-btn">
-                    <a href="training">
-                        <h1>VDA Training</h1>
-                    </a>
-                </div>  
-
-            </div>
-
-          </aside>
-          <section class="main-content">
-            <!-- About Us, Features, Info -->
-            <h1>About us</h1>
-            <p>We are a team led by a highly qualified and experienced 
-                Senior ATA IMI Vehicle Damage Assessor with a Diploma 
-                in Mechanical Engineering and over 22 years in the motor industry. </p>
-                <p>Our core strength lies in our ability to provide accurate and 
-                reliable vehicle damage assessments, driven by a combination 
-                of in-depth industry knowledge & technical proficiency.</p>
-                <p>Key skills and qualifications include:</p>
-                    <ul class="skills-qualf-list">
-                        <li>Senior ATA IMI Vehicle Damage Assessor accreditation(2017, 2021,2024)</li>
-                        <li>Expertise in vehicle damage assessment and repair estimation</li>
-                        <li>Proficiency in industry-standard software (e.g. GT Motive, Audatex)</li>
-                        <li>Strong understanding of insurance claims processes</li>
-                        <li>2:1 Hons in Mechanical Engineering</li>
-                    </ul>
-
-                <p>We are committed to delivering high-quality services, 
-                adhering to industry best practices, and providing our clients 
-                with the information they need to make informed decisions.
-                
-                </p>
-          </section>
-        </div>
-      
-        <%- include('partials/footer') %>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Get Fast Vehicle Repair Quotes</h1>
+        <p>Upload photos, receive competitive quotes from local bodyshops, and choose the best offer — all in minutes.</p>
+        <a class="cta-button" href="/jobs/upload">Upload Your Job</a>
       </div>
-      
+      <div class="hero-image">
+        <img src="/img/hero-car.png" alt="Car Repair" />
+      </div>
+    </section>
 
-      <script src="/js/navbar-toggle.js"></script>
-     </body>
+    <!-- Services Overview -->
+    <section class="services">
+      <div class="service">
+        <img src="/img/icon-upload.png" alt="Upload Icon">
+        <h3>1. Upload Photos</h3>
+        <p>Quickly submit images of the damage with your location.</p>
+      </div>
+      <div class="service">
+        <img src="/img/icon-quote.png" alt="Quote Icon">
+        <h3>2. Get Quotes</h3>
+        <p>Receive quotes from trusted local bodyshops.</p>
+      </div>
+      <div class="service">
+        <img src="/img/icon-compare.png" alt="Compare Icon">
+        <h3>3. Compare & Pay</h3>
+        <p>Pick the best quote and pay a small fee to unlock details.</p>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+      <div class="how-content">
+        <div class="how-text">
+          <h2>How It Works</h2>
+          <p>Our platform connects customers with trusted local vehicle repair shops — no stress, no surprises.</p>
+          <a class="cta-outline" href="/jobs/upload">Try It Now</a>
+        </div>
+        <div class="how-image">
+          <img src="/img/how-it-works.png" alt="How It Works Illustration">
+        </div>
+      </div>
+    </section>
+
+    <%- include('partials/footer') %>
+  </div>
+</body>
+
 
 </html>
