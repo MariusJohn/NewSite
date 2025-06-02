@@ -1,45 +1,50 @@
-/* index.css – Homepage Styles (cleaned‐up) */
-
+/* ===================
+   Global Styles
+=================== */
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f3f8fc;
   color: #002f5c;
-  overflow-x: hidden;
 }
 
-/* Center content in one column up to 1200px wide */
 .page-wrapper {
-  max-width: auto;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 20px;
 }
 
-/* ===== Hero Section ===== */
+/* ===================
+   Hero Section
+=================== */
 .hero {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   background-color: #eef4fa;
-  padding: 3rem 0;
+  padding: 3rem 1rem;
+  border-radius: 12px;
 }
+
 .hero-text {
   flex: 1 1 400px;
   max-width: 500px;
-  padding-right: 1.5rem;
 }
+
 .hero-text h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
   color: #002f5c;
 }
+
 .hero-text p {
   font-size: 1.2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   color: #333;
 }
+
 .cta-button {
   background-color: #003e7e;
   color: #fff;
@@ -49,146 +54,197 @@ body {
   border-radius: 6px;
   display: inline-block;
 }
+
 .hero-image {
-  flex: 0 0 300px;
+  flex: 1 1 300px;
   text-align: right;
 }
+
 .hero-image img {
   max-width: 100%;
   height: auto;
-  display: block;
+  border-radius: 10px;
 }
 
-/* =============================
-   Steps Section (Three Cards)
-   ============================= */
-.steps-section {
-  display: flex !important;           /* force a row on desktop */
-  flex-wrap: nowrap;                  /* no wrapping if there’s space */
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin: 3rem 0;
-  padding: 0;
-  width: 100%;
-}
-
-.step-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.5rem 1rem;
-  flex: 1 0 30% !important;           /* basis = 30%, don’t shrink below */
-  min-width: 240px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+/* ===================
+   Benefits Section
+=================== */
+.benefits-section {
   text-align: center;
+  margin: 4rem 0;
 }
 
-.step-card img {
-  max-width: 80px;
-  height: auto;
-  margin: 0 auto 1rem auto;
-  display: block;
+.section-title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
 }
-.step-card h3 {
+
+.benefit-card {
+  margin: 2rem auto;
+  max-width: 400px;
+}
+
+.benefit-card img {
+  height: 60px;
+  margin-bottom: 1rem;
+}
+
+.benefit-card h3 {
   font-size: 1.2rem;
-  margin-bottom: 0.5rem;
   color: #002f5c;
 }
-.step-card p {
+
+.benefit-card p {
   font-size: 1rem;
   color: #555;
-  margin: 0;
 }
 
-/* ===== How It Works Section ===== */
+/* ===================
+   How It Works
+=================== */
 .how-it-works {
   display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
+  flex-wrap: wrap;
+  align-items: flex-start;
   justify-content: space-between;
   background-color: #ffffff;
-  padding: 3rem 0;
+  padding: 3rem 2rem;
   gap: 2rem;
+  margin-top: 3rem;
+  border-radius: 10px;
 }
+
 .how-it-works-text {
-  flex: 1 1 400px;
-  max-width: 500px;
+  flex: 1 1 350px;
+  max-width: 550px;
 }
+
+/* Heading and intro paragraph */
 .how-it-works-text h2 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
   color: #002f5c;
 }
-.how-it-works-text p {
+
+.how-it-works-text > p {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  color: #333333;
+  line-height: 1.6;
+}
+
+/* Numbered list of steps */
+.how-it-works-steps {
+  list-style-type: decimal;
+  padding-left: 1.5rem;        /* indent the numbers */
+  margin-bottom: 1.5rem;
+}
+
+.how-it-works-steps li {
+  margin-bottom: 1rem;         /* vertical space between steps */
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333333;
+}
+
+/* Emphasize the bold step titles */
+.how-it-works-steps li strong {
+  color: #002f5c;
+}
+
+/* Platform fee note styling */
+.platform-fee {
+  font-size: 0.95rem;
+  color: #004b91;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+/* “Try It Now” button */
+.cta-outline {
+  padding: 12px 24px;
+  border: 2px solid #004b91;
+  color: #004b91;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.cta-outline:hover {
+  background-color: #004b91;
+  color: #ffffff;
+}
+
+/* Right-side container */
+.how-it-works-extra {
+  flex: 1 1 300px;
+  max-width: 600px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.how-it-works-tagline {
+  font-size: 1rem;
+  color: #005b9f;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+/* Illustration image */
+.how-it-works-image img {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ===================
+   Independent Estimate
+=================== */
+.independent-estimate {
+  background-color: #f1f7fc;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 700px;
+  margin: 3rem auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.independent-estimate h2 {
+  font-size: 1.6rem;
+  color: #002f5c;
+  margin-bottom: 1rem;
+}
+
+.independent-estimate p {
   font-size: 1rem;
   color: #333;
-}
-.cta-outline {
-  padding: 10px 20px;
-  border: 2px solid #004b91;
-  text-decoration: none;
-  color: #004b91;
-  border-radius: 5px;
-  margin-top: 20px;
-  display: inline-block;
-  font-weight: 500;
-}
-.how-it-works-image {
-  flex: 0 0 300px;
-  text-align: center;
-}
-.how-it-works-image img {
-  max-width: 100%;
-  height: auto;
-  display: block;
+  margin-bottom: 1rem;
 }
 
-/* ===== Global Image Constraints ===== */
-.hero img,
-.step-card img,
-.how-it-works img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* ===== Footer Spacing ===== */
-footer {
-  margin-top: 3rem;
-}
-
-/* ===== Responsive Stacking ===== */
+/* ===================
+   Responsive Adjustments
+=================== */
 @media (max-width: 768px) {
-  .hero {
-    flex-direction: column !important;
-    text-align: center;
-    gap: 1.5rem;
-  }
-  .hero-image {
-    margin-top: 1.5rem;
-  }
-  .hero-text h1 {
-    font-size: 2rem;
-  }
-
-  .steps-section {
-    flex-direction: column !important;
-    align-items: center;
-    gap: 1rem;
-  }
-  .step-card {
-    flex: 1 0 90% !important;
-    max-width: 400px;
-    margin-bottom: 1.5rem;
-  }
-
+  .hero,
   .how-it-works {
-    flex-direction: column !important;
+    flex-direction: column;
     text-align: center;
   }
-  .how-it-works-image {
-    margin-top: 1.5rem;
-    width: 90%;
-    max-width: 400px;
+
+  .hero-text,
+  .how-it-works-text,
+  .how-it-works-extra {
+    max-width: 100%;
+    margin: 0 auto;
   }
-}
+
+  .how-it-works-steps {
+    padding-left: 1rem;       
+} 
