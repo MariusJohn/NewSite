@@ -7,7 +7,6 @@
 
   <link rel="stylesheet" href="/css/reset.css" />
   <link rel="stylesheet" href="/css/header.css" />
-
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/home.css" />
 
@@ -20,7 +19,7 @@
 <body>
   <div class="page-wrapper">
     <%- include('partials/header') %>
- 
+
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-text">
@@ -33,42 +32,65 @@
       </div>
     </section>
 
-    <!-- Services Overview -->
-    <section class="steps-section">
-      <div class="step-card">
-        <img src="/img/icon-upload.png" alt="Upload Icon" />
-        <h3>1. Upload Photos</h3>
-        <p>Quickly submit images of the damage with your location.</p>
+    <!-- Why Use MC Quote -->
+    <section class="benefits-section">
+      <h2 class="section-title">Why Use MC Quote?</h2>
+      <div class="benefit-card">
+        <img src="/img/icon-fast.png" alt="Fast Response" />
+        <h3>Quick Response</h3><br>
+        <p>We aim to deliver multiple quotes within 24 hours — and notify you as soon as they're ready.</p>
       </div>
-      <div class="step-card">
-        <img src="/img/icon-quote.png" alt="Quote Icon" />
-        <h3>2. Get Quotes</h3>
-        <p>Receive quotes from trusted local bodyshops.</p>
+      <div class="benefit-card">
+        <img src="/img/icon-local.png" alt="Local Network" />
+        <h3>Connect with Local Bodyshops</h3><br>
+        <p>Your job is automatically shared with nearby repair centres — no searching, no chasing.</p>
       </div>
-      <div class="step-card">
-        <img src="/img/icon-compare.png" alt="Compare Icon" />
-        <h3>3. Compare & Pay</h3>
-        <p>Pick the best quote and pay a small fee to unlock details.</p>
+      <div class="benefit-card">
+        <img src="/img/icon-safe.png" alt="Safe & Secure" />
+        <h3>Secure & Transparent</h3><br>
+        <p>Your details are shared only after you approve a quote. No unwanted contact, no pressure.</p>
       </div>
     </section>
 
     <!-- How It Works -->
     <section class="how-it-works">
-      <div class="how-content">
-        <div class="how-text">
-          <h2>How It Works</h2>
-          <p>Our platform connects customers with trusted local vehicle repair shops — no stress, no surprises.</p>
-          <a class="cta-outline" href="/jobs/upload">Try It Now</a>
-        </div>
-        <div class="how-image">
-          <img src="/img/how-it-works.png" alt="How It Works Illustration">
+      <div class="how-it-works-text">
+        <h2>How It Works</h2>
+        <p>Our platform connects you with local vehicle repair shops—securely and efficiently.</p>
+    
+        <!-- Numbered Steps -->
+        <ol class="how-it-works-steps">
+          <li><strong>Upload Photos:</strong> Submit damage images quickly.</li>
+          <li><strong>Get Quotes:</strong> Receive competitive offers from local bodyshops.</li>
+          <li><strong>Compare & Pay:</strong> Select the best quote and unlock full details.</li>
+        </ol>
+    
+        <!-- Platform Fee Note (moved outside the <ol>) -->
+        <p class="platform-fee">
+          <em>A small platform fee of <strong>£5 per job</strong> applies — no hidden costs.</em>
+        </p>
+    
+        <a class="cta-outline" href="/jobs/upload">Try It Now</a>
+      </div>
+    
+      <div class="how-it-works-extra">
+        <p class="how-it-works-tagline">Behind the curtain, all the magic happens.</p>
+        <div class="how-it-works-image">
+          <img src="/img/how-it-works.png" alt="Step-by-step illustration of how MC Quote works" />
         </div>
       </div>
+    </section>
+    
+   
+    <section class="independent-estimate">
+      <h2>Need an Independent Estimate?</h2>
+      <p>
+        Want a certified professional quote? We offer formal estimates for <strong>£25 per case</strong> — perfect for lease returns, insurance disputes, or peace of mind.
+      </p>
+      <a class="cta-outline" href="/contact">Request Estimate</a>
     </section>
 
     <%- include('partials/footer') %>
   </div>
 </body>
-
-
 </html>

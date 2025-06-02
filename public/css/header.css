@@ -1,5 +1,4 @@
 .main-header {
-
   background: linear-gradient(to right, #002f5c, #004b91);
   color: white;
   padding: 15px 0;
@@ -21,41 +20,85 @@
 .nav-links {
   display: flex;
   gap: 1rem;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
 }
-
 
 .nav-links a {
   color: white;
   text-decoration: none;
   font-weight: 500;
+  padding: 8px 12px;
+  position: relative;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.burger {
+@media (min-width: 769px) {
+  .nav-links a:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    background-color: #a8d8ff;
+    left: 0;
+    bottom: 0;
+    transition: width 0.3s ease;
+  }
+
+  .nav-links a:hover::after {
+    width: 100%;
+  }
+}
+
+.burger{
   display: none;
 }
 
 @media (max-width: 768px) {
   .nav-links {
-    display: none; /* initially hidden on mobile */
+    display: none;
     flex-direction: column;
-    background: linear-gradient(to left,#004b91, #002f5c);
     position: absolute;
-    top: 60px;
-    right: 0;
+    top: 20px;
+    right: 20px;
     width: 100%;
+    max-width: 250px;
+    background: linear-gradient(to left, #004b91, #002f5c);
     padding: 1rem;
     z-index: 999;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: -2px 4px 10px rgba(0, 0, 0, 0.15);
   }
 
   .nav-links.mobile-open {
     display: flex;
   }
 
+  .nav-links a {
+    display: block;
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px 12px;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.3s ease;
+  }
+
+  .nav-links a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
   .burger {
     display: block;
-    font-size: 24px;
+    font-size: 26px;
     color: white;
     cursor: pointer;
+    padding-right: 1rem;
   }
 }
