@@ -1,10 +1,9 @@
-/* General Styles */
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: rgb(7, 42, 70); /* Dark blue background */
-  color: white;
   margin: 0;
   padding: 0;
+  background-color: #f3f8fc;
+  color: #002f5c;
 }
 
 .admin-dashboard-container {
@@ -12,476 +11,380 @@ body {
   min-height: 100vh;
 }
 
-/* Sidebar Styles */
 .sidebar {
-  width: 350px;
-  background-color: #102b45; /* Darker blue for sidebar */
+  width: 250px;
+  background-color: #eef4fa;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-right: 1px solid #333;
+  border-right: 1px solid #cce0f0;
 }
 
-.sidebar img {
-  width: 150px;
-  margin-bottom: 20px;
+.sidebar-toggle {
+  background-color: #eef4fa;
+  color: #003e7e;
+  border: none;
+  font-size: 22px;
+  padding: 10px 0;
+  width: 100%;
+  cursor: pointer;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.sidebar.collapsed .sidebar-toggle,
+.sidebar.collapsed img,
+.sidebar.collapsed h2,
+.sidebar.collapsed .menu {
+  display: none;
 }
 
 .sidebar h2 {
-  color: #25D366; /* Green accent */
+  color: #003e7e;
   font-weight: 600;
-  font-size: 28px;
-  margin-bottom: 20px;
-  text-align: center;
+  font-size: 20px;
+  margin-bottom: 1rem;
 }
 
 .sidebar .menu {
   list-style: none;
   padding: 0;
-  width: 100%;
+  margin: 0;
 }
 
 .sidebar .menu li {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .sidebar .menu li a {
-  color: #ffffff;
+  color: #003e7e;
   text-decoration: none;
-  padding: 10px 20px;
-  display: block;
+  padding: 8px 12px;
   border-radius: 5px;
-  transition: background 0.3s;
-  font-weight: normal;
+  display: block;
+  transition: background-color 0.3s;
+  font-weight: 500;
 }
 
 .sidebar .menu li a:hover,
 .sidebar .menu li a.active {
-  background-color: #25D366; /* Green accent on hover/active */
-  color: #ffffff;
-  font-weight: bold;
+  background-color: #003e7e;
+  color: #fff;
+  font-weight: 600;
 }
 
-/* Main Content Styles */
 .main-content {
   flex-grow: 1;
   padding: 40px;
-  background-color: #0b3c5d; /* Main content background blue */
-  overflow-x: auto; /* Ensures horizontal scrolling if content overflows */
+  background-color: #ffffff;
+  overflow-x: auto;
 }
 
 .main-content h1 {
-  margin-bottom: 20px;
-  color: #25D366; /* Green accent for headings */
-  text-align: center;
+  font-size: 2rem;
   font-weight: 700;
-  font-size: 32px;
+  color: #002f5c;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
-/* Base Quotes Table Styles */
 .quotes-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 20px;
-  background-color: #0b3c5d;
-  border-radius: 8px;
-  overflow: hidden; /* Helps with border-radius visually */
-  color: #ffffff;
+  background-color: #ffffff;
+  border: 1px solid #dde8f2;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .quotes-table thead {
-  background-color: #102b45; /* Darker blue for table header */
-  color: white;
+  background-color: #eef4fa;
 }
 
-.quotes-table th, .quotes-table td {
+.quotes-table th,
+.quotes-table td {
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #444; /* Darker border for internal cells */
-  vertical-align: middle;
-  color: white;
+  border-bottom: 1px solid #f0f6fb;
+  white-space: nowrap;
 }
 
 .quotes-table th {
-  font-weight: bold;
-  text-align: center;
+  color: #002f5c;
+  font-weight: 600;
 }
 
-/* Collapsible Table Structure Styles */
-.job-row {
-    cursor: pointer;
-    background-color: #102b45; /* Matches existing even/odd row backgrounds */
-    transition: background-color 0.2s ease;
-}
-.job-row:hover {
-    background-color: #1f4e6f; /* Matches existing hover background */
-}
-
-/* Overrides for specific alternating rows to ensure job-row consistency */
-.quotes-table tbody tr:nth-child(even) {
-  background-color: #122f45; /* Still apply to the overall rows */
-}
-
-.quotes-table tbody tr:nth-child(odd) {
-  background-color: #102b45; /* Still apply to the overall rows */
-}
-
-/* Ensure job-row takes precedence for its specific background */
-.quotes-table tbody .job-row {
-  background-color: #102b45; /* Base color for job rows */
-}
-.quotes-table tbody .job-row:nth-child(odd) {
-  background-color: #102b45; /* Specific for odd job rows */
-}
-.quotes-table tbody .job-row:nth-child(even) {
-  background-color: #122f45; /* Specific for even job rows */
-}
-
-
-.quote-details-row {
-    display: none; /* Hidden by default */
-    background-color: #0d324d; /* Slightly lighter background for details */
-}
-.quote-details-row td {
-    padding: 0; /* Remove padding from the main cell holding nested table */
-}
-
-.nested-quotes-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 0; /* No margin here, as the parent td has its own spacing */
-}
-.nested-quotes-table th,
-.nested-quotes-table td {
-    padding: 8px;
-    border: 1px solid #333; /* Adjusted for dark theme */
-    text-align: left;
-    font-size: 0.9em;
-    color: #ffffff; /* Ensure text color for nested table */
-}
-.nested-quotes-table thead {
-    background-color: #153856; /* Slightly different header for nested table */
-}
-
-.winning-quote {
-    background-color: #25D366 !important; /* Green accent for winning quote */
-    color: #000000 !important; /* Black text for contrast on green */
-    font-weight: bold;
-}
-.toggle-icon {
-    margin-right: 5px;
-    display: inline-block;
-    width: 1em; /* Ensure consistent width */
-    text-align: center;
-}
-
-/* Responsive Table Styling (from EJS inline style, now here) */
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-.quotes-table th,
 .quotes-table td {
-    white-space: nowrap; /* Apply to all cells initially for responsive scroll */
-}
-.quotes-table td:nth-child(2), /* Customer Details column */
-.quotes-table td:nth-child(4), /* Location column */
-.quotes-table td:nth-child(8) /* Winning Bodyshop column */
-{
-    white-space: normal; /* Allows text to wrap for these columns */
-    word-break: break-word; /* Breaks long words if necessary */
-    max-width: 200px; /* Adjust max-width as needed for readability */
-}
-/* For notes in nested table */
-.nested-quotes-table td:nth-child(3) {
-    white-space: normal;
-    word-break: break-word;
-    max-width: 200px;
+  color: #002f5c;
 }
 
+.job-summary {
+  background-color: #f9fbfd;
+}
 
-/* No Quotes Row */
-.no-quotes {
-  background-color: #ffa500; /* Orange for warning */
-  color: #333;
+.quote-details {
+  display: none;
+  background-color: #f5f9fc;
+}
+
+.inner-quotes-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+}
+
+.inner-quotes-table th,
+.inner-quotes-table td {
+  padding: 10px;
+  border: 1px solid #dde8f2;
+  font-size: 0.9rem;
+  color: #002f5c;
+}
+
+.inner-quotes-table thead {
+  background-color: #eef4fa;
+}
+
+.highlight {
+  background-color: #dff4e2 !important;
   font-weight: bold;
-  text-align: center;
 }
 
-/* Status Badges */
 .status-badge {
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
   padding: 5px 10px;
-  border-radius: 5px;
-  color: #ffffff;
-  font-weight: bold;
   display: inline-block;
-  text-align: center;
-  margin-bottom: 5px;
+ color: #fff;
+  text-transform: capitalize;
 }
 
-.status-pending {
-  background-color: #ffa500; /* Orange */
+
+.status-badge.quoted {
+  background-color: #0074D9;
 }
 
-.status-viewed {
-  background-color: #25D366; /* Green */
+.status-badge.paid {
+  background-color: #FF851B;
 }
 
-.status-not-viewed {
-  background-color: #f39c12; /* Darker orange */
+.status-badge.processed {
+  background-color: #2ECC40;
 }
 
-.status-archived {
-  background-color: #6c757d; /* Grey */
+.status-badge.warning {
+  background-color: #FF4136;
 }
 
-.status-deleted {
-  background-color: #444; /* Dark grey */
-}
-
-/* Pending Days */
-.days-pending {
-  font-weight: bold;
-  color: #f39c12; /* Darker orange */
-}
-
-/* Action Buttons */
 .btn {
-  padding: 5px 10px;
-  margin-right: 5px;
+  padding: 6px 12px;
+  border: none;
   border-radius: 5px;
-  color: #ffffff;
-  text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
   display: inline-block;
-  margin-bottom: 5px;
-  transition: background 0.3s;
-}
-
-.btn-view {
-  background-color: #007bff; /* Blue */
-}
-
-.btn-archive {
-  background-color: #6c757d; /* Grey */
 }
 
 .btn-remind {
-  background-color: #28a745; /* Green */
+  background-color: #28a745;
+  color: #ffffff;
 }
 
-.btn:hover {
-  opacity: 0.9;
+.btn-remind:hover {
+  background-color: #218838;
+}
+
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.job-image-preview {
+  width: 100px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
 .thumb-img {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin: 5px;
+  width: 100px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.3s;
+  margin-bottom: 5px;
 }
 
-/* Approve and Reject Buttons */
+.job-actions form {
+  margin-bottom: 6px;
+}
+
+/* Improve overall table appearance */
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  border: 1px solid #cce0f0;
+  font-size: 14px;
+  table-layout: fixed;
+}
+
+.jobs-table thead {
+  background-color: #eef4fa;
+}
+
+.jobs-table th,
+.jobs-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #dde8f2;
+  vertical-align: top;
+  text-align: left;
+}
+
+/* Enforce fixed column widths */
+.jobs-table th:nth-child(1),
+.jobs-table td:nth-child(1) {
+  width: 60px; /* Job ID */
+}
+
+.jobs-table th:nth-child(2),
+.jobs-table td:nth-child(2) {
+  width: 240px; /* Customer Details */
+}
+
+.jobs-table th:nth-child(3),
+.jobs-table td:nth-child(3) {
+  width: 420px; /* Images */
+}
+
+.jobs-table td:nth-child(6),
+.jobs-table th:nth-child(6),
+.jobs-table td:nth-child(5),
+.jobs-table th:nth-child(5),
+.jobs-table td:nth-child(4),
+.jobs-table th:nth-child(4) {
+  text-align: center;
+  vertical-align: top;
+}
+
+.jobs-table tbody tr:nth-child(even) {
+  background-color: #f9fbfd;
+}
+
+.jobs-table tbody tr:hover {
+  background-color: #eef4fa;
+}
+
+
+/* Buttons and spacing */
+.job-actions form {
+  margin-bottom: 5px;
+}
+
 .job-actions button {
-    background-color: #25D366; /* Green */
-    color: #ffffff;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s;
-    font-family: 'Poppins', sans-serif;
-    margin-bottom: 8px;
-    margin-right: 5px;
+  margin-bottom: 4px;
+  min-width: 90px;
 }
 
-.job-actions button:hover {
-    background-color: #1aa851;
+.download-zip-btn {
+  display: inline-block;
+  margin-top: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #002f5c;
 }
 
-/* Reject Button */
-.job-actions .reject-btn {
-    background-color: #fa5d28; /* Orange-red */
+.status-badge {
+  text-transform: capitalize;
+  font-size: 0.85rem;
+  padding: 5px 10px;
+  border-radius: 6px;
+  display: inline-block;
+  font-weight: 600;
 }
 
-.job-actions .reject-btn:hover {
-    background-color: #c4401b;
+
+.status-badge.status-pending {
+  background-color: #6c757d !important;
+  color: #ffffff !important;
 }
 
-/* Restore Button */
-.job-actions .restore-btn {
-    background-color: #007bff; /* Blue */
+.status-badge.status-pending {
+  background-color: #6c757d;
+  color: #fff;
 }
 
-.job-actions .restore-btn:hover {
-    background-color: #0056b3;
+.status-badge.status-approved {
+  background-color: #007bff;
+  color: #fff;
 }
 
-/* Archive Button */
-.job-actions .archive-btn {
-    background-color: #6c757d; /* Grey */
+.status-badge.status-rejected {
+  background-color: #dc3545;
+  color: #fff;
 }
 
-.job-actions .archive-btn:hover {
-    background-color: #5a6268;
+.status-badge.status-archived {
+  background-color: #6f42c1;
+  color: #fff;
 }
 
-/* Delete Button */
-.job-actions .delete-btn {
-    background-color: #d9534f; /* Red */
+.status-badge.status-deleted {
+  background-color: #343a40;
+  color: #fff;
 }
 
-.job-actions .delete-btn:hover {
-    background-color: #c9302c;
+.status-badge.status-paid {
+  background-color: #FF851B;
+  color: #fff;
 }
 
-/* Download Button */
-.job-actions .download-zip-btn {
-    background-color: #17a2b8; /* Teal */
-    color: #ffffff;
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-weight: bold;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 8px;
-    transition: background 0.3s;
+.status-badge.status-processed {
+  background-color: #2ECC40;
+  color: #fff;
 }
 
-.job-actions .download-zip-btn:hover {
-    background-color: #138496;
+.status-badge.status-quoted {
+  background-color: #0074D9;
+  color: #fff;
 }
 
-/* Button Spacing */
-.job-actions button + button,
-.job-actions button + .download-zip-btn {
-    margin-left: 5px;
-}
-
-.thumb-img:hover {
-  transform: scale(1.05);
-}
-
-/* Responsive Styles */
 @media (max-width: 900px) {
   .sidebar {
-      width: 200px;
-      padding: 15px;
+    width: 100%;
+    padding: 10px;
   }
 
   .main-content {
-      padding: 20px;
+    padding: 20px;
   }
 
   .quotes-table th,
   .quotes-table td {
-      padding: 10px;
-      font-size: 12px;
+    font-size: 13px;
+    padding: 8px;
   }
 
   .btn {
-      padding: 4px 8px;
-      font-size: 12px;
+    padding: 5px 10px;
+    font-size: 13px;
   }
 
   .status-badge {
-      padding: 4px 8px;
-      font-size: 12px;
+    font-size: 12px;
+    padding: 4px 8px;
   }
-}
-/* Job Table Row Separation (Original styles for .jobs-table, keeping but less relevant now) */
-.jobs-table tbody tr {
-  border-bottom: 2px solid #333;
-  border-top: 2px solid #333;
-}
-
-/* Make the headers stand out (Original styles for .jobs-table, keeping but less relevant now) */
-.jobs-table thead th {
-  background-color: #102b45;
-  color: #ffffff;
-  font-weight: bold;
-  text-align: center;
-}
-
-/* Even and Odd Row Styling (Original styles for .jobs-table, keeping but less relevant now) */
-.jobs-table tbody tr:nth-child(even) {
-  background-color: #122f45;
-}
-
-.jobs-table tbody tr:nth-child(odd) {
-  background-color: #102b45;
-}
-
-.jobs-table tbody tr:hover {
-  background-color: #1f4e6f;
-  cursor: pointer;
-}
-
-.jobs-table tbody tr {
-  margin-bottom: 10px;
-  border-radius: 8px;
-  border-collapse: separate;
-  border-spacing: 0 10px;
-}
-
-/* Overdue Job Highlight */
-.overdue {
-  background-color: #fa5d28 !important; /* Orange-red */
-  color: #ffffff !important;
-  font-weight: bold;
-}
-
-.btn-approve {
-  background-color: #25D366; /* Green */
-  color: #ffffff;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.btn-reject {
-  background-color: #fa5d28; /* Orange-red */
-  color: #ffffff;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.btn-approve:hover {
-  background-color: #1aa851;
-}
-
-.btn-reject:hover {
-  background-color: #c4401b;
-}
-
-.highlight {
-  background-color: #e0ffe0;
-  font-weight: bold;
-}
-.image-gallery {
-  margin-top: 15px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.job-image-preview {
-  width: 120px;
-  height: auto;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  cursor: pointer;
+  .thumb-img {
+    width: 70px;
+  }
+  
 }

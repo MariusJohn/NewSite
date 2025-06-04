@@ -1,5 +1,7 @@
+//controllers/adminJobController.js
 import { Job, Quote, Bodyshop } from '../models/index.js';
 import { sendHtmlMail } from '../utils/sendMail.js';
+
 
 // Helper: Calculate distance in km
 function getDistanceInKm(lat1, lon1, lat2, lon2) {
@@ -65,6 +67,7 @@ export const remindBodyshops = async (req, res) => {
 
     console.log(`✅ Reminder sent to ${nearbyShops.length} bodyshops for Job #${job.id}`);
     res.redirect('/admin/jobs/quotes');
+
   } catch (err) {
     console.error('❌ Reminder error:', err);
     res.status(500).send('Error sending reminders.');

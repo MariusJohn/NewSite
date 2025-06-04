@@ -66,7 +66,6 @@ app.use('/jobs/admin', adminAuth, adminJobsRoutes);
 
 
 
-
 // Apply adminAuth to adminBodyshopRoutes if it has specific routes under /jobs/admin/bodyshops
 app.use('/jobs/admin/bodyshops', adminAuth, adminBodyshopRoutes);
 
