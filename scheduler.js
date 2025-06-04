@@ -10,6 +10,9 @@ import fs from 'fs';
 import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import { DeletedJob, Job, Quote, Bodyshop } from './models/index.js';
 
+
+
+
 dotenv.config();
 
 
@@ -351,6 +354,30 @@ fs.writeFileSync(
 
 // === Production Cron Job (optional) ===
 cron.schedule('0 * * * *', runSchedulerNow);
+
+
+// === Final Job Status Sync ===
+try {
+  const jobsToSync = await Job.findAll({
+    where: {
+      [Op.or]: [
+        { paid: true },
+        { selectedBodyshopId: { [Op.ne]: null } },
+        { status: { [Op.in]: ['approved', 'quoted', 'paid'] } }
+      ]
+    }
+  });
+
+  for (const job of jobsToSync) {
+
+  }
+
+  console.log(`🔄 Synced ${jobsToSync.length} job statuses at the end of scheduler run.`);
+} catch (err) {
+  console.error('❌ Failed during final job status sync:', err);
+}
+
+
 
 
 // Run immediately if executed directly

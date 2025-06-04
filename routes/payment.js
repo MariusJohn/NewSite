@@ -6,6 +6,8 @@ const router = express.Router();
 import { Job, Quote, Bodyshop } from '../models/index.js';
 import { createCheckoutSession } from '../controllers/paymentController.js';
 import { sendFinalEmails } from '../controllers/emailController.js';
+import { syncJobStatus } from '../utils/syncJobStatus.js';
+
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -60,6 +62,9 @@ router.get('/confirm', async (req, res) => {
       job.paid = true;
       await job.save();
       console.log(`✅ Job ${jobId} marked as paid`);
+
+      // 🔁 Sync status after payment
+      await syncJobStatus(jobId);
     }
 
     res.redirect(`/payment?jobId=${jobId}`);
@@ -83,8 +88,6 @@ router.get('/cancel', (req, res) => {
   res.render('payment/cancel');
 });
 
-
-/// === POST: Customer selects a bodyshop ===
 router.post('/select', async (req, res) => {
   const { jobId, bodyshopId } = req.body;
 
@@ -93,10 +96,10 @@ router.post('/select', async (req, res) => {
       include: {
         model: Quote,
         as: 'quotes',
-      include: [{
-        model: Bodyshop,
-        as: 'bodyshop'
-      }]
+        include: [{
+          model: Bodyshop,
+          as: 'bodyshop'
+        }]
       }
     });
 
@@ -105,24 +108,31 @@ router.post('/select', async (req, res) => {
     }
 
     job.selectedBodyshopId = bodyshopId;
+    job.finalDecision = 'customer_selected';
+    job.finalDecisionRequestedAt = new Date();
     await job.save();
 
     const quote = job.quotes.find(q => q.bodyshopId === parseInt(bodyshopId));
     if (!quote) {
       return res.status(404).send('Selected quote not found.');
     }
-    //Final Email
+
+    // Final email to customer and bodyshop
     await sendFinalEmails(job, quote);
 
+    // 🔁 Sync status after selection
+    await syncJobStatus(jobId);
 
-    res.render('payment/selected-confirmation', { 
-      job, 
-      selectedBodyshop: quote.bodyshop });
+    res.render('payment/selected-confirmation', {
+      job,
+      selectedBodyshop: quote.bodyshop
+    });
   } catch (err) {
     console.error('❌ Error selecting bodyshop:', err);
     res.status(500).send('Server error');
   }
 });
+
 
 // === GET: Confirmation after selecting bodyshop ===
 router.get('/selected/:jobId', async (req, res) => {

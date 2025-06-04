@@ -3,25 +3,82 @@
 <head>
   <title>Quotes for Your Job</title>
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .notice-banner {
+      background-color: #f0f8ff;
+      border-left: 6px solid #0074d9;
+      padding: 16px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+
+    .notice-banner h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.2rem;
+      color: #004080;
+    }
+
+    .notice-banner p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    ul.quote-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul.quote-list li {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+    }
+
+    .quote-actions {
+      margin-top: 8px;
+    }
+
+    .quote-actions form {
+      display: inline;
+    }
+
+    .accepted {
+      color: green;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <h1>Quotes for Job in <%= job.location %></h1>
 
+  <% if (job.paid && !job.selectedBodyshopId) { %>
+    <div class="notice-banner">
+      <h3>🛠️ Next Step: Select Your Bodyshop</h3>
+      <p>You've unlocked all quotes. Please <strong>select a bodyshop</strong> below to share your contact details and arrange a booking date.</p>
+      <p style="font-size: 0.85rem; color: #666;">We will only share your contact information with the bodyshop you choose.</p>
+    </div>
+  <% } %>
+
   <% if (quotes.length === 0) { %>
     <p>No quotes yet. Please check back soon.</p>
   <% } else { %>
-    <ul>
+    <ul class="quote-list">
       <% quotes.forEach(q => { %>
         <li>
           <strong><%= q.bodyshopName %></strong>: £<%= q.price.toFixed(2) %>
-          <% if (!job.selectedBodyshop) { %>
-          <form action="/quotes/<%= job.id %>/select" method="POST" style="display:inline;">
-            <input type="hidden" name="bodyshopName" value="<%= q.bodyshopName %>">
-            <button type="submit">Accept Quote</button>
-          </form>
-          <% } else if (job.selectedBodyshop === q.bodyshopName) { %>
-            ✅ Accepted
-          <% } %>
+          <div class="quote-actions">
+            <% if (!job.selectedBodyshopId) { %>
+              <form action="/quotes/<%= job.id %>/select" method="POST">
+                <input type="hidden" name="bodyshopName" value="<%= q.bodyshopName %>">
+                <input type="hidden" name="bodyshopId" value="<%= q.bodyshopId %>">
+                <button type="submit">Select This Bodyshop</button>
+              </form>
+            <% } else if (job.selectedBodyshopId === q.bodyshopId) { %>
+              <span class="accepted">✅ You selected this bodyshop</span>
+            <% } %>
+          </div>
         </li>
       <% }) %>
     </ul>

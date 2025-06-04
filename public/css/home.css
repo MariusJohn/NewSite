@@ -228,23 +228,54 @@ body {
   margin-bottom: 1rem;
 }
 
-/* ===================
-   Responsive Adjustments
-=================== */
-@media (max-width: 768px) {
-  .hero,
-  .how-it-works {
-    flex-direction: column;
-    text-align: center;
-  }
 
-  .hero-text,
-  .how-it-works-text,
-  .how-it-works-extra {
-    max-width: 100%;
-    margin: 0 auto;
+/* =================================
+   Mobile‐Specific Spacing Fixes
+   (Place these under @media max-width:768px)
+   ================================= */
+   @media (max-width: 768px) {
+    /* 1) Hero Section: reduce padding so the image sits closer to the button */
+    .hero {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.75rem;        /* small gap between text block and image */
+      padding: 1.5rem 1rem;/* reduce top/bottom padding from 2rem → 1.5rem */
+    }
+  
+    .hero-text {
+      margin-bottom: 0;    /* remove any extra bottom margin */
+    }
+  
+    /* 2) Hero Image: control its margins exactly */
+    .hero-image {
+      margin-top: 0.75rem; /* ensure a 0.75rem gap above the image */
+      margin-bottom: 0.75rem; /* ensure a 0.75rem gap below the image */
+      width: 100%;
+    }
+  
+    .hero-image img {
+      width: 100%;
+      max-width: 400px;    /* caps it on extremely wide mobile screens */
+      margin: 0 auto;      /* centers it horizontally */
+      display: block;
+    }
+  
+    /* 3) “Why Use MC Quote?”: pull it up closer to the hero image */
+    .benefits-section {
+      margin-top: 1.5rem;  /* reduce from larger desktop spacing */
+      padding: 0 1rem;     /* flush with sides, no extra top padding */
+    }
+  
+    /* 4) “How It Works”: also tighten (in case it sits below the benefits) */
+    .how-it-works {
+      margin-top: 1.5rem;  /* smaller gap than desktop */
+      padding: 1.5rem 1rem;/* reduce overall padding */
+    }
+  
+    /* 5) Independent Estimate: tighten that gap as well */
+    .independent-estimate {
+      margin-top: 1.5rem;  /* consistent 1.5rem gap below “How It Works” */
+      padding: 1.5rem 1rem;/* slightly less vertical padding on mobile */
+    }
   }
-
-  .how-it-works-steps {
-    padding-left: 1rem;       
-} 
+  

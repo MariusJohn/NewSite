@@ -2,31 +2,46 @@
 import { Job, Quote, Bodyshop } from '../models/index.js';
 import { Parser } from 'json2csv';
 import { sendHtmlMail } from '../utils/sendMail.js';
+import { getJobCounts } from './jobController.js';
+
 
 export async function renderJobsWithQuotes(req, res) {
   try {
+    const counts = await getJobCounts();
+
     const jobs = await Job.findAll({
       include: [{
         model: Quote,
+        as: 'quotes',
         required: true,
-        include: [{ model: Bodyshop }]
+        include: [{
+          model: Bodyshop,
+          as: 'bodyshop' 
+        }]
       }]
     });
 
-    res.render('admin/jobs-quotes', { jobs });
+    res.render('admin/jobs-quotes', { 
+              jobs,
+              ...counts
+     });
   } catch (err) {
     console.error('❌ Error loading jobs with quotes:', err);
     res.status(500).send('Server error');
   }
 }
 
+
 export async function exportJobsWithQuotesCSV(req, res) {
   try {
     const jobs = await Job.findAll({
       include: [{
         model: Quote,
+        as: 'quotes',
         required: true,
-        include: [{ model: Bodyshop }]
+        include: [{ model: Bodyshop,
+          as: 'bodyshop'
+         }]
       }]
     });
 
@@ -66,8 +81,11 @@ export async function remindUnselectedJobs(req, res) {
     const jobs = await Job.findAll({
       include: [{
         model: Quote,
+        as: 'quotes',
         required: true,
-        include: [{ model: Bodyshop }]
+        include: [{ model: Bodyshop,
+          as: 'bodyshop'
+         }]
       }],
       where: {
         selectedBodyshopId: null

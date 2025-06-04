@@ -1,4 +1,4 @@
-<!--/admin/jobs-dashboard.ejs-->
+<!--//admin/jobs-dashboard.ejs-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,23 +78,19 @@
                                   </small>
                             </td>
                             <td>
-                                <div class="image-preview-block">
-                                    <% if (job.images && job.images.length > 0) { %>       
-                                        <% job.images.forEach(function(imageUrl, index) { %>
-                                            <a href="<%= imageUrl %>" 
-                                               class="glightbox" 
-                                               data-gallery="job-<%= job.id %>" 
-                                               data-title="Job Image <%= index + 1 %>">
-                                                <img src="<%= imageUrl %>" 
-                                                     alt="Job Image" 
-                                                     class="thumb-img">
-                                            </a>
-                                        <% }) %>
-                                    <% } else { %>
-                                        <em>No Images</em>
-                                    <% } %>
+                                <div class="image-gallery">
+                                  <% job.images.forEach((img, idx) => { %>
+                                    <a href="<%= img %>" 
+                                       class="glightbox"
+                                       data-gallery="job-<%= job.id %>"
+                                       data-title="Job Image <%= idx + 1 %>">
+                                      <img src="<%= img %>" alt="Job Image" class="thumb-img">
+                                    </a>
+                                  <% }) %>
                                 </div>
-                            </td>
+                              </td>
+                              
+                              
                             <td>
                                 <span class="status-badge status-<%= job.status %>"><%= job.status || 'Pending' %></span>
                             </td>
@@ -104,13 +100,16 @@
 
                             <td>
                                 <%= job.quoteStatus || 'no_quotes' %>
-                                <t<td class="job-actions">
+                            </td>
+                                <td class="job-actions">
                                     <% if (job.status === 'pending') { %>
                                         <form action="/jobs/admin/<%= job.id %>/approve" method="POST">
-                                            <button type="submit">Approve</button>
+                                            <button type="submit" class="btn btn-remind">Approve</button>
+
                                         </form>
                                         <form action="/jobs/admin/<%= job.id %>/reject" method="POST">
-                                            <button type="submit">Reject</button>
+                                            <button type="submit" class="btn btn-warning">Reject</button>
+
                                         </form>
                                 
                                     <% } else if (job.status === 'approved') { %>
@@ -145,7 +144,7 @@
                                     <a href="/jobs/admin/download/<%= job.id %>" class="download-zip-btn">📦 Download Images</a>
 
                                 </td>
-                                
+                             
                         </tr>
                     <% }) %>
                 </tbody>
@@ -156,17 +155,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 <script>
-    const lightbox = GLightbox({
+    document.addEventListener("DOMContentLoaded", function () {
+      GLightbox({
         selector: '.glightbox',
         touchNavigation: true,
         loop: true,
-        onOpen: () => {
-            document.body.style.overflow = 'hidden';
-        },
-        onClose: () => {
-            document.body.style.overflow = 'auto';
-        }
+        openEffect: 'zoom',
+        closeEffect: 'fade',
+        slideEffect: 'slide'
+      });
     });
-</script>
+  </script>
+  
 </body>
 </html>

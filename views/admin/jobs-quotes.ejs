@@ -1,3 +1,4 @@
+<!--views/admin/jobs-quotes.ejs-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,120 +11,150 @@
 </head>
 <body>
     <div class="admin-dashboard-container">
-        <div class="sidebar">
-            <a href="/."><img src="/img/logo.png" alt="MC Quote Logo"></a>
-            <h2>Admin Panel</h2>
-            <ul class="menu">
-                <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
-                <li><a href="/jobs/admin?filter=live">Live Jobs (<%= liveCount %>)</a></li>
-                <li><a href="/jobs/admin?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
-                <li><a href="/jobs/admin?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
-                <li><a href="/jobs/admin?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
-                <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
-                <li><a href="/jobs/admin/quotes" class="active">Jobs with Quotes</a></li>
-                <li><a href="/jobs/admin/bodyshops">Bodyshops</a></li>
-            </ul>
-        </div>
+      <div class="sidebar" id="sidebar">
+        <button id="toggleSidebar" class="sidebar-toggle">☰</button>
+        <a href="/." ><img src="/img/logo.png" alt="MC Quote Logo"></a>
+        <h2>Admin Panel</h2>
+        <ul class="menu">
+          <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=live">Live Jobs (<%= liveCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
+          <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
+          <li><a href="/jobs/admin/quotes" class="active">Jobs with Quotes</a></li>
+          <li><a href="/jobs/admin/bodyshops">Bodyshops</a></li>
+        </ul>
+      </div>
 
-        <div class="main-content">
-            <h1>Submitted Jobs with Quotes</h1>
+      <div class="main-content">
+        <h1>Submitted Jobs with Quotes</h1>
 
-            <% if (jobs.length === 0) { %>
-                <p>No jobs with quotes available at the moment.</p>
-            <% } else { %>
-                <table class="quotes-table">
-                    <thead>
+        <% if (jobs.length === 0) { %>
+            <p>No jobs with quotes available at the moment.</p>
+        <% } else { %>
+
+          <div style="text-align: right; margin-bottom: 1rem;">
+            <a href="/jobs/admin/quotes/export-csv" class="btn btn-export">📥 Export CSV</a>
+
+          </div>
+          
+             
+
+            <table class="quotes-table">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Customer Details</th>
+                  <th>Bodyshop</th>
+                  <th>Quote</th>
+                  <th>Status</th>
+                  <th>Days Pending</th>
+                  <th>Quote Status</th>
+                  <th>Date Uploaded</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% jobs.forEach(job => { %>
+                <tr class="job-summary" data-job-id="<%= job.id %>">
+                  <td><%= job.id %></td>
+                  <td>
+                    <strong><%= job.customerName %></strong><br>
+                    <%= job.customerEmail %><br>
+                    <%= job.customerPhone %><br>
+                    Uploaded: <%= new Date(job.createdAt).toLocaleDateString() %>
+                  </td>
+                  <td>
+                    <% if (job.quotes && job.quotes.length > 0) { %>
+                      <% const selectedQuote = job.quotes.find(q => q.bodyshopId === job.selectedBodyshopId); %>
+                      <%= selectedQuote ? selectedQuote.bodyshop?.name : '—' %>
+                    <% } else { %>
+                      —
+                    <% } %>
+                  </td>
+                  <td><%= job.quotes?.length || 0 %></td>
+                  <td>
+                    <% if (!job.quotes || job.quotes.length === 0) { %>
+                      <span class="status-badge warning">Unquoted</span>
+                    <% } else if (job.status === 'processed') { %>
+                      <span class="status-badge processed">Processed ✅</span>
+                    <% } else if (job.status === 'paid') { %>
+                      <span class="status-badge paid">Paid (Awaiting selection)</span>
+                    <% } else if (job.status === 'quoted') { %>
+                      <span class="status-badge quoted">Quoted</span>
+                    <% } else if (job.status === 'waiting_customer_selection') { %>
+                      <span class="status-badge warning">Waiting</span>
+                    <% } else { %>
+                      <span class="status-badge"><%= job.status %></span>
+                    <% } %>
+                  </td>
+                  <td><%= job.daysPending %></td>
+                  <td><%= job.quoteStatus || '—' %></td>
+                  <td><%= new Date(job.createdAt).toLocaleDateString() %></td>
+                  <td>
+                    <a href="#" class="toggle-quotes btn btn-view" data-job-id="<%= job.id %>"></a>
+                    <a href="/admin/jobs/<%= job.id %>/remind" class="btn btn-remind">Remind</a>
+                    <% if (job.status === 'paid') { %>
+                      <form action="/jobs/admin/<%= job.id %>/archive" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-archive">Archive</button>
+                      </form>
+                    <% } %>
+                  </td>
+                </tr>
+                <tr class="quote-details" id="quotes-<%= job.id %>" style="display:none;">
+                  <td colspan="9">
+                    <table class="inner-quotes-table">
+                      <thead>
                         <tr>
-                            <th>Job ID</th>
-                            <th>Customer Details</th>
-                            <th>Bodyshop</th>
-                            <th>Quote</th>
-                            <th>Notes</th>
-                            <th>Quote Date</th>
-                            <th>Status</th>
-                            <th>Days Pending</th>
-                            <th>Quote Status</th>
-                            <th>Last Action</th>
-                            <th>Actions</th>
+                          <th>Bodyshop</th><th>Price</th><th>Notes</th><th>Date</th><th>Status</th>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <% jobs.forEach(job => { %>
-                            <tr class="job-summary">
-                              <td><%= job.id %></td>
-                              <td><strong><%= job.customerName %></strong><br><%= job.customerEmail %><br><%= job.customerPhone %></td>
-                              <td colspan="8">
-                                <strong><%= job.location %></strong><br>
-                                <% if (job.paid && job.selectedBodyshopId) { %>
-                                  <%= job.paid ? 'Paid' : 'Unpaid' %>
-                                  <% if (job.selectedBodyshopId) { %> & Allocated <% } %> | Pending: <%= job.daysPending %> days
-
-                                <% } else if (job.quotes && job.quotes.length > 0) { %>
-                                  <%= job.quotes.length %> Quote<%= job.quotes.length > 1 ? 's' : '' %> Received
-                                <% } else { %>
-                                  No Quotes Yet
-                                <% } %> | Pending: <%= job.daysPending %> days
-                                <br>
-                                <button class="toggle-quotes" data-job-id="<%= job.id %>">Toggle Quotes</button>
-                                <a href="/admin/jobs/<%= job.id %>/remind" class="btn btn-remind">Remind</a>
-                              </td>
-                            </tr>
-                          
-                            <tr class="quote-details" id="quotes-<%= job.id %>" style="display:none;">
-                              <td colspan="11">
-                                <table class="inner-quotes-table">
-                                  <thead>
-                                    <tr>
-                                      <th>Bodyshop</th><th>Price</th><th>Notes</th><th>Date</th><th>Status</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <% job.quotes.forEach(quote => { %>
-                                      <tr class="<%= job.selectedBodyshopId === quote.bodyshopId ? 'highlight' : '' %>">
-
-                                        <td><%= quote.bodyshop?.name || 'Unknown' %></td>
-                                        <td>£<%= quote.price.toFixed(2) %></td>
-                                        <td><%= quote.notes || 'N/A' %></td>
-                                        <td><%= quote.createdAt.toLocaleDateString() %></td>
-                                        <td>
-                                          <% if (job.selectedBodyshopId === quote.bodyshopId) { %>
-                                            selected
-                                          <% } else { %>
-                                            submitted
-                                          <% } %>
-                                        </td>
-                                        
-                                      </tr>
-                                    <% }) %>
-                                  </tbody>
-                                </table>
-                            
-                                <% if (job.images && job.images.length) { %>
-                                <div class="image-gallery">
-                                  <% job.images.forEach((img, idx) => { %>
-                                    <a href="<%= img %>" class="glightbox<%= job.id %>" data-gallery="job-<%= job.id %>">
-                                      <img src="<%= img %>" alt="Job Image <%= idx + 1 %>" class="job-image-preview" />
-                                    </a>
-                                  <% }) %>
-                                </div>
-                                <% } %>
-                              </td>
-                            </tr>
+                      </thead>
+                      <tbody>
+                        <% job.quotes.forEach(quote => { %>
+                        <tr class="<%= job.selectedBodyshopId === quote.bodyshopId ? 'highlight' : '' %>">
+                          <td><%= quote.bodyshop?.name || 'Unknown' %></td>
+                          <td>£<%= quote.price.toFixed(2) %></td>
+                          <td><%= quote.notes || 'N/A' %></td>
+                          <td><%= new Date(quote.createdAt).toLocaleDateString() %></td>
+                          <td>
+                            <% if (job.selectedBodyshopId === quote.bodyshopId) { %>
+                              selected
+                            <% } else { %>
+                              submitted
+                            <% } %>
+                          </td>
+                        </tr>
                         <% }) %>
-                    </tbody>
-                </table>
-            <% } %>
-        </div>
+                      </tbody>
+                    </table>
+
+                    <% if (job.images && job.images.length) { %>
+                      <div class="image-gallery">
+                        <% job.images.forEach((img, idx) => { %>
+                          <a href="<%= img %>" class="glightbox<%= job.id %>" data-gallery="job-<%= job.id %>">
+                            <img src="<%= img %>" alt="Job Image <%= idx + 1 %>" class="job-image-preview" />
+                          </a>
+                        <% }) %>
+                      </div>
+                    <% } %>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+        <% } %>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
     <script>
-      document.querySelectorAll('.toggle-quotes').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const jobId = btn.dataset.jobId;
-          const quotesRow = document.getElementById('quotes-' + jobId);
-          const isVisible = quotesRow.style.display === 'table-row';
-          quotesRow.style.display = isVisible ? 'none' : 'table-row';
+      document.querySelectorAll(".job-summary").forEach(row => {
+        row.addEventListener("click", () => {
+          const jobId = row.dataset.jobId;
+          const quotesRow = document.getElementById("quotes-" + jobId);
+          const isVisible = quotesRow.style.display === "table-row";
+          quotesRow.style.display = isVisible ? "none" : "table-row";
 
           if (!isVisible) {
             GLightbox({ selector: `.glightbox${jobId}` });
