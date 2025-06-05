@@ -15,6 +15,11 @@ import { renderJobsWithQuotes, exportJobsWithQuotesCSV, remindUnselectedJobs } f
 import { showJobsWithQuotes, remindBodyshops } from '../controllers/adminJobsController.js';
 import { exportQuotesToCSV } from '../controllers/exportQuotesToCSV.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
+import { hardDeleteJob } from '../controllers/hardDeleteJob.js';
+
+
+
+
 
 dotenv.config();
 
@@ -134,7 +139,21 @@ router.get('/', async (req, res) => {
     const filter = req.query.filter || 'total';
     const { whereClause, includeClause } = getJobFilterOptions(filter);
 
-    const jobs = await Job.findAll({ where: whereClause, include: includeClause, order: [['createdAt', 'DESC']] });
+    const jobs = await Job.findAll({
+      where: whereClause,
+      include: includeClause,
+      order: [['createdAt', 'DESC']]
+    });
+
+    //  Add daysPending calculation
+    const now = new Date();
+    jobs.forEach(job => {
+      const createdAt = new Date(job.createdAt);
+      const msInDay = 1000 * 60 * 60 * 24;
+      const daysPending = Math.floor((now - createdAt) / msInDay);
+      job.dataValues.daysPending = daysPending;
+    });
+
     const counts = await getJobCounts();
 
     res.render('admin/jobs-dashboard', { jobs, ...counts, filter });
@@ -143,6 +162,7 @@ router.get('/', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 // === JOB STATUS ROUTES ===
 router.post('/:id/approve', async (req, res) => {
@@ -190,6 +210,9 @@ router.post('/:jobId/restore-deleted', async (req, res) => {
   }
   res.status(400).send('Only deleted jobs can be restored.');
 });
+
+// === HARD DELETE POST === //
+router.post('/:jobId/hard-delete', hardDeleteJob);
 
 // === IMAGE DOWNLOAD AS ZIP ===
 router.get('/download/:jobId', async (req, res) => {

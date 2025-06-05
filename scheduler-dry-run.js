@@ -9,18 +9,22 @@ import { runSchedulerNow } from './scheduler.js';
   });
 
   for (const job of jobs) {
+    // Skip job 37 to preserve your manual 49h update
+    if (job.id === 37) continue;
+  
     if ((job.quotes?.length || 0) === 0) {
-      job.setDataValue('createdAt', new Date(Date.now() - 25 * 60 * 60 * 1000)); // force set
-      job.changed('createdAt', true); // mark as modified
+      job.setDataValue('createdAt', new Date(Date.now() - 25 * 60 * 60 * 1000));
+      job.changed('createdAt', true);
   
       job.status = 'approved';
       job.extensionRequestedAt = null;
   
       await job.save({ silent: false });
       console.log(`✅ Updated Job #${job.id} to be 25h old with 0 quotes`);
-        }
+    }
   }
   
+
 
   // Run scheduler without dry-run
   await runSchedulerNow();
