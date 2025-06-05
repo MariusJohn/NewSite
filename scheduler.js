@@ -10,34 +10,13 @@ import fs from 'fs';
 import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import { DeletedJob, Job, Quote, Bodyshop } from './models/index.js';
 
-
-
-
 dotenv.config();
 
-
-// === Generic HTML sender ===
-async function sendHtmlEmail(to, subject, html) {
-  try {
-    await transporter.sendMail({
-      from: `"MC Quote" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html
-    });
-    console.log(`✅ Email sent: ${subject} -> ${to}`);
-  } catch (err) {
-    console.error(`❌ Email failed: ${subject} -> ${to}`, err);
-  }
-}
-
-// === Setup __dirname and view path ===
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const EMAIL_VIEWS_PATH = path.join(__dirname, 'views', 'email');
+const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
 
-
-// === Email transporter ===
 export const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT,
@@ -48,35 +27,29 @@ export const transporter = nodemailer.createTransport({
   }
 });
 
-transporter.verify((error) => {
+transporter.verify(error => {
   if (error) console.error("Email connection failed:", error);
   else console.log("✅ Email transporter ready");
 });
 
-
-
-// === Email helpers using templates ===
-const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-
-async function sendCustomerNoQuotesEmail(job) {
-
-
-
-const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes.ejs'), {
-  customerName: job.customerName,
-  job,
-  extendUrl: `${baseUrl}/jobs/action/${job.id}/${job.extendToken}?action=extend`,
-  cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`,
-  
-});
-
-await sendHtmlEmail(
-  job.customerEmail,
-  `Update on Your Job #${job.id} - No Quotes Received`,
-  html
-);
+async function sendHtmlEmail(to, subject, html) {
+  try {
+    await transporter.sendMail({ from: `"MC Quote" <${process.env.EMAIL_USER}>`, to, subject, html });
+    console.log(`✅ Email sent: ${subject} -> ${to}`);
+  } catch (err) {
+    console.error(`❌ Email failed: ${subject} -> ${to}`, err);
+  }
 }
 
+async function sendCustomerNoQuotesEmail(job) {
+  const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes.ejs'), {
+    customerName: job.customerName,
+    job,
+    extendUrl: `${baseUrl}/jobs/action/${job.id}/${job.extendToken}?action=extend`,
+    cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`
+  });
+  await sendHtmlEmail(job.customerEmail, `Update on Your Job #${job.id} - No Quotes Received`, html);
+}
 
 async function sendCustomerSingleQuoteEmail(job, remaining) {
   const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'single-quote.ejs'), {
@@ -84,10 +57,7 @@ async function sendCustomerSingleQuoteEmail(job, remaining) {
     job,
     remaining,
     extendUrl: `${baseUrl}/jobs/action/${job.id}/${job.extendToken}?action=extend`,
-    cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`,
-  
-    
-    
+    cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`
   });
   await sendHtmlEmail(job.customerEmail, `1 Quote Received for Job #${job.id}`, html);
 }
@@ -100,8 +70,6 @@ async function sendCustomerMultipleQuotesEmail(job, remaining) {
     baseUrl,
     paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
   });
-
-  
   await sendHtmlEmail(job.customerEmail, `Quotes Ready for Job #${job.id}`, html);
 }
 
@@ -112,7 +80,6 @@ async function sendCustomerPaymentEmail(job) {
     paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
   });
   await sendHtmlEmail(job.customerEmail, `Quotes Ready for Job #${job.id} – View Now`, html);
-
   job.status = 'pending_payment';
   await job.save();
 }
@@ -128,14 +95,10 @@ async function sendCustomerJobDeletedEmail(job) {
   await sendHtmlEmail(job.customerEmail, `Job #${job.id} Removed – No Quotes Received`, html);
 }
 
-// === Scheduler Logic ===
 export async function runSchedulerNow() {
   console.log('=== Scheduler started ===');
-  
   const dryRun = process.argv.includes('--dry-run');
-  if (dryRun) {
-    console.log('=== DRY RUN MODE ENABLED ===');
-  }
+  if (dryRun) console.log('=== DRY RUN MODE ENABLED ===');
 
   const summary = {
     earlyEmails: [],
@@ -143,9 +106,9 @@ export async function runSchedulerNow() {
     oneQuote: [],
     multiQuotes: [],
     paymentRequested: [],
-    jobsDeleted: []
+    jobsDeleted: [],
+    jobsArchived: []
   };
-
 
   try {
     const now = new Date();
@@ -161,24 +124,13 @@ export async function runSchedulerNow() {
     });
 
     for (const job of jobs) {
-      
-      console.log(`Checking Job #${job.id} | Created At: ${job.createdAt.toISOString()} | Status: ${job.status} | Expiry: ${job.quoteExpiry}`);
-
-
       const quoteCount = job.quotes?.length || 0;
       const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
       const remaining = Math.max(0, bodyshopsInRange - quoteCount);
 
-      console.log(`Job ${job.id} | Quotes: ${quoteCount} | Extension requested: ${job.extensionRequestedAt}`);
-
-      // === Early Trigger if 2+ Quotes Before 24h ===
+      // Early trigger: 2+ quotes before 24h
       if (quoteCount >= 2 && !job.extensionRequestedAt && job.createdAt > cutoff24h) {
-        console.log(`>>> Triggering early email for job ${job.id} (${quoteCount} quotes)`);
-        if (dryRun) {
-          console.log(`[DRY RUN] Would send early multi-quote email for job ${job.id}`);
-        } else {
-          await sendCustomerMultipleQuotesEmail(job, remaining);
-        }
+        if (!dryRun) await sendCustomerPaymentEmail(job);
         job.extensionRequestedAt = now;
         job.emailSentAt = null;
         await job.save();
@@ -186,201 +138,139 @@ export async function runSchedulerNow() {
         continue;
       }
 
-
-    // === 24h Logic ===
-    if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
-      console.log(`>>> Processing 24h logic for job ${job.id} (${quoteCount} quotes)`);
-
-      try {
-        if (quoteCount === 0) {
-          await sendCustomerNoQuotesEmail(job);
-
-          const bodyshops = await Bodyshop.findAll({ where: { area: job.location } });
-
-                    for (const bs of bodyshops) {
-                      if (bs.email) {
-                        await sendHtmlEmail(
-                          bs.email,
-                          `Reminder: Quote opportunity for Job #${job.id}`,
-                          `<p>Hello ${bs.name},</p>
-                          <p>A job in your area has been open for 24 hours without receiving any quotes.</p>
-                          <p><strong>Location:</strong> ${job.location}</p>
-                          <p><a href="${baseUrl}/bodyshop/dashboard">Log in to view and quote</a></p>
-                          <p>– MC Quote</p>`
-                        );
-                        console.log(`📢 Reminder sent to ${bs.email} for job ${job.id}`);
-                      }
-                    }
-
-
-
-          summary.noQuotes.push(job.id);
-        } else if (quoteCount === 1) {
-          await sendCustomerSingleQuoteEmail(job, remaining);
-          summary.oneQuote.push(job.id);
-        } else if (quoteCount >= 2) {
-          await sendCustomerMultipleQuotesEmail(job, remaining);
-          summary.multiQuotes.push(job.id);
+      // 24h logic
+      if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
+        try {
+          if (quoteCount === 0) {
+            await sendCustomerNoQuotesEmail(job);
+            const bodyshops = await Bodyshop.findAll({ where: { area: job.location } });
+            for (const bs of bodyshops) {
+              if (bs.email) {
+                await sendHtmlEmail(bs.email, `Reminder: Quote opportunity for Job #${job.id}`,
+                  `<p>Hello ${bs.name},</p><p>A job in your area has been open for 24 hours without receiving any quotes.</p><p><strong>Location:</strong> ${job.location}</p><p><a href="${baseUrl}/bodyshop/dashboard">Log in to quote</a></p><p>– MC Quote</p>`);
+              }
+            }
+            summary.noQuotes.push(job.id);
+          } else if (quoteCount === 1) {
+            await sendCustomerSingleQuoteEmail(job, remaining);
+            summary.oneQuote.push(job.id);
+          } else if (quoteCount >= 2) {
+            await sendCustomerMultipleQuotesEmail(job, remaining);
+            summary.multiQuotes.push(job.id);
+          }
+          job.extensionRequestedAt = now;
+          job.emailSentAt = now;
+          await job.save();
+        } catch (err) {
+          console.error(`❌ Failed to process 24h logic for job ${job.id}:`, err);
         }
+        continue;
+      }
 
-        job.extensionRequestedAt = now;
-        job.emailSentAt = now;
+      // Reminder for extended jobs
+      if (job.extended && job.extensionRequestedAt && !job.emailSentAt) {
+        const bodyshops = await Bodyshop.findAll({ where: { area: job.location } });
+        for (const bs of bodyshops) {
+          if (bs.email) {
+            await sendHtmlEmail(bs.email, `Reminder: Extended Quote Opportunity for Job #${job.id}`,
+              `<p>Hello ${bs.name},</p><p>A nearby job has been extended and is still open.</p><p><a href="${baseUrl}/bodyshop/dashboard">Log in to quote</a></p>`);
+          }
+        }
+        job.emailSentAt = new Date();
         await job.save();
-      } catch (err) {
-        console.error(`❌ Failed to process 24h logic for job ${job.id}:`, err);
       }
 
-      continue;
-    }
-
-    // === Trigger bodyshop reminders for manually extended jobs
-if (job.extended && job.extensionRequestedAt && !job.emailSentAt) {
-  console.log(`>>> Sending reminder emails for manually extended job ${job.id}`);
-
-  const bodyshops = await Bodyshop.findAll({ where: { area: job.location } });
-
-  for (const bs of bodyshops) {
-    if (bs.email) {
-      await sendHtmlEmail(
-        bs.email,
-        `Reminder: Extended Quote Opportunity for Job #${job.id}`,
-        `<p>Hello ${bs.name},</p>
-         <p>A nearby job has been extended by the customer and is still open for quoting.</p>
-         <p><strong>Location:</strong> ${job.location}</p>
-         <p><a href="${baseUrl}/bodyshop/dashboard">Log in to quote now</a></p>
-         <p>– MC Quote</p>`
-      );
-      console.log(`📨 Reminder sent to ${bs.email} for extended job ${job.id}`);
-    }
-  }
-
-  job.emailSentAt = new Date();
-  await job.save();
-}
-
-
-// === Handle post-extension jobs with 2+ quotes that haven't received payment email
-if (job.extended && quoteCount >= 2 && !job.paid && job.status !== 'pending_payment') {
-  
-  console.log(`>>> DEBUG Job ${job.id} | extended: ${job.extended} | quoteCount: ${quoteCount} | paid: ${job.paid} | status: ${job.status}`);
-
-  console.log(`>>> Sending payment email after extension for job ${job.id}`);
-  if (!dryRun) await sendCustomerPaymentEmail(job);
-  summary.paymentRequested.push(job.id);
-}
-
-
-    
-// === 48h Logic ===
-if (job.createdAt <= cutoff48h) {
-  if (quoteCount === 0) {
-    if (!dryRun) await sendCustomerJobDeletedEmail(job);
-    
-    const s3Client = new S3Client({
-      region: process.env.AWS_REGION,
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      // Payment email after extension
+      if (job.extended && quoteCount >= 2 && !job.paid && job.status !== 'pending_payment') {
+        if (!dryRun) await sendCustomerPaymentEmail(job);
+        summary.paymentRequested.push(job.id);
       }
-    });
-    
-    async function deleteJobImagesFromS3(imageKeys = []) {
-      if (!imageKeys.length) return;
-    
-      const deleteParams = {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Delete: {
-          Objects: imageKeys.map(key => ({ Key: `job-images/${key}` }))
+
+console.log('cutoff48h:', cutoff48h.toISOString());
+console.log(`Job #${job.id} createdAt: ${job.createdAt.toISOString()}`);
+console.log(`Job #${job.id} extended: ${job.extended}`);
+console.log(`Job #${job.id} quoteCount: ${quoteCount}`);
+
+
+
+
+
+
+      // 48h logic
+      if (job.createdAt <= cutoff48h) {
+        if (quoteCount === 0) {
+          if (job.extended) {
+            const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes-archive.ejs'), {
+              customerName: job.customerName,
+              job,
+              homeUrl: `${baseUrl}/`,
+              newRequestUrl: `${baseUrl}/jobs/upload`
+            });
+            if (!dryRun) {
+              await sendHtmlEmail(job.customerEmail, `Job #${job.id} – No Quotes Received`, html);
+              job.status = 'archived';
+              await job.save();
+            }
+            summary.jobsArchived.push(job.id);
+          } else {
+            if (!dryRun) await sendCustomerJobDeletedEmail(job);
+            const s3Client = new S3Client({
+              region: process.env.AWS_REGION,
+              credentials: {
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+              }
+            });
+            async function deleteJobImagesFromS3(imageKeys = []) {
+              if (!imageKeys.length) return;
+              const deleteParams = {
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Delete: { Objects: imageKeys.map(key => ({ Key: `job-images/${key}` })) }
+              };
+              await s3Client.send(new DeleteObjectsCommand(deleteParams));
+            }
+            await DeletedJob.create({
+              jobId: job.id,
+              customerName: job.customerName,
+              customerEmail: job.customerEmail,
+              location: job.location
+            });
+            await deleteJobImagesFromS3(job.images || []);
+            await job.destroy();
+            summary.jobsDeleted.push(job.id);
+          }
+        } else {
+          if (!job.paid && job.status !== 'pending_payment') {
+            if (!dryRun) await sendCustomerPaymentEmail(job);
+            summary.paymentRequested.push(job.id);
+          }
         }
-      };
-    
-      try {
-        await s3Client.send(new DeleteObjectsCommand(deleteParams));
-        console.log(`🗑️ Deleted ${imageKeys.length} image(s) from S3`);
-      } catch (err) {
-        console.error('❌ Failed to delete images from S3:', err);
       }
     }
 
-    await DeletedJob.create({
-      jobId: job.id,
-      customerName: job.customerName,
-      customerEmail: job.customerEmail,
-      location: job.location
-    });
-    
-    await deleteJobImagesFromS3(job.images || []);
+    console.log('\n=== Scheduler Summary ===');
+    for (const [category, jobs] of Object.entries(summary)) {
+      const jobList = jobs.length ? ` => ${jobs.join(', ')}` : '';
+      console.log(`${category}: ${jobs.length} job(s)${jobList}`);
+    }
 
+    const summaryText = `Scheduler Run at ${now.toISOString()}\n` +
+      Object.entries(summary).map(
+        ([key, jobs]) => `${key}: ${jobs.length} job(s)${jobs.length ? ` => ${jobs.join(', ')}` : ''}`
+      ).join('\n');
 
-    await job.destroy(); 
-    
-
-
-
-    summary.jobsDeleted.push(job.id);
-  } else {
-    if (!dryRun) await sendCustomerPaymentEmail(job);
-    summary.paymentRequested.push(job.id);
-  }
-}
-}
-console.log('\n=== Scheduler Summary ===');
-for (const [category, jobs] of Object.entries(summary)) {
-const jobList = jobs.length ? ` => ${jobs.join(', ')}` : '';
-console.log(`${category}: ${jobs.length} job(s)${jobList}`);
-}
-
-
-
-    // === Log file ===
-const summaryText = `Scheduler Run at ${now.toISOString()}\n` + 
-Object.entries(summary).map(
-  ([key, jobs]) => `${key}: ${jobs.length} job(s)${jobs.length ? ` => ${jobs.join(', ')}` : ''}`
-).join('\n');
-
-fs.writeFileSync(
-  path.join(__dirname, 'logs', `scheduler-summary-${Date.now()}.log`),
-  summaryText
-);
-
-
-
+    fs.writeFileSync(
+      path.join(__dirname, 'logs', `scheduler-summary-${Date.now()}.log`),
+      summaryText
+    );
 
   } catch (err) {
     console.error("Scheduler failed:", err);
   }
 }
 
-
-// === Production Cron Job (optional) ===
 cron.schedule('0 * * * *', runSchedulerNow);
 
-
-// === Final Job Status Sync ===
-try {
-  const jobsToSync = await Job.findAll({
-    where: {
-      [Op.or]: [
-        { paid: true },
-        { selectedBodyshopId: { [Op.ne]: null } },
-        { status: { [Op.in]: ['approved', 'quoted', 'paid'] } }
-      ]
-    }
-  });
-
-  for (const job of jobsToSync) {
-
-  }
-
-  console.log(`🔄 Synced ${jobsToSync.length} job statuses at the end of scheduler run.`);
-} catch (err) {
-  console.error('❌ Failed during final job status sync:', err);
-}
-
-
-
-
-// Run immediately if executed directly
 if (process.argv[1].endsWith('scheduler.js')) {
- runSchedulerNow();
+  runSchedulerNow();
 }

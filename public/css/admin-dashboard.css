@@ -1,3 +1,4 @@
+/*public/css/admin-dashboard.css*/
 body {
   font-family: 'Poppins', sans-serif;
   margin: 0;
@@ -90,94 +91,66 @@ body {
   text-align: center;
 }
 
-.quotes-table {
+.jobs-table, .quotes-table {
   width: 100%;
   border-collapse: collapse;
   background-color: #ffffff;
   border: 1px solid #dde8f2;
   border-radius: 10px;
-  overflow: hidden;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  margin-top: 1rem;
+  font-size: 14px;
+  table-layout: fixed;
 }
 
-.quotes-table thead {
+.jobs-table th, .jobs-table td,
+.quotes-table th, .quotes-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #dde8f2;
+  vertical-align: top;
+  text-align: left;
+  white-space: nowrap;
+  color: #002f5c;
+}
+
+.jobs-table thead, .quotes-table thead {
   background-color: #eef4fa;
 }
 
-.quotes-table th,
-.quotes-table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #f0f6fb;
-  white-space: nowrap;
+.jobs-table th:nth-child(1), .jobs-table td:nth-child(1) {
+  width: 60px;
 }
 
-.quotes-table th {
-  color: #002f5c;
-  font-weight: 600;
+.jobs-table th:nth-child(2), .jobs-table td:nth-child(2) {
+  width: 240px;
 }
 
-.quotes-table td {
-  color: #002f5c;
+.jobs-table th:nth-child(3), .jobs-table td:nth-child(3) {
+  width: 420px;
 }
 
-.job-summary {
+.jobs-table tbody tr:nth-child(even) {
   background-color: #f9fbfd;
 }
 
-.quote-details {
-  display: none;
-  background-color: #f5f9fc;
-}
-
-.inner-quotes-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #ffffff;
-}
-
-.inner-quotes-table th,
-.inner-quotes-table td {
-  padding: 10px;
-  border: 1px solid #dde8f2;
-  font-size: 0.9rem;
-  color: #002f5c;
-}
-
-.inner-quotes-table thead {
+.jobs-table tbody tr:hover {
   background-color: #eef4fa;
 }
 
-.highlight {
-  background-color: #dff4e2 !important;
-  font-weight: bold;
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 1rem;
 }
 
-.status-badge {
-  font-size: 0.85rem;
-  font-weight: 600;
+.thumb-img, .job-image-preview {
+  width: 100px;
+  height: auto;
   border-radius: 6px;
-  padding: 5px 10px;
-  display: inline-block;
- color: #fff;
-  text-transform: capitalize;
-}
-
-
-.status-badge.quoted {
-  background-color: #0074D9;
-}
-
-.status-badge.paid {
-  background-color: #FF851B;
-}
-
-.status-badge.processed {
-  background-color: #2ECC40;
-}
-
-.status-badge.warning {
-  background-color: #FF4136;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  margin-bottom: 5px;
 }
 
 .btn {
@@ -196,111 +169,55 @@ body {
   color: #ffffff;
 }
 
-.btn-remind:hover {
-  background-color: #218838;
+.btn-reject {
+  background-color: #dc3545;
+  color: #ffffff;
 }
 
-.image-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 1rem;
+.btn-archive {
+  background-color: #6f42c1;
+  color: #ffffff;
 }
 
-.job-image-preview {
-  width: 100px;
-  height: auto;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
+.btn-download {
+  background-color: #007bff;
+  color: #ffffff;
 }
 
-.thumb-img {
-  width: 100px;
-  height: auto;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  margin-bottom: 5px;
+.btn-view {
+  background-color: #17a2b8;
+  color: #ffffff;
 }
 
-.job-actions form {
-  margin-bottom: 6px;
+.btn-export {
+  background-color: #ffc107;
+  color: #212529;
 }
 
-/* Improve overall table appearance */
-.jobs-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  border: 1px solid #cce0f0;
-  font-size: 14px;
-  table-layout: fixed;
-}
-
-.jobs-table thead {
-  background-color: #eef4fa;
-}
-
-.jobs-table th,
-.jobs-table td {
-  padding: 10px 8px;
-  border-bottom: 1px solid #dde8f2;
-  vertical-align: top;
-  text-align: left;
-}
-
-/* Enforce fixed column widths */
-.jobs-table th:nth-child(1),
-.jobs-table td:nth-child(1) {
-  width: 60px; /* Job ID */
-}
-
-.jobs-table th:nth-child(2),
-.jobs-table td:nth-child(2) {
-  width: 240px; /* Customer Details */
-}
-
-.jobs-table th:nth-child(3),
-.jobs-table td:nth-child(3) {
-  width: 420px; /* Images */
-}
-
-.jobs-table td:nth-child(6),
-.jobs-table th:nth-child(6),
-.jobs-table td:nth-child(5),
-.jobs-table th:nth-child(5),
-.jobs-table td:nth-child(4),
-.jobs-table th:nth-child(4) {
-  text-align: center;
-  vertical-align: top;
-}
-
-.jobs-table tbody tr:nth-child(even) {
-  background-color: #f9fbfd;
-}
-
-.jobs-table tbody tr:hover {
-  background-color: #eef4fa;
-}
-
-
-/* Buttons and spacing */
-.job-actions form {
-  margin-bottom: 5px;
-}
-
-.job-actions button {
-  margin-bottom: 4px;
-  min-width: 90px;
-}
-
-.download-zip-btn {
-  display: inline-block;
-  margin-top: 4px;
-  text-decoration: none;
+.restore-btn,
+.delete-btn,
+.hard-delete-btn {
+  padding: 6px 12px;
   font-weight: 600;
-  color: #002f5c;
+  border: none;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  display: inline-block;
+}
+
+.restore-btn {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.delete-btn {
+  background-color: #fd7e14;
+  color: #fff;
+}
+
+.hard-delete-btn {
+  background-color: #dc3545;
+  color: #fff;
 }
 
 .status-badge {
@@ -310,52 +227,55 @@ body {
   border-radius: 6px;
   display: inline-block;
   font-weight: 600;
-}
-
-
-.status-badge.status-pending {
-  background-color: #6c757d !important;
-  color: #ffffff !important;
-}
-
-.status-badge.status-pending {
-  background-color: #6c757d;
   color: #fff;
 }
 
-.status-badge.status-approved {
+.status-badge.status-pending { background-color: #6c757d; }
+.status-badge.status-approved { background-color: #007bff; }
+.status-badge.status-rejected { background-color: #dc3545; }
+.status-badge.status-archived { background-color: #6f42c1; }
+.status-badge.status-deleted { background-color: #343a40; }
+.status-badge.status-paid { background-color: #FF851B; }
+.status-badge.status-processed { background-color: #2ECC40; }
+.status-badge.status-quoted { background-color: #0074D9; }
+.status-badge.warning { background-color: #FF4136; }
+
+
+.job-actions .btn {
+  display: block;
+  margin-bottom: 8px;
+}
+
+
+.btn-archive {
   background-color: #007bff;
-  color: #fff;
+  color: #ffffff;
 }
 
-.status-badge.status-rejected {
-  background-color: #dc3545;
-  color: #fff;
+.btn-archive:hover {
+  background-color: #0056b3;
 }
 
-.status-badge.status-archived {
-  background-color: #6f42c1;
-  color: #fff;
+
+.customer-info-block {
+  margin-bottom: 12px;
+  line-height: 1.6;
+  word-break: break-word;
 }
 
-.status-badge.status-deleted {
-  background-color: #343a40;
-  color: #fff;
+.elapsed-ok {
+  color: #2e7d32; /* green */
+  font-weight: 600;
 }
 
-.status-badge.status-paid {
-  background-color: #FF851B;
-  color: #fff;
+.elapsed-warning {
+  color: #ff9800; /* amber */
+  font-weight: 600;
 }
 
-.status-badge.status-processed {
-  background-color: #2ECC40;
-  color: #fff;
-}
-
-.status-badge.status-quoted {
-  background-color: #0074D9;
-  color: #fff;
+.elapsed-critical {
+  color: #c62828; /* red */
+  font-weight: 600;
 }
 
 @media (max-width: 900px) {
@@ -363,22 +283,18 @@ body {
     width: 100%;
     padding: 10px;
   }
-
   .main-content {
     padding: 20px;
   }
-
   .quotes-table th,
   .quotes-table td {
     font-size: 13px;
     padding: 8px;
   }
-
   .btn {
     padding: 5px 10px;
     font-size: 13px;
   }
-
   .status-badge {
     font-size: 12px;
     padding: 4px 8px;
@@ -386,5 +302,4 @@ body {
   .thumb-img {
     width: 70px;
   }
-  
 }

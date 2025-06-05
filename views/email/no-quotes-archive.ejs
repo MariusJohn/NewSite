@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Job #<%= job.id %> – No Quotes Received</title>
+</head>
+<body style="font-family: Arial, sans-serif; color: #333;">
+  <h2>Hello <%= customerName %>,</h2>
+
+  <p>We’re sorry to inform you that your request (Job #<%= job.id %>) has been automatically closed after 48 hours because no bodyshops submitted quotes, even after your extension.</p>
+
+  <p>You can <a href="<%= newRequestUrl %>">submit a new request</a> at any time or return to our <a href="<%= homeUrl %>">home page</a>.</p>
+
+  <p>Thank you for using MC Quote.<br>The MC Quote Team</p>
+</body>
+</html>

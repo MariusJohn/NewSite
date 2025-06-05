@@ -31,6 +31,8 @@ export const showJobsWithQuotes = async (req, res) => {
       order: [['createdAt', 'DESC']]
     });
 
+
+
     res.render('admin/jobs-quotes', { jobs });
   } catch (err) {
     console.error('❌ Failed to load jobs with quotes:', err);
