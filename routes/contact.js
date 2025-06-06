@@ -8,7 +8,7 @@ router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
 const headerData = {
-    logo: '/public/img/logo.png',
+    logo: '/public/img/logo.svg',
     navLinks: [
         { url: '/', text: 'Home' },
         { url: '/quotations', text: 'Private Quotations' },
@@ -20,7 +20,7 @@ const headerData = {
 };
 
 const footerData = {
-    content: '&copy; 2025 MC Quote'
+    content: '&copy; 2025 My Car Quote'
 };
 
 // GET /contact page
@@ -28,7 +28,7 @@ router.get('/', (req, res, next) => {
   
     try {
         const pageData = {
-            title: 'MC Quote - Contact',
+            title: 'My Car Quote - Contact',
             headerData,
             mainContent: 'Contact us here.',
             sidebarContent: 'This is the sidebar for the contact page',

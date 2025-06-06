@@ -33,7 +33,7 @@ router.get('/email/:template', async (req, res) => {
       extendUrl: `${baseUrl}/extend/${sampleJob.id}`,
       cancelUrl: `${baseUrl}/cancel/${sampleJob.id}`,
       paymentUrl: `${baseUrl}/payment?jobId=${sampleJob.id}`,
-      logoUrl: `${baseUrl}/img/logo.png`,
+      logoUrl: `${baseUrl}/img/logo.svg`,
       homeUrl: `${baseUrl}/`,
       newRequestUrl: `${baseUrl}/jobs/upload`
     });

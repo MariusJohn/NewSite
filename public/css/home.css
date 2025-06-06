@@ -12,7 +12,7 @@ body {
 .page-wrapper {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+
 }
 
 /* ===================
@@ -260,7 +260,7 @@ body {
       display: block;
     }
   
-    /* 3) “Why Use MC Quote?”: pull it up closer to the hero image */
+    /* 3) “Why Use My Car Quote?”: pull it up closer to the hero image */
     .benefits-section {
       margin-top: 1.5rem;  /* reduce from larger desktop spacing */
       padding: 0 1rem;     /* flush with sides, no extra top padding */

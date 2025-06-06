@@ -80,7 +80,7 @@ const handleJobAction = async (req, res) => {
           `<p>Hello ${bs.name},</p>
            <p>A nearby job has been extended by the customer.</p>
            <p><a href="${process.env.BASE_URL}/bodyshop/dashboard">Quote now</a></p>
-           <p>– MC Quote</p>`
+           <p>– My Car Quote</p>`
         );
       }
 

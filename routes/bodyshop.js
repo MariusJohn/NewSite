@@ -39,7 +39,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 
 const headerData = {
-    logo: '/public/img/logo.png',
+    logo: '/public/img/logo.svg',
     navLinks: [
         { url: '/', text: 'Home' },
         { url: '/quotations', text: 'Private Quotations' },
@@ -51,15 +51,15 @@ const headerData = {
 };
 
 const footerData = {
-    content: '&copy; 2025 MC Quote'
+    content: '&copy; 2025 My Car Quote'
 };
 
 // === Main Bodyshop Support page ===
 router.get('/', (req, res) => {
     const pageData = {
-        title: 'MC Quote - Bodyshop',
+        title: 'My Car Quote - Bodyshop',
         headerData,
-        mainContent: 'Welcome to the MC Quote website!',
+        mainContent: 'Welcome to the My Car Quote website!',
         sidebarContent: 'This is the sidebar on the bodyshop page.',
         content1: 'Bodyshop Content 1',
         content2: 'Bodyshop Content 2',
@@ -159,7 +159,7 @@ router.post('/register', async (req, res) => {
             subject: 'Verify Your Bodyshop Account',
             html: `
             <div>
-                <h2>Welcome to MC Quote</h2>
+                <h2>Welcome to My Car Quote</h2>
                 <p>Thank you for registering your bodyshop. Please verify your email by clicking the link below:</p>
                 <a href="${verificationUrl}" style="background-color:#25D366;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Verify Email</a>
                 <p>If you did not register, please ignore this email.</p>

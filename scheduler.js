@@ -34,7 +34,7 @@ transporter.verify(error => {
 
 async function sendHtmlEmail(to, subject, html) {
   try {
-    await transporter.sendMail({ from: `"MC Quote" <${process.env.EMAIL_USER}>`, to, subject, html });
+    await transporter.sendMail({ from: `"My Car Quote" <${process.env.EMAIL_USER}>`, to, subject, html });
     console.log(`✅ Email sent: ${subject} -> ${to}`);
   } catch (err) {
     console.error(`❌ Email failed: ${subject} -> ${to}`, err);
@@ -88,7 +88,7 @@ async function sendCustomerJobDeletedEmail(job) {
   const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'job-deleted.ejs'), {
     customerName: job.customerName,
     job,
-    logoUrl: `${baseUrl}/img/logo.png`,
+    logoUrl: `${baseUrl}/img/logo.svg`,
     homeUrl: `${baseUrl}/`,
     newRequestUrl: `${baseUrl}/jobs/upload`
   });
@@ -147,7 +147,7 @@ export async function runSchedulerNow() {
             for (const bs of bodyshops) {
               if (bs.email) {
                 await sendHtmlEmail(bs.email, `Reminder: Quote opportunity for Job #${job.id}`,
-                  `<p>Hello ${bs.name},</p><p>A job in your area has been open for 24 hours without receiving any quotes.</p><p><strong>Location:</strong> ${job.location}</p><p><a href="${baseUrl}/bodyshop/dashboard">Log in to quote</a></p><p>– MC Quote</p>`);
+                  `<p>Hello ${bs.name},</p><p>A job in your area has been open for 24 hours without receiving any quotes.</p><p><strong>Location:</strong> ${job.location}</p><p><a href="${baseUrl}/bodyshop/dashboard">Log in to quote</a></p><p>– My Car Quote</p>`);
               }
             }
             summary.noQuotes.push(job.id);

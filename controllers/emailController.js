@@ -12,7 +12,7 @@ export async function sendFinalEmails(job, quote) {
       <li><strong>Quote:</strong> £${quote.price}</li>
     </ul>
     <p>Please contact them if they don’t reach out within 24 hours.</p>
-    <p>– MC Quote Team</p>
+    <p>– My Car Quote Team</p>
   `;
 
   const bodyshopHtml = `
@@ -26,7 +26,7 @@ export async function sendFinalEmails(job, quote) {
       <li><strong>Quote:</strong> £${quote.price}</li>
     </ul>
     <p>Please reach out to the customer within 24 hours.</p>
-    <p>– MC Quote System</p>
+    <p>– My Car Quote System</p>
   `;
 
   await sendHtmlMail(job.customerEmail, 'Repair Bodyshop Selected', customerHtml);

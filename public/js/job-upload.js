@@ -85,9 +85,19 @@ document.addEventListener("DOMContentLoaded", function() {
             showError(formError, "Please correct the highlighted errors before submitting.");
         } else {
             clearError(formError);
+    
+            // 🧷 Disable button to prevent double submission
+            const submitBtn = document.getElementById("submitBtn");
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Uploading...";
+                submitBtn.style.opacity = 0.7;
+            }
+    
             console.log("DEBUG: Client-side validation PASSED. Allowing default form submission to:", form.action);
         }
     });
+    
 
     // Show error message
     function showError(element, message) {
