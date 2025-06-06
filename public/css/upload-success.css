@@ -1,36 +1,57 @@
+body {
+  background-color: #f3f8fc;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+
+.logo-jobUpload {
+  text-align: center;
+  margin: 30px 0 10px;
+}
+
+.logo-jobUpload img {
+  width: 160px;
+  height: auto;
+  max-width: 100%;
+}
+
+
 .upload-feedback-main {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 80vh;
-  background-color: rgb(7, 42, 70);
+  background-color: #f3f8fc;
   padding: 40px 20px;
 }
 
 .upload-feedback-box {
-  background-color: #0b3c5d;
+  background-color: #ffffff;
   border: 2px solid #25D366;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 40px 30px;
   max-width: 500px;
   width: 100%;
   text-align: center;
-  color: white;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  color: #002f5c;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
   margin: 20px;
 }
 
 .upload-feedback-box h2 {
-  font-size: 32px;
+  font-size: 30px;
   color: #25D366;
   margin-bottom: 20px;
+  font-weight: 700;
 }
 
 .upload-feedback-box p {
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.6;
   margin-bottom: 30px;
-  color: #ffffff;
+  color: #444f61;
 }
 
 .btn-home {
@@ -40,8 +61,8 @@
   color: white;
   border-radius: 8px;
   text-decoration: none;
-  font-weight: 700;
-  font-size: 18px;
+  font-weight: 600;
+  font-size: 16px;
   transition: background-color 0.3s ease;
 }
 
@@ -55,7 +76,7 @@
   }
 
   .upload-feedback-box h2 {
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .upload-feedback-box p {
@@ -63,7 +84,7 @@
   }
 
   .btn-home {
-    font-size: 16px;
+    font-size: 15px;
     padding: 12px 24px;
   }
 }
@@ -74,7 +95,7 @@
   }
 
   .upload-feedback-box h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .upload-feedback-box p {
