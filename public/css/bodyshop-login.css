@@ -5,17 +5,15 @@ body {
   padding: 0;
 }
 
-.page-wrapper {
+.page-wrapper main {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh;
-  padding: 40px 20px;
-}
-
-main {
+  flex-direction: column;
+  min-height: 70vh;
   width: 100%;
 }
+
 
 .login-wrapper {
   max-width: 600px;
@@ -67,7 +65,7 @@ main {
 }
 
 .login-btn {
-  background-color: #004b91;
+  background-color: #528fc8;
   color: white;
   padding: 14px;
   width: 100%;
@@ -97,4 +95,10 @@ main {
 .error-message {
   color: red;
   font-size: 0.85em;
+}
+
+@media (max-width: 768px) {
+  .login-wrapper {
+    padding: 30px 20px;
+  }
 }

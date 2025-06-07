@@ -10,15 +10,16 @@
   <link rel="stylesheet" href="/css/header.css" />
   <link rel="stylesheet" href="/css/footer.css" />
   <link rel="stylesheet" href="/css/bodyshop-login.css" />
+
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
-
+  <div class="page-wrapper">
   <!-- Header -->
   <%- include('../partials/header') %>
 
-  <!-- Page Wrapper -->
-  <div class="page-wrapper">
+  <!-- Consistent Wrapper -->
+
     <main>
       <div class="login-wrapper">
         <h1>Bodyshop Login</h1>
@@ -44,10 +45,10 @@
         </form>
       </div>
     </main>
-  </div>
-
+ 
   <!-- Footer -->
   <%- include('../partials/footer') %>
+</div>
 
   <!-- Scripts -->
   <script src="/js/bodyshop-login.js"></script>

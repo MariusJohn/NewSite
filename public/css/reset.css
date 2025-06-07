@@ -1,27 +1,37 @@
 /*** The new CSS Reset - version 1.2.0 (last updated 23.7.2021) ***/
 
-/* Remove all the styles of the "User-Agent-Stylesheet", except for the 'display' property */
-*:where(:not(iframe, canvas, img, svg, video):not(svg *)) {
-    all: unset;
-    display: revert;
-  }
-  
-  /* Preferred box-sizing value */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f3f8fc;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+
   *,
   *::before,
   *::after {
     box-sizing: border-box;
   }
   
-  /*
-    Remove list styles (bullets/numbers)
-    in case you use it with normalize.css
-  */
+
   ol, ul {
     list-style: none;
   }
   
-  /* For images to not be able to exceed their container */
+ 
   img {
     max-width: 100%;
   }
@@ -39,8 +49,10 @@
   .page-wrapper {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 15px;
+    padding: 1rem 1rem;
+    width: 100%;
   }
+  
   
   .container {
     max-width: 1200px;

@@ -21,17 +21,22 @@ body {
 .hero {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   background-color: #eef4fa;
-  padding: 3rem 1rem;
+  padding: 2rem 1rem;
   border-radius: 12px;
+  min-height: 400px; 
 }
 
 .hero-text {
-  flex: 1 1 400px;
-  max-width: 500px;
+  flex: 1 1 500px;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
 
 .hero-text h1 {
   font-size: 2.5rem;
@@ -53,17 +58,27 @@ body {
   text-decoration: none;
   border-radius: 6px;
   display: inline-block;
+  width: fit-content;
+  margin: 0;
 }
 
 .hero-image {
-  flex: 1 1 300px;
-  text-align: right;
+  flex: 1 1 500px;
+  position: relative;
+  height: 100%;
+  min-height: 350px;
+  max-width: 600px;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .hero-image img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* ===================
@@ -119,7 +134,7 @@ body {
   max-width: 550px;
 }
 
-/* Heading and intro paragraph */
+
 .how-it-works-text h2 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
@@ -133,26 +148,26 @@ body {
   line-height: 1.6;
 }
 
-/* Numbered list of steps */
+
 .how-it-works-steps {
   list-style-type: decimal;
-  padding-left: 1.5rem;        /* indent the numbers */
+  padding-left: 1.5rem;    
   margin-bottom: 1.5rem;
 }
 
 .how-it-works-steps li {
-  margin-bottom: 1rem;         /* vertical space between steps */
+  margin-bottom: 1rem;        
   font-size: 1rem;
   line-height: 1.6;
   color: #333333;
 }
 
-/* Emphasize the bold step titles */
+
 .how-it-works-steps li strong {
   color: #002f5c;
 }
 
-/* Platform fee note styling */
+
 .platform-fee {
   font-size: 0.95rem;
   color: #004b91;
@@ -160,7 +175,7 @@ body {
   font-style: italic;
 }
 
-/* “Try It Now” button */
+
 .cta-outline {
   padding: 12px 24px;
   border: 2px solid #004b91;
@@ -177,7 +192,7 @@ body {
   color: #ffffff;
 }
 
-/* Right-side container */
+
 .how-it-works-extra {
   flex: 1 1 300px;
   max-width: 600px;
@@ -195,7 +210,7 @@ body {
   margin-bottom: 1rem;
 }
 
-/* Illustration image */
+
 .how-it-works-image img {
   width: 100%;
   max-width: 600px;
@@ -231,51 +246,57 @@ body {
 
 /* =================================
    Mobile‐Specific Spacing Fixes
-   (Place these under @media max-width:768px)
-   ================================= */
+    ================================= */
    @media (max-width: 768px) {
-    /* 1) Hero Section: reduce padding so the image sits closer to the button */
     .hero {
       flex-direction: column;
       text-align: center;
-      gap: 0.75rem;        /* small gap between text block and image */
-      padding: 1.5rem 1rem;/* reduce top/bottom padding from 2rem → 1.5rem */
+      gap: 0.75rem;
+      padding: 1.5rem 1rem;
     }
   
     .hero-text {
-      margin-bottom: 0;    /* remove any extra bottom margin */
+      margin-bottom: 0;
     }
   
-    /* 2) Hero Image: control its margins exactly */
     .hero-image {
-      margin-top: 0.75rem; /* ensure a 0.75rem gap above the image */
-      margin-bottom: 0.75rem; /* ensure a 0.75rem gap below the image */
+      position: relative;      
       width: 100%;
+      height: 300px;           
+      margin-top: 1rem;
+      overflow: hidden;
+      border-radius: 10px;
     }
   
     .hero-image img {
+      position: absolute;      
+      top: 0;
+      left: 0;
       width: 100%;
-      max-width: 400px;    /* caps it on extremely wide mobile screens */
-      margin: 0 auto;      /* centers it horizontally */
-      display: block;
+      height: 100%;
+      object-fit: cover;        
     }
   
-    /* 3) “Why Use My Car Quote?”: pull it up closer to the hero image */
+    .cta-button {
+      align-self: center;
+    }
+  
+  
     .benefits-section {
-      margin-top: 1.5rem;  /* reduce from larger desktop spacing */
-      padding: 0 1rem;     /* flush with sides, no extra top padding */
+      margin-top: 1.5rem;  
+      padding: 0 1rem;   
     }
   
-    /* 4) “How It Works”: also tighten (in case it sits below the benefits) */
+
     .how-it-works {
-      margin-top: 1.5rem;  /* smaller gap than desktop */
-      padding: 1.5rem 1rem;/* reduce overall padding */
+      margin-top: 1.5rem;  
+      padding: 1.5rem 1rem;
     }
   
-    /* 5) Independent Estimate: tighten that gap as well */
+   
     .independent-estimate {
-      margin-top: 1.5rem;  /* consistent 1.5rem gap below “How It Works” */
-      padding: 1.5rem 1rem;/* slightly less vertical padding on mobile */
+      margin-top: 1.5rem; 
+      padding: 1.5rem 1rem;
     }
   }
   
