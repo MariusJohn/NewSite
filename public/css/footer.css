@@ -1,8 +1,8 @@
 .main-footer {
-  background: linear-gradient(to right, rgb(255, 255, 255), #004b91);
+  background: linear-gradient(to right, #004b91, #004b91); 
     color: white;
     text-align: center;
-    padding: 20px;
+    padding: 20px 0;
     font-size: 0.95rem;
   }
   

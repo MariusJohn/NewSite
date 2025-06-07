@@ -1,25 +1,42 @@
 .main-header {
-  background: linear-gradient(to right, white, #004b91);
+  background: linear-gradient(to right, #004b91, #004b91); 
   color: white;
-  padding: 15px 0;
+  padding: 20px 0;
 }
 
-.nav-container {
+.container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
+}
+
+.nav-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+}
+
+.logo {
+  width: 160px;
+  flex-shrink: 0;
 }
 
 .logo img {
-  height: 50px;
+  width: 160px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+  backface-visibility: hidden;
+  filter: brightness(0) invert(1);
 }
+
 
 .nav-links {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
+  align-items: center;
   flex-wrap: wrap;
 }
 
@@ -32,46 +49,48 @@
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-@media (min-width: 769px) {
-  .nav-links a:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-radius: 4px;
-  }
-
-  .nav-links a::after {
-    content: '';
-    position: absolute;
-    width: 0%;
-    height: 2px;
-    background-color: #a8d8ff;
-    left: 0;
-    bottom: 0;
-    transition: width 0.3s ease;
-  }
-
-  .nav-links a:hover::after {
-    width: 100%;
-  }
+.nav-links a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
 }
 
-.burger{
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  background-color: #a8d8ff;
+  left: 0;
+  bottom: 0;
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.burger {
   display: none;
 }
 
+/* ✅ Media Query for Mobile */
 @media (max-width: 768px) {
+  .logo {
+    width: 120px;
+  }
+
   .nav-links {
     display: none;
     flex-direction: column;
     position: absolute;
-    top: 20px;
+    top: 60px;
     right: 20px;
     width: 100%;
     max-width: 250px;
     background: linear-gradient(to left, #004b91, #002f5c);
     padding: 1rem;
     z-index: 999;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+    border-radius: 10px;
     box-shadow: -2px 4px 10px rgba(0, 0, 0, 0.15);
   }
 
@@ -80,18 +99,9 @@
   }
 
   .nav-links a {
-    display: block;
     width: 100%;
-    font-size: 1rem;
     padding: 10px 12px;
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    transition: background 0.3s ease;
-  }
-
-  .nav-links a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    font-size: 1rem;
   }
 
   .burger {
@@ -99,6 +109,6 @@
     font-size: 26px;
     color: white;
     cursor: pointer;
-    padding-right: 1rem;
+    padding-left: 1rem;
   }
 }
