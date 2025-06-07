@@ -116,10 +116,7 @@ export async function runSchedulerNow() {
     const cutoff48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
     const jobs = await Job.findAll({
-      where: {
-        status: 'approved',
-        quoteExpiry: { [Op.gt]: now }
-      },
+      where: { status: 'approved' },
       include: [{ model: Quote, as: 'quotes' }]
     });
 
@@ -128,7 +125,6 @@ export async function runSchedulerNow() {
       const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
       const remaining = Math.max(0, bodyshopsInRange - quoteCount);
 
-      // Early trigger: 2+ quotes before 24h
       if (quoteCount >= 2 && !job.extensionRequestedAt && job.createdAt > cutoff24h) {
         if (!dryRun) await sendCustomerPaymentEmail(job);
         job.extensionRequestedAt = now;
@@ -138,18 +134,10 @@ export async function runSchedulerNow() {
         continue;
       }
 
-      // 24h logic
       if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
         try {
           if (quoteCount === 0) {
             await sendCustomerNoQuotesEmail(job);
-            const bodyshops = await Bodyshop.findAll({ where: { area: job.location } });
-            for (const bs of bodyshops) {
-              if (bs.email) {
-                await sendHtmlEmail(bs.email, `Reminder: Quote opportunity for Job #${job.id}`,
-                  `<p>Hello ${bs.name},</p><p>A job in your area has been open for 24 hours without receiving any quotes.</p><p><strong>Location:</strong> ${job.location}</p><p><a href="${baseUrl}/bodyshop/dashboard">Log in to quote</a></p><p>– My Car Quote</p>`);
-              }
-            }
             summary.noQuotes.push(job.id);
           } else if (quoteCount === 1) {
             await sendCustomerSingleQuoteEmail(job, remaining);
@@ -167,36 +155,21 @@ export async function runSchedulerNow() {
         continue;
       }
 
-      // Reminder for extended jobs
       if (job.extended && job.extensionRequestedAt && !job.emailSentAt) {
-        const bodyshops = await Bodyshop.findAll({ where: { area: job.location } });
-        for (const bs of bodyshops) {
-          if (bs.email) {
-            await sendHtmlEmail(bs.email, `Reminder: Extended Quote Opportunity for Job #${job.id}`,
-              `<p>Hello ${bs.name},</p><p>A nearby job has been extended and is still open.</p><p><a href="${baseUrl}/bodyshop/dashboard">Log in to quote</a></p>`);
-          }
-        }
         job.emailSentAt = new Date();
         await job.save();
       }
 
-      // Payment email after extension
       if (job.extended && quoteCount >= 2 && !job.paid && job.status !== 'pending_payment') {
         if (!dryRun) await sendCustomerPaymentEmail(job);
         summary.paymentRequested.push(job.id);
       }
 
-console.log('cutoff48h:', cutoff48h.toISOString());
-console.log(`Job #${job.id} createdAt: ${job.createdAt.toISOString()}`);
-console.log(`Job #${job.id} extended: ${job.extended}`);
-console.log(`Job #${job.id} quoteCount: ${quoteCount}`);
+      console.log(`cutoff48h: ${cutoff48h.toISOString()}`);
+      console.log(`Job #${job.id} createdAt: ${job.createdAt.toISOString()}`);
+      console.log(`Job #${job.id} extended: ${job.extended}`);
+      console.log(`Job #${job.id} quoteCount: ${quoteCount}`);
 
-
-
-
-
-
-      // 48h logic
       if (job.createdAt <= cutoff48h) {
         if (quoteCount === 0) {
           if (job.extended) {

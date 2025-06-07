@@ -101,3 +101,9 @@ sequelize.sync()
     .catch(err => {
         console.error('❌ Failed to sync database or start server:', err);
     });
+
+    // === Run Scheduler Cron Job ===
+import { runSchedulerNow } from './scheduler.js';
+import cron from 'node-cron';
+
+cron.schedule('0 * * * *', runSchedulerNow);
