@@ -4,47 +4,77 @@
   <meta charset="UTF-8">
   <title>Register Bodyshop - My Car Quote</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="/css/navbar.css">
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="/css/reset.css">
+   <link rel="stylesheet" href="/css/header.css">
   <link rel="stylesheet" href="/css/footer.css">
   <link rel="stylesheet" href="/css/bodyshop-register.css">
+
+  <!-- Poppins Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
+  <div class="page-wrapper">
 
 <%- include('../partials/header') %>
 
-<div class="register-container">
-  <h2>Register Your Bodyshop</h2>
-  <% if (error) { %><p class="error-msg"><%= error %></p><% } %>
-  <form id="registerForm" action="/bodyshop/register" method="POST">
-    <input type="text" name="name" placeholder="Bodyshop Name" required>
+<main>
 
-    <input type="email" name="email" placeholder="Email Address" required>
+  
 
-    <input type="tel" name="phone" placeholder="Phone Number" id="phone" required pattern="^07\d{9}$" title="Enter a valid UK phone number (07...)">
-    <span class="error-message" id="phone-error"></span>
+  <div class="register-wrapper">
 
-    <div class="password-container">
-      <input type="password" name="password" placeholder="Password" required autocomplete="new-password" id="password">
-      <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
-    </div>
+ 
 
-    <div class="password-container">
-      <input type="password" name="confirmPassword" placeholder="Confirm Password" required autocomplete="new-password" id="confirmPassword">
-      <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
-    </div>
+    <h1>Register Your Bodyshop</h1>
+    <% if (error) { %>
+      <p class="error-msg"><%= error %></p>
+    <% } %>
 
-    <span class="error-message" id="password-error"></span>
+    <form id="registerForm" action="/bodyshop/register" method="POST" class="register-form">
+      <label for="name">Bodyshop Name:</label>
+      <input type="text" id="name" name="name" placeholder="Bodyshop Name" required>
 
-    <input type="text" name="area" placeholder="Postcode / Area" required>
-    <button type="submit">Register</button>
-  </form>
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" name="email" placeholder="Email Address" required>
 
-  <p>Already registered? <a href="/bodyshop/login">Login here</a>.</p>
-</div>
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" name="phone" placeholder="07..." required pattern="^07\\d{9}$" title="Enter a valid UK phone number (07...)">
+      <span class="error-message" id="phone-error"></span>
+
+      <label for="password">Password:</label>
+      <div class="password-container">
+        <input type="password" id="password" name="password" placeholder="Password" required autocomplete="new-password">
+        <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
+      </div>
+
+      <label for="confirmPassword">Confirm Password:</label>
+      <div class="password-container">
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required autocomplete="new-password">
+        <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
+      </div>
+
+      <span class="error-message" id="password-error"></span>
+
+      <label for="area">Postcode / Area:</label>
+      <input type="text" id="area" name="area" placeholder="Postcode / Area" required>
+
+      <button type="submit" class="register-btn">Register</button>
+    </form>
+
+    <p class="form-footer-link">
+      Already registered? <a href="/bodyshop/login">Login here</a>.
+    </p>
+
+
+
+  </div>
+
+</main>
 
 <%- include('../partials/footer') %>
-
+</div>
 <script src="/js/navbar-toggle.js"></script>
 <script src="/js/bodyshop-register.js"></script>
 </body>

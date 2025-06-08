@@ -1,0 +1,234 @@
+/* admin-bodyshops.css */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3f8fc;
+    color: #002f5c;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #ffffff;
+    margin-left: 0;
+  }
+  
+
+
+  .admin-dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+  }
+  
+  .sidebar {
+    width: 250px;
+    background-color: #eef4fa;
+    padding: 20px;
+    border-right: 1px solid #cce0f0;
+  }
+  
+  .sidebar-toggle {
+    background-color: #eef4fa;
+    color: #003e7e;
+    border: none;
+    font-size: 22px;
+    padding: 10px 0;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  
+  .sidebar.collapsed {
+    width: 60px;
+  }
+  
+  .sidebar.collapsed .sidebar-toggle,
+  .sidebar.collapsed img,
+  .sidebar.collapsed h2,
+  .sidebar.collapsed .menu {
+    display: none;
+  }
+  
+  .sidebar h2 {
+    color: #003e7e;
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 1rem;
+  }
+  
+  .sidebar .menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar .menu li {
+    margin-bottom: 10px;
+  }
+  
+  .sidebar .menu li a {
+    color: #003e7e;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    display: block; 
+    transition: background-color 0.3s;
+    font-weight: 500;
+  }
+  
+  .sidebar .menu li a:hover,
+  .sidebar .menu li a.active {
+    background-color: #003e7e;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .main-content h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  table.bodyshops-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border: 1px solid #dde8f2;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    table-layout: auto;
+    word-break: break-word;
+  }
+  
+  .bodyshops-table th, .bodyshops-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    font-size: 14px;
+  }
+  
+  .bodyshops-table thead {
+    background-color: #eef4fa;
+    font-weight: 600;
+  }
+  
+  .bodyshops-table tr:nth-child(even) {
+    background-color: #f9fbfd;
+  }
+  
+  .btn-approve {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 5px;
+  }
+  
+  .btn-reject {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  
+  .badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-block;
+  }
+  
+  .badge.active {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .badge.inactive {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .badge.pending {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .bodyshops-table td {
+    vertical-align: middle;
+  }
+  .bodyshops-table .btn {
+    margin: 4px 2px;
+  }
+  
+  @media (max-width: 900px) {
+    .admin-dashboard-container {
+      flex-direction: column;
+    }
+  
+    .sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #cce0f0;
+    }
+  
+    .main-content {
+      padding: 20px;
+    }
+  
+    .bodyshops-table {
+      font-size: 13px;
+      table-layout: fixed;
+      word-break: break-word;
+    }
+  
+    .bodyshops-table th,
+    .bodyshops-table td {
+      padding: 8px;
+    }
+  
+    .btn-approve,
+    .btn-reject {
+      font-size: 13px;
+      padding: 5px 10px;
+    }
+  
+    .badge {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+  
+    .sidebar-toggle {
+      font-size: 18px;
+      padding: 8px;
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .bodyshops-table th,
+    .bodyshops-table td {
+      font-size: 12px;
+    }
+  
+    .main-content h1 {
+      font-size: 1.5rem;
+    }
+  
+    .btn-approve,
+    .btn-reject {
+      display: block;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+  }
+  

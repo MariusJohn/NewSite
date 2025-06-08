@@ -227,6 +227,7 @@ body {
   border-radius: 6px;
   display: inline-block;
   font-weight: 600;
+  background-color:#adb5bd ;
   color: #fff;
 }
 
@@ -239,6 +240,10 @@ body {
 .status-badge.status-processed { background-color: #2ECC40; }
 .status-badge.status-quoted { background-color: #0074D9; }
 .status-badge.warning { background-color: #FF4136; }
+.status-badge.status-pending_payment {
+  background-color: #17a2b8;
+  color: #ffffff;
+}
 
 
 .job-actions .btn {
@@ -278,11 +283,82 @@ body {
   font-weight: 600;
 }
 
-@media (max-width: 900px) {
+
+@media (max-width: 768px) {
+  .admin-dashboard-container {
+    flex-direction: column;
+  }
+
   .sidebar {
     width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #cce0f0;
     padding: 10px;
+    background-color: #eef4fa;
   }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sidebar h2 {
+    font-size: 1rem;
+    margin: 0;
+    color: #002f5c;
+  }
+
+  .sidebar-toggle {
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    color: #003e7e;
+  }
+
+  .sidebar .menu {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-top: 10px;
+    gap: 8px;
+    scrollbar-width: none;
+  }
+
+  .sidebar .menu::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sidebar .menu li {
+    flex-shrink: 0;
+  }
+
+  .sidebar .menu li a {
+    font-size: 13px;
+    padding: 6px 10px;
+    white-space: nowrap;
+    background-color: #d7e6f4;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .logout-btn {
+    font-size: 13px;
+    padding: 6px 10px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 4px;
+    color: #002f5c;
+    cursor: pointer;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+
   .main-content {
     padding: 20px;
   }

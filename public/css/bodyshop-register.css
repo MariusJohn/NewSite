@@ -1,83 +1,186 @@
-body {
-  background-color: rgb(7, 42, 70);
-}
-
-.register-container {
-    max-width: 380px;
-    margin: 60px auto;
-    padding: 20px;
-    background-color: rgba(64, 141, 204, 0);
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    color: white;
-    text-align: center;
-}
-
-.register-container h2 {
-    margin-bottom: 20px;
-    color: #25D366;
-    font-weight: 600;
-    font-size: 1.8rem;
-}
-
-.register-container input {
+.register-form input {
     width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border-radius: 8px;
+    padding: 10px;
+    margin: 5px 0 15px;
     border: 1px solid #ccc;
-    font-size: 1rem;
-    box-sizing: border-box; /* Make sure padding is included in width */
-}
-
-.password-container {
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+  
+  .password-container {
     position: relative;
     margin-bottom: 15px;
-}
-
-.password-container input {
-    padding-right: 45px; /* Space for the eye icon */
-}
-
-.password-toggle {
-    position: absolute;
-    top: 35%;
-    right: 15px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 18px;
-    color: #333;
-}
-
-.register-container button {
+  }
+  
+  .error-message,
+  .error-msg {
+    display: block;
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 5px;
+  }
+  
+  .form-footer-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .register-btn {
     width: 100%;
     padding: 12px;
-    background-color: #25D366;
+    background-color: #4a84d3;
     color: white;
+    font-weight: 600;
     border: none;
     border-radius: 6px;
-    font-size: 1rem;
+    margin-top: 1.5rem;
     cursor: pointer;
-    margin-bottom: 15px;
-}
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .register-btn:hover {
+    background-color: #3b6db0;
+  }
+  
 
-.register-container button:hover {
-    background-color: #1aa851;
-}
-
-.register-container a {
-    color: #25D366;
-    text-decoration: none;
-}
-
-.register-container a:hover {
-    color: #1aa851;
-    text-decoration: underline;
-}
-
-.error-msg {
-    color: #fa5d28;
-    margin-bottom: 15px;
+.register-wrapper {
+    max-width: 420px;
+    margin: 4rem auto;
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 47, 92, 0.1);
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .register-wrapper h1 {
+    font-size: 24px;
     font-weight: 600;
-    font-size: 0.9rem;
-}
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #002f5c;
+  }
+  
+  .register-form label {
+    font-weight: 500;
+    margin-top: 1rem;
+    display: block;
+    color: #002f5c;
+  }
+  
+  .register-form input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+  
+  .password-container {
+    position: relative;
+  }
+  
+  .password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  
+  .register-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #4a84d3;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    margin-top: 1.5rem;
+    cursor: pointer;
+  }
+  
+  .register-btn:hover {
+    background-color: #3b6db0;
+  }
+  
+  .error-msg,
+  .error-message {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 5px;
+  }
+  
+  .form-footer-link {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .form-footer-link a {
+    color: #004f9f;
+    text-decoration: none;
+  }
+  
+  .form-footer-link a:hover {
+    text-decoration: underline;
+  }
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+    .register-wrapper {
+      margin: 2rem 1.5rem;
+      padding: 2rem;
+    }
+  
+    .register-wrapper h1 {
+      font-size: 20px;
+    }
+  
+    .register-form label {
+      font-size: 14px;
+    }
+  
+    .register-form input {
+      font-size: 14px;
+      padding: 8px;
+    }
+  
+    .register-btn {
+      font-size: 15px;
+      padding: 10px;
+    }
+  
+    .form-footer-link {
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .register-wrapper {
+      margin: 1rem 1rem;
+      padding: 1.5rem;
+      border-radius: 10px;
+    }
+  
+    .register-wrapper h1 {
+      font-size: 18px;
+    }
+  
+    .password-toggle {
+      right: 8px;
+      font-size: 16px;
+    }
+  
+    .register-btn {
+      font-size: 14px;
+      padding: 10px;
+    }
+  
+    .error-message,
+    .error-msg {
+      font-size: 13px;
+    }
+  }
+  

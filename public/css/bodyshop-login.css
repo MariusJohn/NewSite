@@ -97,6 +97,22 @@ body {
   font-size: 0.85em;
 }
 
+.register-link {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.register-link a {
+  color: #004f9f;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+
 @media (max-width: 768px) {
   .login-wrapper {
     padding: 30px 20px;
