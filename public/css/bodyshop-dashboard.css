@@ -3,12 +3,25 @@
   min-height: 100vh;
 }
 
+.logo-wrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sidebar img {
+  max-width: 120px;
+  height: auto;
+  display: inline-block;
+}
+
+
 .sidebar {
   width: 260px;
-  background-color: rgb(7, 42, 70);
-  color: #fff;
+  background-color: #eef4fa;
+  color: #002f5c;
   padding: 20px;
   flex-shrink: 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
 }
 
 .sidebar img {
@@ -17,9 +30,17 @@
 }
 
 .sidebar h2 {
-  font-size: 1.2em;
-  margin-bottom: 20px;
+  color: #003e7e;
 }
+
+.sidebar ul.menu li a {
+  color: #003e7e;
+}
+.sidebar ul.menu li a.active {
+  background-color: #003e7e;
+  color: #fff;
+}
+
 
 .sidebar .radius-form {
   margin-bottom: 20px;

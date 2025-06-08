@@ -96,6 +96,13 @@ async function sendCustomerJobDeletedEmail(job) {
 }
 
 export async function runSchedulerNow() {
+  if (global.schedulerRunning) {
+    console.log('⛔ Scheduler already running. Skipping...');
+    return;
+  }
+  global.schedulerRunning = true;
+  
+
   console.log('=== Scheduler started ===');
   const dryRun = process.argv.includes('--dry-run');
   if (dryRun) console.log('=== DRY RUN MODE ENABLED ===');
@@ -136,24 +143,29 @@ export async function runSchedulerNow() {
 
       if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
         try {
-          if (quoteCount === 0) {
-            await sendCustomerNoQuotesEmail(job);
-            summary.noQuotes.push(job.id);
-          } else if (quoteCount === 1) {
-            await sendCustomerSingleQuoteEmail(job, remaining);
-            summary.oneQuote.push(job.id);
-          } else if (quoteCount >= 2) {
-            await sendCustomerMultipleQuotesEmail(job, remaining);
-            summary.multiQuotes.push(job.id);
+          if (!job.emailSentAt) { // prevent repeat
+            if (quoteCount === 0) {
+              await sendCustomerNoQuotesEmail(job);
+              summary.noQuotes.push(job.id);
+            } else if (quoteCount === 1) {
+              await sendCustomerSingleQuoteEmail(job, remaining);
+              summary.oneQuote.push(job.id);
+            } else if (quoteCount >= 2) {
+              await sendCustomerMultipleQuotesEmail(job, remaining);
+              summary.multiQuotes.push(job.id);
+            }
+            job.extensionRequestedAt = now;
+            job.emailSentAt = now;
+            await job.save();
+          } else {
+            console.log(`⏩ Skipped Job #${job.id} – Already emailed at ${job.emailSentAt}`);
           }
-          job.extensionRequestedAt = now;
-          job.emailSentAt = now;
-          await job.save();
         } catch (err) {
           console.error(`❌ Failed to process 24h logic for job ${job.id}:`, err);
         }
         continue;
       }
+      
 
       if (job.extended && job.extensionRequestedAt && !job.emailSentAt) {
         job.emailSentAt = new Date();
@@ -179,6 +191,15 @@ export async function runSchedulerNow() {
               homeUrl: `${baseUrl}/`,
               newRequestUrl: `${baseUrl}/jobs/upload`
             });
+
+            if (!job.emailSentAt) {
+              await sendCustomerJobDeletedEmail(job);
+              job.emailSentAt = now;
+              await job.save();
+            }
+            
+
+
             if (!dryRun) {
               await sendHtmlEmail(job.customerEmail, `Job #${job.id} – No Quotes Received`, html);
               job.status = 'archived';
@@ -194,6 +215,9 @@ export async function runSchedulerNow() {
                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
               }
             });
+
+
+
             async function deleteJobImagesFromS3(imageKeys = []) {
               if (!imageKeys.length) return;
               const deleteParams = {
@@ -240,6 +264,7 @@ export async function runSchedulerNow() {
   } catch (err) {
     console.error("Scheduler failed:", err);
   }
+  global.schedulerRunning = false;
 }
 
 cron.schedule('0 * * * *', runSchedulerNow);

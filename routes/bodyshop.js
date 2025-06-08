@@ -3,7 +3,7 @@ import express from 'express';
 const router = express.Router();
 
 import path from 'path'; // Keep if used for path manipulation (unlikely for current routes)
-// import fs from 'fs'; // Remove if not explicitly writing/reading local files
+
 import archiver from 'archiver'; 
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
@@ -244,6 +244,12 @@ router.post('/login', async (req, res) => {
         if (!bodyshop.verified) {
             return res.render('bodyshop/login', { error: 'Please verify your email before logging in.' });
         }
+
+        // ❌ Block inactive bodyshops
+        if (bodyshop.status === 'inactive') {
+            return res.render('bodyshop/login', { error: 'Your account has been deactivated. Please contact support to reactivate.' });
+        }
+
 
         // Check if the account is admin approved
         if (!bodyshop.adminApproved) {

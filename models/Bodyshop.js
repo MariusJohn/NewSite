@@ -65,16 +65,18 @@ Bodyshop.init({
     lastReminderSent: {
         type: DataTypes.DATE,
         allowNull: true
-    }
+    },
+    status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: 'active',
+      },
+      
 }, {
     sequelize,
     modelName: 'Bodyshop',
     timestamps: true
 });
-
-// Associations (ALL associations defined in models/index.js)
-// Bodyshop.hasMany(Quote, { foreignKey: 'bodyshopId', onDelete: 'CASCADE', onUpdate: 'CASCADE' }); // <--- REMOVED
-// Quote.belongsTo(Bodyshop, { foreignKey: 'bodyshopId', onDelete: 'CASCADE', onUpdate: 'CASCADE' }); // <--- REMOVED
 
 
 export default Bodyshop;

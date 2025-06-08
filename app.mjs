@@ -102,6 +102,12 @@ sequelize.sync()
         console.error('❌ Failed to sync database or start server:', err);
     });
 
+    console.log('✅ DB URL:', process.env.DATABASE_URL);
+    if (!process.env.DATABASE_URL) {
+        throw new Error('❌ DATABASE_URL is missing in .env file');
+      }
+      
+
     // === Run Scheduler Cron Job ===
 import { runSchedulerNow } from './scheduler.js';
 import cron from 'node-cron';
