@@ -1,8 +1,7 @@
 // models/Bodyshop.js
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
-// import Quote from './Quote.js'; // <--- REMOVED this import (if only for associations)
-// import Job from './Job.js'; // <--- This was already removed as per previous step
+
 
 class Bodyshop extends Model {}
 

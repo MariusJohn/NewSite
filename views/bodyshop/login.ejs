@@ -39,6 +39,9 @@
           <input type="text" id="bodyshopArea" name="area" placeholder="Postcode / Area" required />
           <span class="error-message" id="area-error"></span>
 
+          <div class="g-recaptcha" data-sitekey="<%= process.env.RECAPTCHA_SITE_KEY %>"></div>
+
+
           <button type="submit" class="login-btn">Login</button>
           <p class="forgot-password"><a href="/bodyshop/password-reset">Forgot Password?</a></p>
           <p class="register-link">
@@ -54,6 +57,7 @@
 </div>
 
   <!-- Scripts -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <script src="/js/bodyshop-login.js"></script>
   <script defer src="/js/navbar-toggle.js"></script>
 </body>

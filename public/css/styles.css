@@ -230,6 +230,42 @@
   .main-content {
     flex: 2;
   }
+
+  .cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background-color: #002f5c;
+    color: #fff;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    z-index: 9999;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  @media (max-width: 480px) {
+    .cookie-banner p {
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin-bottom: 1rem;
+    }
+  
+    .cookie-banner .btn-accept {
+      width: 100%;
+      font-size: 1rem;
+      padding: 0.8rem;
+      margin-top: 0.5rem;
+    }
+  
+    .cookie-banner a {
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+  }
+  
   
   @media screen and (max-width: 768px) {
     .hero-section {
@@ -301,7 +337,23 @@
     margin-bottom: 10px;
     }
   }
+  .cookie-banner p {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+  }
 
+  .cookie-banner .btn-accept {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.8rem;
+    margin-top: 0.5rem;
+  }
+
+  .cookie-banner a {
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
 
   .key-services {
     display: flex;

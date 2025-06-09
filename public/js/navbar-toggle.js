@@ -21,3 +21,4 @@ function togglePasswordVisibility(element) {
     element.textContent = "👁️";
   }
 }
+
