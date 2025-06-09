@@ -1,0 +1,114 @@
+/* Base Reset */
+* {
+    box-sizing: border-box;
+  }
+  
+  /* Container */
+  section {
+    display: flex;
+    justify-self: center;
+    padding: 30px;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+  }
+  
+  .terms-policy .container-terms {
+    max-width: 900px;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Headings */
+  .terms-policy h1 {
+    font-size: 2.4rem;
+    color: #007BFF;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #007BFF;
+    padding-bottom: 10px;
+  }
+  
+  .terms-policy h2 {
+    color: #0056b3;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+  }
+  
+  /* Paragraphs */
+  .terms-policy p {
+    margin-bottom: 15px;
+    font-size: 1.05rem;
+    color: #333;
+  }
+  
+  /* Strong text */
+  .terms-policy strong {
+    color: #007BFF;
+  }
+  
+  /* Links */
+  .terms-policy a {
+    color: #007BFF;
+    text-decoration: underline;
+  }
+  
+  .terms-policy a:hover {
+    text-decoration: none;
+  }
+  
+  /* Footer override */
+  footer {
+    grid-area: footer;
+    border-radius: var(--main-radius);
+    padding-top: var(--main-padding);
+    text-align: center;
+  }
+  
+  footer p {
+    color: #fff;
+    margin-bottom: 5px;
+  }
+  
+  /* Responsive */
+  @media screen and (max-width: 600px) {
+    section {
+      display: flex;
+      justify-self: center;
+      padding: 30px;
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      line-height: 1.6;
+    }
+  
+    .terms-policy .container-terms {
+      max-width: 900px;
+      padding: 40px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      margin-top: 60px;
+    }
+  
+    .terms-policy h1 {
+      font-size: 2rem;
+    }
+  
+    .terms-policy h2 {
+      font-size: 1.3rem;
+    }
+  
+    .terms-policy p {
+      font-size: 1rem;
+    }
+  
+    footer p {
+      color: #333;
+      margin-bottom: 5px;
+    }
+  }
+  

@@ -7,5 +7,6 @@ router.get('/training', (req, res) => res.render('static/training'));
 router.get('/pricing', (req, res) => res.render('static/pricing'));
 router.get('/contact', (req, res) => res.render('static/contact'));
 router.get('/privacy', (req, res) => res.render('static/privacy'));
+router.get('/terms', (req, res) => res.render('static/terms'));
 
 export default router;

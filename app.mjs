@@ -1,12 +1,11 @@
 // app.mjs
 import express from 'express';
 import path from 'path';
+import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import session from 'express-session';
-
 import { sequelize } from './models/index.js';
-
 import customerRoutes from './routes/customer.js';
 import adminRoutes from './routes/admin.js';
 import adminAuth from './middleware/adminAuth.js';
@@ -14,12 +13,8 @@ import indexRoutes from './routes/index.js';
 import servicesRoutes from './routes/services.js';
 import bodyshopRoutes from './routes/bodyshop.js';
 import contactRoutes from './routes/contact.js';
-
 import publicJobsRoutes from './routes/public-jobs.js';
 import adminJobsRoutes from './routes/admin-jobs.js';
-
-
-
 import adminBodyshopRoutes from './routes/admin-bodyshops.js';
 import staticRoutes from './routes/static.js';
 import emailPreviewRoutes from './routes/email-preview.js';
@@ -32,6 +27,8 @@ const port = process.env.PORT || 3000;
 
 const __filename = new URL(import.meta.url).pathname;
 const __dirname = path.dirname(__filename);
+
+app.use(cookieParser());
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'SESSION_KEY',
@@ -102,8 +99,7 @@ sequelize.sync()
         console.error('❌ Failed to sync database or start server:', err);
     });
 
-    console.log('✅ DB URL:', process.env.DATABASE_URL);
-    if (!process.env.DATABASE_URL) {
+       if (!process.env.DATABASE_URL) {
         throw new Error('❌ DATABASE_URL is missing in .env file');
       }
       

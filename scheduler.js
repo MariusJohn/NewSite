@@ -57,7 +57,8 @@ async function sendCustomerSingleQuoteEmail(job, remaining) {
     job,
     remaining,
     extendUrl: `${baseUrl}/jobs/action/${job.id}/${job.extendToken}?action=extend`,
-    cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`
+    cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`,
+    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
   });
   await sendHtmlEmail(job.customerEmail, `1 Quote Received for Job #${job.id}`, html);
 }

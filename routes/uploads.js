@@ -16,9 +16,12 @@ import { showJobsWithQuotes, remindBodyshops } from '../controllers/adminJobsCon
 import { exportQuotesToCSV } from '../controllers/exportQuotesToCSV.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
 
+
 dotenv.config();
 
 const router = express.Router();
+
+
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
 const s3Client = new S3Client({
@@ -42,6 +45,25 @@ router.get('/upload', (req, res) => {
 router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, res) => {
   try {
     const { name, email, location, telephone, ['g-recaptcha-response']: token } = req.body;
+
+
+
+    // Block registered bodyshops from using customer upload form
+const bodyshopMatch = await Bodyshop.findOne({
+  where: {
+    email: email.trim(),
+    postcode: location.trim(), // assuming you store postcode in the `location` field
+  }
+});
+
+if (bodyshopMatch) {
+  return res.status(400).render('jobs/upload-error', {
+    title: 'Access Restricted',
+    message: 'This email and postcode are already registered to a bodyshop. Please log in through the bodyshop portal.',
+  });
+}
+
+
     const phoneRegex = /^07\d{9}$/;
 
     if (!phoneRegex.test(telephone)) {
