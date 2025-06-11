@@ -114,7 +114,7 @@ const Job = sequelize.define('Job', {
     allowNull: true
   },
   finalDecision: {
-    type: DataTypes.ENUM('yes', 'no'),
+    type: DataTypes.ENUM('yes', 'no', 'customer_selected'),
     allowNull: true
   },
   daysPending: {

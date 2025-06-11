@@ -1,54 +1,85 @@
-// routes/admin.js
+//routes/admin.js
+
 import express from 'express';
 const router = express.Router();
-
+import speakeasy from 'speakeasy';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-
-
 // === Admin Login Page ===
 router.get('/login', (req, res) => {
+  if (req.session?.isAdmin) return res.redirect('/jobs/admin');
 
-  if (req.session.isAdmin) {
-    return res.redirect('/jobs/admin');
-  }
-  res.render('admin/login', { error: null });
+  const expired = req.query.expired === 'true';
+  res.render('admin/login', {
+    error: expired ? 'Session expired. Please log in again.' : null
+  });
 });
 
 // === Admin Login Handler ===
 router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+  console.log('🔐 Admin login POST hit');
+
+  const { email, password, token } = req.body;
 
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
 
-  if (email === adminEmail && password === adminPassword) {
-    req.session.isAdmin = true;
-    req.session.save(err => {
-      if (err) {
-        console.error('❌ Error saving session:', err);
-        return res.render('admin/login', { error: 'Login failed. Please try again.' });
-      }
+  const isAuthenticated = email === adminEmail && password === adminPassword;
 
-      
-      res.redirect('/jobs/admin');
-    });
-  } else {
-    return res.render('admin/login', { error: 'Invalid credentials' });
+  const is2FAValid = speakeasy.totp.verify({
+    secret: process.env.ADMIN_2FA_SECRET,
+    encoding: 'base32',
+    token
+  });
+
+  if (!isAuthenticated || !is2FAValid) {
+    return res.render('admin/login', { error: 'Invalid credentials or 2FA code.' });
   }
+
+  // ✅ Set session
+// Inside your POST /admin/login handler:
+req.session.isAdmin = true;
+req.session.lastActivity = Date.now();
+req.session.idleExpired = false;
+
+req.session.save(err => {
+  if (err) {
+    console.error('❌ Error saving session:', err);
+    return res.render('admin/login', { error: 'Login failed. Please try again.' });
+  }
+
+  console.log('✅ Session saved, redirecting to dashboard');
+  res.redirect('/jobs/admin'); 
 });
 
-// === Admin Logout Handler(POST) ===
-router.post('/logout', (req, res) => {
+});
+
+const handleLogout = (req, res) => {
+  if (!req.session) {
+    return res.redirect('/admin/login');
+  }
+
   req.session.destroy(err => {
     if (err) {
-      console.error('❌ Error destroying session:', err);
-      return res.status(500).send('Error logging out. Please try again.');
+      console.error('❌ Session destroy error:', err);
+      return res.status(500).send('Logout failed');
     }
-    res.redirect('/admin/login');
+
+    
+    res.clearCookie('connect.sid', {
+      path: '/',
+      httpOnly: true,
+      sameSite: 'lax'
+    });
+
+    return res.redirect('/admin/login');
   });
-});
+};
+
+
+router.post('/logout', handleLogout);
+router.get('/logout', handleLogout);
 
 export default router;

@@ -16,9 +16,7 @@ import { showJobsWithQuotes, remindBodyshops } from '../controllers/adminJobsCon
 import { exportQuotesToCSV } from '../controllers/exportQuotesToCSV.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
 import { hardDeleteJob } from '../controllers/hardDeleteJob.js';
-
-
-
+import adminAuth from '../middleware/adminAuth.js';
 
 
 dotenv.config();
@@ -232,10 +230,10 @@ router.get('/download/:jobId', async (req, res) => {
 });
 
 // === JOB QUOTES VIEW ===
-router.get('/quotes', renderJobsWithQuotes);
-router.get('/quotes/export', exportJobsWithQuotesCSV);
-router.get('/quotes/remind', remindUnselectedJobs);
-router.post('/remind/:jobId', remindBodyshops);
+router.get('/quotes',  renderJobsWithQuotes);
+router.get('/quotes/export',  exportJobsWithQuotesCSV);
+router.get('/quotes/remind',  remindUnselectedJobs);
+router.post('/remind/:jobId',  remindBodyshops);
 router.get('/quotes/export-csv', exportQuotesToCSV);
 
 // === CUSTOMER ONE-TIME ACTIONS ===
