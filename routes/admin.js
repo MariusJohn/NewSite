@@ -21,7 +21,7 @@ router.get('/login', (req, res) => {
 router.post('/login', (req, res) => {
   console.log('🔐 Admin login POST hit');
 
-  const { email, password, token } = req.body;
+  const { email, password, token, role } = req.body;
 
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -38,24 +38,24 @@ router.post('/login', (req, res) => {
     return res.render('admin/login', { error: 'Invalid credentials or 2FA code.' });
   }
 
-  // ✅ Set session
-// Inside your POST /admin/login handler:
-req.session.isAdmin = true;
-req.session.lastActivity = Date.now();
-req.session.idleExpired = false;
+  // ✅ Set session with role
+  req.session.isAdmin = true;
+  req.session.role = role; // Add role to session
+  req.session.lastActivity = Date.now();
+  req.session.idleExpired = false;
 
-req.session.save(err => {
-  if (err) {
-    console.error('❌ Error saving session:', err);
-    return res.render('admin/login', { error: 'Login failed. Please try again.' });
-  }
+  req.session.save(err => {
+    if (err) {
+      console.error('❌ Error saving session:', err);
+      return res.render('admin/login', { error: 'Login failed. Please try again.' });
+    }
 
-  console.log('✅ Session saved, redirecting to dashboard');
-  res.redirect('/jobs/admin'); 
+    console.log('✅ Session saved, redirecting to dashboard');
+    res.redirect('/jobs/admin');
+  });
 });
 
-});
-
+// === Admin Logout Handler ===
 const handleLogout = (req, res) => {
   if (!req.session) {
     return res.redirect('/admin/login');
@@ -67,17 +67,16 @@ const handleLogout = (req, res) => {
       return res.status(500).send('Logout failed');
     }
 
-    
     res.clearCookie('connect.sid', {
       path: '/',
       httpOnly: true,
       sameSite: 'lax'
     });
 
+    console.log('✅ Session destroyed, redirecting to login page');
     return res.redirect('/admin/login');
   });
 };
-
 
 router.post('/logout', handleLogout);
 router.get('/logout', handleLogout);

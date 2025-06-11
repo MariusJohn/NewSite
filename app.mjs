@@ -44,7 +44,7 @@ app.use(session({
     name: 'admin.sid',
     secure: false, // Set to true if using HTTPS
     httpOnly: true,
-    sameSite: 'lax',
+   
     maxAge: 15 * 60 * 1000 // 15 minutes
   }
 }));
