@@ -5,8 +5,6 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
-import Redis from 'ioredis';
-import connectRedis from 'connect-redis';
 import { sequelize } from './models/index.js';
 
 import customerRoutes from './routes/customer.js';
@@ -30,13 +28,6 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const RedisStore = connectRedis(session);
-
-// ======= REDIS SESSION SETUP =======
-const redisClient = new Redis(process.env.REDIS_URL, {
-    tls: {} 
-  });
-  
 
 // ======= DEBUG ENV =======
 console.log('DEBUG ENV:', process.env.NODE_ENV);
@@ -45,40 +36,31 @@ console.log('DEBUG ENV:', process.env.NODE_ENV);
 app.use(cookieParser());
 
 app.use(session({
-  store: new RedisStore({ client: redisClient }),
   secret: process.env.SESSION_SECRET || 'SESSION_KEY',
   resave: false,
   saveUninitialized: false,
   rolling: true,
   cookie: {
     name: 'admin.sid',
-    secure: false, // set to true if using HTTPS
+    secure: false, // Set to true if using HTTPS
     httpOnly: true,
     sameSite: 'lax',
     maxAge: 15 * 60 * 1000 // 15 minutes
   }
 }));
 
+
 // Session mutation logger
-app.use((req, res, next) => {
-  const before = JSON.stringify(req.session);
-  res.on('finish', () => {
-    const after = JSON.stringify(req.session);
-    if (before !== after) {
-      console.log('🔧 Session was mutated:', { before, after });
-    }
-  });
-  next();
-});
-
-
-app.get('/session-debug', (req, res) => {
-    req.session.testKey = req.session.testKey ? req.session.testKey + 1 : 1;
-    console.log('🧪 Redis session:', req.session);
-    res.send(`Redis session count: ${req.session.testKey}`);
-  });
-  
-
+// app.use((req, res, next) => {
+//   const before = JSON.stringify(req.session);
+//   res.on('finish', () => {
+//     const after = JSON.stringify(req.session);
+//     if (before !== after) {
+//       console.log('🔧 Session was mutated:', { before, after });
+//     }
+//   });
+//   next();
+// });
 
 // Idle timeout
 app.use(idleTimeout);
@@ -128,13 +110,25 @@ if (!process.env.DATABASE_URL) {
 
 sequelize.sync()
   .then(() => {
-    app.listen(port, () => {
-      console.log(`✅ Server running on port ${port}`);
+    console.log('✅ Database synced');
+    app.listen(port, '0.0.0.0', (err) => {
+      if (err) {
+        console.error('❌ Error starting server:', err);
+        process.exit(1);  // Exit if binding fails
+      } else {
+        console.log(`✅ Server running on port ${port}`);
+      }
     });
   })
   .catch(err => {
-    console.error('❌ Failed to sync database or start server:', err);
+    console.error('❌ Failed to sync database:', err);
+    process.exit(1);  // Exit if DB sync fails
   });
+
+  
+
 
 // ======= SCHEDULER =======
 cron.schedule('0 * * * *', runSchedulerNow);
+
+console.log('🚨 End of file reached');
