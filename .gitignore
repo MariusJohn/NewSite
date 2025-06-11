@@ -53,5 +53,4 @@ uploads/
 database.sqlite
 cors.json
 
-#PM2 config
-ecosystem.config.cjs
+
