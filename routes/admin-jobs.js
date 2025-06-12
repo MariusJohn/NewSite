@@ -120,10 +120,10 @@ router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, 
       cancelToken: crypto.randomBytes(32).toString('hex'),
     });
 
-    console.log('✅ Job created:', newJob.id);
+    // console.log('✅ Job created:', newJob.id); // Removed verbose log
     res.render('jobs/upload-success');
   } catch (err) {
-    console.error('❌ Upload Error:', err);
+    console.error('❌ Upload Error:', err); // Keep error log
     res.status(500).render('jobs/upload-error', {
       title: 'Server Error',
       message: 'Something went wrong. Please try again later.',
@@ -134,36 +134,17 @@ router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, 
 
 // === ADMIN DASHBOARD ===
 router.get('/', async (req, res) => {
-  console.log('--- Inside router.get(/jobs/admin) handler ---');
-  console.log('Request URL:', req.originalUrl); // Should be /jobs/admin or /jobs/admin?filter=...
-  console.log('Query parameters (req.query):', req.query);
-
   try {
     const filter = req.query.filter || 'total';
-    console.log('Detected filter (after default):', filter);
-
-    // This is where you might have conditional redirects,
-    // though your current code defaults the filter, it doesn't redirect if it's unexpected.
-    // If you had logic like this, it would be here:
-    // if (filter === 'invalid') {
-    //   console.log('Invalid filter detected, redirecting to total jobs.');
-    //   return res.redirect('/jobs/admin?filter=total');
-    // }
-
     const { whereClause, includeClause } = getJobFilterOptions(filter);
-    console.log('Generated whereClause:', JSON.stringify(whereClause));
-    console.log('Generated includeClause (models):', includeClause.map(inc => inc.model.name));
-
 
     const jobs = await Job.findAll({
       where: whereClause,
       include: includeClause,
       order: [['createdAt', 'DESC']]
     });
-    console.log(`Fetched ${jobs.length} jobs for filter: ${filter}`);
 
-
-    //  Add daysPending calculation
+    // Add daysPending calculation
     const now = new Date();
     jobs.forEach(job => {
       const createdAt = new Date(job.createdAt);
@@ -171,18 +152,14 @@ router.get('/', async (req, res) => {
       const daysPending = Math.floor((now - createdAt) / msInDay);
       job.dataValues.daysPending = daysPending;
     });
-    console.log('Days pending calculated for jobs.');
-
 
     const counts = await getJobCounts();
-    console.log('Fetched job counts:', counts);
 
     // This is the template being rendered
     res.render('admin/jobs-dashboard', { jobs, ...counts, filter });
-    console.log('--- Successfully rendered admin/jobs-dashboard for /jobs/admin ---');
 
   } catch (err) {
-    console.error('❌ Dashboard Error in /jobs/admin handler:', err);
+    console.error('❌ Dashboard Error in /jobs/admin handler:', err); // Keep error log
     res.status(500).send('Internal Server Error');
   }
 });
@@ -255,14 +232,13 @@ router.get('/download/:jobId', async (req, res) => {
 });
 
 // === JOB QUOTES VIEW ===
-router.get('/quotes',  renderJobsWithQuotes);
-router.get('/quotes/export',  exportJobsWithQuotesCSV);
-router.get('/quotes/remind',  remindUnselectedJobs);
-router.post('/remind/:jobId',  remindBodyshops);
+router.get('/quotes', renderJobsWithQuotes);
+router.get('/quotes/export', exportJobsWithQuotesCSV);
+router.get('/quotes/remind', remindUnselectedJobs);
+router.post('/remind/:jobId', remindBodyshops);
 router.get('/quotes/export-csv', exportQuotesToCSV);
 
 // === CUSTOMER ONE-TIME ACTIONS ===
 router.get('/jobs/action/:jobId/:token', handleJobAction);
 
 export default router;
-
