@@ -20,6 +20,6 @@ resetIdleTimer();
 );
 
 // Attempt logout on tab close
-window.addEventListener('beforeunload', () => {
-  navigator.sendBeacon('/admin/logout');
-});
+// window.addEventListener('beforeunload', () => {
+//   navigator.sendBeacon('/admin/logout');
+// });

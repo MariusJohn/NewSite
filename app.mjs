@@ -14,14 +14,18 @@ import servicesRoutes from './routes/services.js';
 import bodyshopRoutes from './routes/bodyshop.js';
 import contactRoutes from './routes/contact.js';
 import publicJobsRoutes from './routes/public-jobs.js';
+
 import adminJobsRoutes from './routes/admin-jobs.js';
 import adminBodyshopRoutes from './routes/admin-bodyshops.js';
+import adminAuth from './middleware/adminAuth.js';
+
 import staticRoutes from './routes/static.js';
 import emailPreviewRoutes from './routes/email-preview.js';
 import paymentRoutes from './routes/payment.js';
+
 import { runSchedulerNow } from './scheduler.js';
 
-import adminAuth from './middleware/adminAuth.js';
+
 import idleTimeout from './middleware/idleTimeout.js';
 
 dotenv.config();
@@ -63,7 +67,7 @@ app.use(session({
 // });
 
 // Idle timeout
-app.use(idleTimeout);
+ app.use(idleTimeout);
 
 // ======= STATIC & VIEW SETUP =======
 app.use(express.static(path.join(process.cwd(), 'public')));
@@ -78,6 +82,8 @@ app.set('view engine', 'ejs');
 app.use('/admin', adminRoutes);
 app.use('/jobs/admin', adminAuth, adminJobsRoutes);
 app.use('/jobs/admin/bodyshops', adminAuth, adminBodyshopRoutes);
+
+
 app.use('/jobs', publicJobsRoutes);
 app.use('/', indexRoutes);
 app.use('/services', servicesRoutes);

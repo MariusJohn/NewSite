@@ -131,17 +131,37 @@ router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, 
   }
 });
 
+
 // === ADMIN DASHBOARD ===
 router.get('/', async (req, res) => {
+  console.log('--- Inside router.get(/jobs/admin) handler ---');
+  console.log('Request URL:', req.originalUrl); // Should be /jobs/admin or /jobs/admin?filter=...
+  console.log('Query parameters (req.query):', req.query);
+
   try {
     const filter = req.query.filter || 'total';
+    console.log('Detected filter (after default):', filter);
+
+    // This is where you might have conditional redirects,
+    // though your current code defaults the filter, it doesn't redirect if it's unexpected.
+    // If you had logic like this, it would be here:
+    // if (filter === 'invalid') {
+    //   console.log('Invalid filter detected, redirecting to total jobs.');
+    //   return res.redirect('/jobs/admin?filter=total');
+    // }
+
     const { whereClause, includeClause } = getJobFilterOptions(filter);
+    console.log('Generated whereClause:', JSON.stringify(whereClause));
+    console.log('Generated includeClause (models):', includeClause.map(inc => inc.model.name));
+
 
     const jobs = await Job.findAll({
       where: whereClause,
       include: includeClause,
       order: [['createdAt', 'DESC']]
     });
+    console.log(`Fetched ${jobs.length} jobs for filter: ${filter}`);
+
 
     //  Add daysPending calculation
     const now = new Date();
@@ -151,16 +171,21 @@ router.get('/', async (req, res) => {
       const daysPending = Math.floor((now - createdAt) / msInDay);
       job.dataValues.daysPending = daysPending;
     });
+    console.log('Days pending calculated for jobs.');
+
 
     const counts = await getJobCounts();
+    console.log('Fetched job counts:', counts);
 
+    // This is the template being rendered
     res.render('admin/jobs-dashboard', { jobs, ...counts, filter });
+    console.log('--- Successfully rendered admin/jobs-dashboard for /jobs/admin ---');
+
   } catch (err) {
-    console.error('❌ Dashboard Error:', err);
+    console.error('❌ Dashboard Error in /jobs/admin handler:', err);
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 // === JOB STATUS ROUTES ===
 router.post('/:id/approve', async (req, res) => {
@@ -240,3 +265,4 @@ router.get('/quotes/export-csv', exportQuotesToCSV);
 router.get('/jobs/action/:jobId/:token', handleJobAction);
 
 export default router;
+
