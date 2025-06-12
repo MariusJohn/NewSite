@@ -54,20 +54,8 @@ app.use(session({
 }));
 
 
-// Session mutation logger
-// app.use((req, res, next) => {
-//   const before = JSON.stringify(req.session);
-//   res.on('finish', () => {
-//     const after = JSON.stringify(req.session);
-//     if (before !== after) {
-//       console.log('🔧 Session was mutated:', { before, after });
-//     }
-//   });
-//   next();
-// });
-
 // Idle timeout
- app.use(idleTimeout);
+//  app.use(idleTimeout);
 
 // ======= STATIC & VIEW SETUP =======
 app.use(express.static(path.join(process.cwd(), 'public')));
