@@ -12,7 +12,6 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
     logging: shouldLog ? console.log : false, // Use console.log if shouldLog is true, otherwise false
     dialectOptions: isProduction ? {
         ssl: {
-            require: true,
             rejectUnauthorized: false
         }
     } : {},

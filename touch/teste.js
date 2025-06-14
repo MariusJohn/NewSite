@@ -1,1 +1,0 @@
-DATABASE_URL=postgres://mc_admin:Wb2Muf3viUbm6mZQWS25VxbQY8c@localhost:5432/mc_quote

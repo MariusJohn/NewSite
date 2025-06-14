@@ -9,6 +9,8 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import { DeletedJob, Job, Quote, Bodyshop } from './models/index.js';
+import { sendMonthlyProcessedReport } from './controllers/monthlyReportController.js';
+
 
 dotenv.config();
 
@@ -270,6 +272,35 @@ export async function runSchedulerNow() {
 
 cron.schedule('0 * * * *', runSchedulerNow);
 
+
+cron.schedule('59 23 28-31 * *', async () => {
+  const now = new Date();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  if (now.getDate() === lastDay) {
+    console.log('📅 Running monthly processed report scheduler...');
+    await sendMonthlyProcessedReport();
+  }
+});
+
+
 if (process.argv[1].endsWith('scheduler.js')) {
   runSchedulerNow();
 }
+
+
+
+  if (process.argv.includes('--send-report')) {
+    await sendMonthlyProcessedReport();
+  }
+  
+  cron.schedule('59 23 28-31 * *', async () => {
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    if (now.getDate() === lastDay) {
+      console.log('📅 Running monthly processed report scheduler...');
+      await sendMonthlyProcessedReport();
+    }
+  });
+
+  
+

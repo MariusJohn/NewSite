@@ -49,12 +49,18 @@
 }
     </style>
 </head>
-<body>
-<div class="error-container">
-    <img src="/img/logo.svg" alt="My Car Quote Logo" class="error-logo">
-    <h2>Login Error</h2>
-    <% if (error) { %><p class="error-msg"><%= error %></p><% } %>
-    <button onclick="window.location.href='/bodyshop/login'">Back to Login</button>
-</div>
-</body>
+
+    <body>
+        <div class="error-container">
+          <img src="/img/logo.svg" alt="My Car Quote Logo" class="error-logo" />
+          <h2>Login Error</h2>
+          <% if (error) { %>
+            <p class="error-msg"><%= error %></p>
+          <% } else { %>
+            <p class="error-msg">Something went wrong. Please try again later.</p>
+          <% } %>
+          <button onclick="window.location.href='/bodyshop/login'">Back to Login</button>
+        </div>
+      </body>
+
 </html>

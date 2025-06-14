@@ -19,7 +19,7 @@ export const exportQuotesToCSV = async (req, res) => {
       ],
       where: {
         status: {
-          [Op.in]: ['approved', 'paid', 'quoted', 'processed', 'waiting_customer_selection'] 
+          [Op.in]: ['approved', 'paid', 'quoted', 'processed','pending_payment', 'waiting_customer_selection'] 
         }
       },
       order: [['createdAt', 'DESC']]

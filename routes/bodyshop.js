@@ -266,7 +266,7 @@ router.post('/login', async (req, res) => {
         res.redirect('/bodyshop/dashboard');
     } catch (err) {
         console.error('❌ Error during bodyshop login:', err);
-        res.render('bodyshop/login', { error: 'Server error. Please try again later.' });
+        res.render('bodyshop/login-error', { error: 'Bodyshop login failed, please check your login credentials.' });
     }
 });
 

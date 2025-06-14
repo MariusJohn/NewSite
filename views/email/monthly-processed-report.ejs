@@ -1,0 +1,23 @@
+<h2>Processed Jobs – <%= reportDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) %></h2>
+<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
+  <thead style="background-color: #f9f9f9;">
+    <tr>
+      <th>Job ID</th>
+      <th>Customer</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>Date Uploaded</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% jobs.forEach(job => { %>
+    <tr>
+      <td><%= job.id %></td>
+      <td><%= job.customerName %></td>
+      <td><%= job.customerEmail %></td>
+      <td><%= job.customerPhone %></td>
+      <td><%= new Date(job.createdAt).toLocaleDateString('en-GB') %></td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>

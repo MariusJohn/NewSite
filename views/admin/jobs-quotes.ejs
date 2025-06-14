@@ -95,12 +95,21 @@
                   <td>
                     <a href="#" class="toggle-quotes btn btn-view" data-job-id="<%= job.id %>"></a>
                     <a href="/admin/jobs/<%= job.id %>/remind" class="btn btn-remind">Remind</a>
+                  
                     <% if (job.status === 'paid') { %>
                       <form action="/jobs/admin/<%= job.id %>/archive" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-archive">Archive</button>
                       </form>
                     <% } %>
+                  
+                    <% if (job.status === 'processed') { %>
+                      <form action="/jobs/admin/<%= job.id %>/soft-delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this processed job?');">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                      </form>
+                      
+                    <% } %>
                   </td>
+                  
                 </tr>
                 <tr class="quote-details" id="quotes-<%= job.id %>" style="display:none;">
                   <td colspan="9">

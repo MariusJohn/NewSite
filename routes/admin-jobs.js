@@ -16,8 +16,7 @@ import { showJobsWithQuotes, remindBodyshops } from '../controllers/adminJobsCon
 import { exportQuotesToCSV } from '../controllers/exportQuotesToCSV.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
 import { hardDeleteJob } from '../controllers/hardDeleteJob.js';
-import adminAuth from '../middleware/adminAuth.js';
-
+import { softDeleteProcessedJob } from '../controllers/adminJobDeleteController.js';
 
 dotenv.config();
 
@@ -164,6 +163,30 @@ router.get('/', async (req, res) => {
   }
 });
 
+// === ADMIN SOFT DELETE PROCESSED JOBS === 
+router.get('/jobs/deleted', async (req, res) => {
+  try {
+    const deletedJobs = await Job.findAll({
+      where: { status: 'deleted' },
+      include: [
+        { model: Quote },
+        { model: Bodyshop, as: 'selectedBodyshop' } // Optional
+      ],
+      order: [['updatedAt', 'DESC']]
+    });
+
+    res.render('admin/jobs-deleted', {
+      jobs: deletedJobs,
+      currentPage: 'deleted',
+      deletedJobCount: deletedJobs.length
+    });
+  } catch (err) {
+    console.error('❌ Failed to load deleted jobs:', err);
+    res.status(500).send('Error loading deleted jobs');
+  }
+});
+
+
 // === JOB STATUS ROUTES ===
 router.post('/:id/approve', async (req, res) => {
   await Job.update({ status: 'approved' }, { where: { id: req.params.id } });
@@ -175,6 +198,12 @@ router.post('/:id/reject', async (req, res) => {
   res.redirect('/jobs/admin?filter=rejected');
 });
 
+
+
+
+
+
+// === ARCHIVE REJECTED JOBS ===
 router.post('/:jobId/archive', async (req, res) => {
   const job = await Job.findByPk(req.params.jobId);
   if (job?.status === 'rejected') {
@@ -184,6 +213,7 @@ router.post('/:jobId/archive', async (req, res) => {
   res.status(400).send('Only rejected jobs can be archived.');
 });
 
+// === RESTORE ARCHIVED JOBS ===
 router.post('/:jobId/restore', async (req, res) => {
   const job = await Job.findByPk(req.params.jobId);
   if (job && ['rejected', 'archived'].includes(job.status)) {
@@ -193,6 +223,11 @@ router.post('/:jobId/restore', async (req, res) => {
   res.status(400).send('Only archived jobs can be restored.');
 });
 
+// === SOFT DELETE PROCESSED JOB ===
+router.post('/:jobId/soft-delete', softDeleteProcessedJob);
+
+
+// === DELETE AND RESTORE ARCHIVED JOBS ===
 router.post('/:jobId/delete', async (req, res) => {
   const job = await Job.findByPk(req.params.jobId);
   if (job?.status === 'archived') {
@@ -202,6 +237,7 @@ router.post('/:jobId/delete', async (req, res) => {
   res.status(400).send('Only archived jobs can be deleted.');
 });
 
+// === RESTORE DELETED JOBS ===
 router.post('/:jobId/restore-deleted', async (req, res) => {
   const job = await Job.findByPk(req.params.jobId);
   if (job?.status === 'deleted') {
@@ -237,6 +273,7 @@ router.get('/quotes/export', exportJobsWithQuotesCSV);
 router.get('/quotes/remind', remindUnselectedJobs);
 router.post('/remind/:jobId', remindBodyshops);
 router.get('/quotes/export-csv', exportQuotesToCSV);
+
 
 // === CUSTOMER ONE-TIME ACTIONS ===
 router.get('/jobs/action/:jobId/:token', handleJobAction);
