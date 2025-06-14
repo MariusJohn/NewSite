@@ -4,7 +4,6 @@ import { sendHtmlMail } from '../utils/sendMail.js';
 import { deleteImagesFromS3 } from './imageCleanupController.js';
 
 
-console.log('📦 public-jobs.js route loaded');
 
 
 function getDistanceInKm(lat1, lon1, lat2, lon2) {
