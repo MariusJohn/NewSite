@@ -1,66 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Error</title>
-    <link rel="stylesheet" href="/css/bodyshop-login.css">
-    <style>
-        .error-container {
-    max-width: 400px;
-    margin: 80px auto;
-    padding: 20px;
-    background-color: rgba(14, 64, 105, 0.9);
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-    color: white;
-    text-align: center;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Error</title>
 
-.error-container h2 {
-    margin-bottom: 20px;
-    color: #fa5d28;
-    font-weight: 600;
-}
+  <!-- Base styles -->
+  <link rel="stylesheet" href="/css/reset.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 
-.error-container .error-msg {
-    color: #fa5d28;
-    margin-bottom: 20px;
-    font-weight: 500;
-}
+  <style>
+    body {
+      background-color: #f3f8fc;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
 
-.error-container button {
-    padding: 10px 20px;
-    background-color: #25D366;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    cursor: pointer;
-}
+    .error-container {
+      max-width: 420px;
+      background: #ffffff;
+      padding: 2rem;
+      margin: 6rem auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
 
-.error-container button:hover {
-    background-color: #1cb75e;
-}
+    .error-logo {
+      width: 160px;
+      margin-bottom: 1.5rem;
+    }
 
-.error-container .error-logo {
-    width: 150px;
-    margin-bottom: 20px;
-}
-    </style>
+    h2 {
+      font-size: 1.6rem;
+      color: #dc2626;
+      margin-bottom: 1rem;
+    }
+
+    .error-msg {
+      font-size: 1rem;
+      color: #b91c1c;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
+    .back-button {
+      background-color: #22c55e;
+      color: white;
+      padding: 0.75rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease-in-out;
+    }
+
+    .back-button:hover {
+      background-color: #16a34a;
+    }
+
+    @media (max-width: 480px) {
+      .error-container {
+        margin: 3rem 1rem;
+        padding: 1.5rem;
+      }
+    }
+  </style>
 </head>
 
-    <body>
-        <div class="error-container">
-          <img src="/img/logo.svg" alt="My Car Quote Logo" class="error-logo" />
-          <h2>Login Error</h2>
-          <% if (error) { %>
-            <p class="error-msg"><%= error %></p>
-          <% } else { %>
-            <p class="error-msg">Something went wrong. Please try again later.</p>
-          <% } %>
-          <button onclick="window.location.href='/bodyshop/login'">Back to Login</button>
-        </div>
-      </body>
-
+<body>
+  <div class="error-container">
+    <img src="/img/logo.svg" alt="My Car Quote Logo" class="error-logo" />
+    <h2>Login Error</h2>
+    <% if (error) { %>
+      <p class="error-msg"><%= error %></p>
+    <% } else { %>
+      <p class="error-msg">Something went wrong. Please try again later.</p>
+    <% } %>
+    <button class="back-button" onclick="window.location.href='/bodyshop/login'">Back to Login</button>
+  </div>
+</body>
 </html>

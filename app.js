@@ -25,8 +25,8 @@ import paymentRoutes from './routes/payment.js';
 
 import { runSchedulerNow } from './scheduler.js';
 
+import devRoutes from './routes/dev.js';
 
-import idleTimeout from './middleware/idleTimeout.js';
 
 dotenv.config();
 
@@ -54,8 +54,11 @@ app.use(session({
 }));
 
 
-// Idle timeout
-//  app.use(idleTimeout);
+// ======= DEV ROUTES =======
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/', devRoutes);
+}
+
 
 // ======= STATIC & VIEW SETUP =======
 app.use(express.static(path.join(process.cwd(), 'public')));
@@ -119,7 +122,6 @@ sequelize.sync()
     process.exit(1);  // Exit if DB sync fails
   });
 
-  
 
 
 // ======= SCHEDULER =======

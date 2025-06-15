@@ -1,0 +1,299 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f3f8fc;
+    color: #002f5c;
+  }
+  
+  .admin-dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  .sidebar {
+    width: 250px;
+    background-color: #eef4fa;
+    padding: 20px;
+    border-right: 1px solid #cce0f0;
+    flex-shrink: 0;
+  }
+  
+  .sidebar-toggle {
+    display: none;
+  }
+  
+  .sidebar h2 {
+    color: #003e7e;
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 1rem;
+  }
+  
+  .sidebar .menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar .menu li {
+    margin-bottom: 10px;
+  }
+  
+  .sidebar .menu li a {
+    color: #003e7e;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    display: block;
+    transition: background-color 0.3s;
+    font-weight: 500;
+  }
+  
+  .sidebar .menu li a:hover,
+  .sidebar .menu li a.active {
+    background-color: #003e7e;
+    color: #fff;
+    font-weight: 600;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #ffffff;
+    overflow-x: auto;
+    width: 100%;
+  }
+  
+  .main-content h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #002f5c;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .jobs-table, .quotes-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border: 1px solid #dde8f2;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    margin-top: 1rem;
+    font-size: 14px;
+    table-layout: fixed;
+  }
+  
+  .jobs-table th, .jobs-table td,
+  .quotes-table th, .quotes-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #dde8f2;
+    vertical-align: top;
+    text-align: left;
+    white-space: normal;
+    color: #002f5c;
+  }
+  
+  .jobs-table thead, .quotes-table thead {
+    background-color: #eef4fa;
+  }
+  
+  .jobs-table th:nth-child(1), .jobs-table td:nth-child(1) {
+    width: 60px;
+  }
+  
+  .jobs-table th:nth-child(2), .jobs-table td:nth-child(2) {
+    width: 220px;
+    word-break: break-word;
+  }
+  
+  .jobs-table th:nth-child(3), .jobs-table td:nth-child(3) {
+    width: auto;
+    word-break: break-word;
+  }
+  
+  .image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 1rem;
+  }
+  
+  .thumb-img, .job-image-preview {
+    width: 100px;
+    max-width: 100%;
+    object-fit: cover;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    margin-bottom: 5px;
+  }
+  
+  .btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+  }
+  
+  .btn-remind { background-color: #28a745; color: #ffffff; }
+  .btn-reject { background-color: #dc3545; color: #ffffff; }
+  .btn-archive { background-color: #6f42c1; color: #ffffff; }
+  .btn-download { background-color: #007bff; color: #ffffff; }
+  .btn-view { background-color: #17a2b8; color: #ffffff; }
+  .btn-export { background-color: #ffc107; color: #212529; }
+  
+  .restore-btn, .delete-btn, .hard-delete-btn {
+    padding: 6px 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+  }
+  
+  .restore-btn { background-color: #007bff; color: #fff; }
+  .delete-btn { background-color: #fd7e14; color: #fff; }
+  .hard-delete-btn { background-color: #dc3545; color: #fff; }
+  
+  .status-badge {
+    text-transform: capitalize;
+    font-size: 0.85rem;
+    padding: 5px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    font-weight: 600;
+    background-color: #adb5bd;
+    color: #fff;
+  }
+  
+  .status-badge.status-pending { background-color: #6c757d; }
+  .status-badge.status-approved { background-color: #007bff; }
+  .status-badge.status-rejected { background-color: #dc3545; }
+  .status-badge.status-archived { background-color: #6f42c1; }
+  .status-badge.status-deleted { background-color: #343a40; }
+  .status-badge.status-paid { background-color: #FF851B; }
+  .status-badge.status-processed { background-color: #2ECC40; }
+  .status-badge.status-quoted { background-color: #0074D9; }
+  .status-badge.warning { background-color: #FF4136; }
+  .status-badge.status-pending_payment { background-color: #17a2b8; }
+  
+  .job-actions .btn {
+    display: block;
+    margin-bottom: 8px;
+  }
+  
+  .customer-info-block {
+    margin-bottom: 12px;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+  
+  .elapsed-ok { color: #2e7d32; font-weight: 600; }
+  .elapsed-warning { color: #ff9800; font-weight: 600; }
+  .elapsed-critical { color: #c62828; font-weight: 600; }
+  
+  @media (max-width: 768px) {
+    .admin-dashboard-container {
+      flex-direction: column;
+    }
+  
+    .sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #cce0f0;
+      padding: 10px;
+      background-color: #eef4fa;
+    }
+  
+    .sidebar-toggle {
+      display: block;
+      background-color: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px 8px;
+      color: #003e7e;
+    }
+  
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  
+    .sidebar h2 {
+      font-size: 1rem;
+      margin: 0;
+      color: #002f5c;
+    }
+  
+    .sidebar .menu {
+      display: flex;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-top: 10px;
+      gap: 8px;
+      scrollbar-width: none;
+    }
+  
+    .sidebar .menu::-webkit-scrollbar {
+      display: none;
+    }
+  
+    .sidebar .menu li {
+      flex-shrink: 0;
+    }
+  
+    .sidebar .menu li a {
+      font-size: 13px;
+      padding: 6px 10px;
+      white-space: nowrap;
+      background-color: #d7e6f4;
+      border-radius: 4px;
+      display: inline-block;
+    }
+  
+    .logout-btn {
+      font-size: 13px;
+      padding: 6px 10px;
+      background-color: #ccc;
+      border: none;
+      border-radius: 4px;
+      color: #002f5c;
+      cursor: pointer;
+    }
+  
+    .main-content {
+      padding: 20px;
+    }
+  
+    .quotes-table th,
+    .quotes-table td {
+      font-size: 13px;
+      padding: 8px;
+    }
+  
+    .btn {
+      padding: 5px 10px;
+      font-size: 13px;
+    }
+  
+    .status-badge {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+  
+    .thumb-img {
+      width: 70px;
+    }
+  }
+  

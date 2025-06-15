@@ -22,9 +22,13 @@
 
     <main>
       <div class="login-wrapper">
+        
         <h1>Bodyshop Login</h1>
         <form id="loginForm" action="/bodyshop/login" method="POST" class="login-form">
-          <label for="bodyshopEmail">Bodyshop Email:</label>
+          <% if (error) { %>
+            <p class="error-msg"><%= error %></p>
+          <% } %>
+           <label for="bodyshopEmail">Bodyshop Email:</label>
           <input type="email" id="bodyshopEmail" name="email" placeholder="Email" required />
           <span class="error-message" id="email-error"></span>
 

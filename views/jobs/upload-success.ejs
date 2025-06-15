@@ -3,28 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <title>Job Submitted</title>
-    <link rel="stylesheet" href="/css/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/css/upload-success.css">
 </head>
 <body>
-  <div class="page-wrapper">
-    <div class="logo-jobUpload">
-      <a href="/">
-        <img src="/img/logo.svg" alt="My Car Quote Logo">
-      </a>
+  <div class="success-container">
+    <img src="/img/logo.svg" alt="My Car Quote Logo" class="success-logo" />
+
+    <div class="success-box">
+      <h1>✅ Job Submitted Successfully</h1>
+      <p>Your job has been submitted and is awaiting approval by our admin team.</p>
+      <a href="/" class="btn-home">← Back to Homepage</a>
     </div>
-    
-    <main class="upload-feedback-main">
-      <div class="upload-feedback-box">
-        <h2>✅ Job Submitted Successfully</h2>
-        <p>Your job has been submitted and is awaiting approval by our admin team.</p>
-        <a href="/" class="btn-home">← Back to Homepage</a>
-      </div>
-    </main>
-    <%- include('../partials/footer') %>
   </div>
 
-
-<script src="/js/navbar-toggle.js"></script>
+  <script>
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 6000); 
+  </script>
 </body>
 </html>

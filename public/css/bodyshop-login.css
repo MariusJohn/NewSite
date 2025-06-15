@@ -92,9 +92,15 @@ body {
   font-weight: 500;
 }
 
-.error-message {
-  color: red;
-  font-size: 0.85em;
+.error-msg {
+  color: #dc2626;
+  background-color: #ffecec;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 1rem;
+  border: 1px solid #fca5a5;
 }
 
 .register-link {

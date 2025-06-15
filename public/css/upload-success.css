@@ -1,109 +1,100 @@
-body {
-  background-color: #f3f8fc;
-  font-family: 'Poppins', sans-serif;
+/* === Layout Reset === */
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-
-.logo-jobUpload {
-  text-align: center;
-  margin: 30px 0 10px;
-}
-
-.logo-jobUpload img {
-  width: 160px;
-  height: auto;
-  max-width: 100%;
-}
-
-
-.upload-feedback-main {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 80vh;
-  background-color: #f3f8fc;
-  padding: 40px 20px;
-}
-
-.upload-feedback-box {
-  background-color: #ffffff;
-  border: 2px solid #25D366;
-  border-radius: 14px;
-  padding: 40px 30px;
-  max-width: 500px;
+body, html {
   width: 100%;
+  height: 100%;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f3f8fc;
+}
+
+/* === Centered Container === */
+.success-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
   text-align: center;
-  color: #002f5c;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  margin: 20px;
 }
 
-.upload-feedback-box h2 {
-  font-size: 30px;
-  color: #25D366;
-  margin-bottom: 20px;
-  font-weight: 700;
+/* === Logo === */
+.success-logo {
+  width: 260px;
+  margin-bottom: 2rem;
 }
 
-.upload-feedback-box p {
-  font-size: 17px;
+/* === Feedback Box === */
+.success-box {
+  max-width: 720px;
+  width: 100%;
+  background: #ffffff;
+  border: 3px solid #22c55e;
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.success-box h1 {
+  color: #22c55e;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.success-box p {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 2rem;
   line-height: 1.6;
-  margin-bottom: 30px;
-  color: #444f61;
 }
 
 .btn-home {
   display: inline-block;
-  padding: 14px 30px;
-  background-color: #25D366;
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
+  padding: 1rem 2rem;
+  background-color: #002f5c;
+  color: #ffffff;
+  border-radius: 10px;
   font-weight: 600;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .btn-home:hover {
-  background-color: #1bbd57;
+  background-color: #004080;
 }
 
-@media screen and (max-width: 768px) {
-  .upload-feedback-box {
-    padding: 30px 20px;
+/* === Animation === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Responsive === */
+@media (max-width: 480px) {
+  .success-logo {
+    width: 180px;
   }
 
-  .upload-feedback-box h2 {
-    font-size: 26px;
+  .success-box {
+    padding: 2rem 1.5rem;
   }
 
-  .upload-feedback-box p {
-    font-size: 16px;
+  .success-box h1 {
+    font-size: 1.6rem;
+  }
+
+  .success-box p {
+    font-size: 1rem;
   }
 
   .btn-home {
-    font-size: 15px;
-    padding: 12px 24px;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .upload-feedback-box {
-    padding: 20px 15px;
-  }
-
-  .upload-feedback-box h2 {
-    font-size: 22px;
-  }
-
-  .upload-feedback-box p {
-    font-size: 15px;
-  }
-
-  .btn-home {
-    font-size: 14px;
-    padding: 10px 20px;
+    width: 100%;
   }
 }

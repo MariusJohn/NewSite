@@ -145,7 +145,13 @@ const Job = sequelize.define('Job', {
     selectedQuoteId: {
     type: DataTypes.INTEGER,
     allowNull: true
+  },
+  deletedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    defaultValue: null
   }
+  
   
   
 }, {

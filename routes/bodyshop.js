@@ -199,10 +199,11 @@ router.get('/verify/:token', async (req, res) => {
     }
 });
 
-// === GET: Bodyshop Login Page ===
+// GET: Bodyshop Login Page
 router.get('/login', (req, res) => {
-    res.render('bodyshop/login');
-});
+    res.render('bodyshop/login', { error: null });
+  });
+  
 
 // === GET: Bodyshop Logout ===
 router.get('/logout', (req, res) => {
