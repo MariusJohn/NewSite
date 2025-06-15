@@ -1,15 +1,20 @@
-// public/js/cookie-banner.js
 document.addEventListener('DOMContentLoaded', () => {
-  const banner = document.getElementById('cookie-banner');
+  console.log("✅ Cookie banner script running");
+
+  const cookieBanner = document.getElementById('cookie-banner');
   const acceptBtn = document.getElementById('accept-cookies');
 
-  // Show only if not already accepted this session
-  if (!sessionStorage.getItem('cookieAccepted')) {
-    banner.classList.remove('hidden');
+  console.log("cookieBanner:", cookieBanner);
+  console.log("acceptBtn:", acceptBtn);
+
+  if (!cookieBanner || !acceptBtn) return;
+
+  if (!localStorage.getItem('cookiesAccepted')) {
+    cookieBanner.classList.remove('hidden');
   }
 
   acceptBtn.addEventListener('click', () => {
-    sessionStorage.setItem('cookieAccepted', 'true'); // Auto-clears when browser closes
-    banner.classList.add('hidden');
+    cookieBanner.classList.add('hidden');
+    localStorage.setItem('cookiesAccepted', 'true');
   });
 });
