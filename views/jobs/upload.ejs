@@ -48,7 +48,7 @@
       <input type="file" id="images" name="images" multiple accept="image/*" required>
       <span class="error-message" id="images-error"></span>
 
-      <div class="g-recaptcha" data-sitekey="***REMOVED***"></div>
+      <div class="g-recaptcha" data-sitekey="<%= process.env.RECAPTCHA_SITE_KEY %>"></div>
 
       <button type="submit" class="upload-btn" id="submitBtn">Submit Job</button>
 
