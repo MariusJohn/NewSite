@@ -19,13 +19,6 @@
 
 <div class="admin-dashboard-container">
 
-  <% if (subscriptionMessage) { %>
-    <div style="background: #dff0d8; color: #3c763d; padding: 1rem; margin: 1rem;">
-      <%= subscriptionMessage %>
-    </div>
-  <% } %>
-  
-
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -114,14 +107,18 @@
                               
                             <td>
                                 <div class="image-gallery">
-                                  <% job.images.forEach((img, idx) => { %>
-                                    <a href="<%= img %>" 
-                                       class="glightbox"
-                                       data-gallery="job-<%= job.id %>"
-                                       data-title="Job Image <%= idx + 1 %>">
-                                      <img src="<%= img %>" alt="Job Image" class="thumb-img">
-                                    </a>
-                                  <% }) %>
+                                  <% if (job.images && job.images.length > 0) { %>
+                                    <% job.images.forEach((img, idx) => { %>
+                                      <a href="<%= img %>" 
+                                         class="glightbox"
+                                         data-gallery="job-<%= job.id %>"
+                                         data-title="Job Image <%= idx + 1 %>">
+                                        <img src="<%= img %>" alt="Job Image" class="thumb-img">
+                                      </a>
+                                    <% }) %>
+                                  <% } else { %>
+                                    <p>No images available</p>
+                                  <% } %>
                                 </div>
                               </td>
                               
@@ -186,7 +183,6 @@
                     <% }) %>
                 </tbody>
             </table>
-        <% } %>
     </div>
 </div>
 

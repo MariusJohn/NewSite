@@ -10,6 +10,7 @@ import crypto from 'crypto';
 import { Job, Quote, Bodyshop, sequelize } from '../models/index.js'; 
 import { requireBodyshopLogin } from '../middleware/auth.js'; 
 import { getUnselectedJobs } from '../controllers/bodyshopUnselectedJobsController.js';
+import { checkSubscriptionActive } from '../middleware/subscriptionCheck.js';
 
 
 import { submitQuote } from '../controllers/bodyshopController.js';
@@ -126,6 +127,10 @@ router.post('/register', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = crypto.randomBytes(32).toString('hex');
+
+        const trialEndsAt = new Date();
+        trialEndsAt.setFullYear(trialEndsAt.getFullYear() + 1);
+
 
         // Create the bodyshop
         await Bodyshop.create({
@@ -284,7 +289,7 @@ router.post('/login', async (req, res) => {
 });
 
 // === GET: Bodyshop Dashboard ===
-router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
+router.get('/dashboard', requireBodyshopLogin, checkSubscriptionActive, async (req, res) => {
     console.log('Logged in bodyshopId:', req.session.bodyshopId);
     try {
         const tab = req.query.tab || 'available';
@@ -412,7 +417,7 @@ router.post('/update-radius', requireBodyshopLogin, async (req, res) => {
     }
 });
 // === POST: Job Quote (with distance calculation) ===
-router.post('/quote/:jobId', requireBodyshopLogin, async (req, res) => {
+router.post('/quote/:jobId', requireBodyshopLogin, checkSubscriptionActive, async (req, res) => {
     const { jobId } = req.params;
     const { price, notes } = req.body;
   
@@ -450,7 +455,7 @@ router.post('/quote/:jobId', requireBodyshopLogin, async (req, res) => {
   });
 
 // === GET: Unselected Jobs ===
-  router.get('/dashboard/unselected', requireBodyshopLogin, getUnselectedJobs);
+  router.get('/dashboard/unselected', requireBodyshopLogin, checkSubscriptionActive, getUnselectedJobs);
 
 
 

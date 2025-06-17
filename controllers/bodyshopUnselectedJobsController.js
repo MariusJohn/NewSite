@@ -5,30 +5,50 @@ export const getUnselectedJobs = async (req, res) => {
   try {
     const bodyshopId = req.session.bodyshopId;
 
-    // Find jobs where this bodyshop quoted
     const quotedJobs = await Quote.findAll({
       where: { bodyshopId },
-      include: [{ model: Job, where: { paid: true }, required: true }]
+      include: [{
+        model: Job,
+        as: 'job',
+        where: { paid: true },
+        required: true,
+        include: [{
+          model: Quote,
+          as: 'quotes',
+          include: [{
+            model: Bodyshop,
+            as: 'bodyshop'
+          }]
+        }]
+      }]
     });
-
+    
     const unselectedJobs = quotedJobs
-    .filter(q => 
-      q.Job.selectedBodyshopId && 
-      q.Job.selectedBodyshopId !== bodyshopId
-    )
-    .map(q => ({
-      jobId: q.Job.id,
-      createdAt: q.Job.createdAt,
-      quoteAmount: q.price,
-      quoteDate: q.createdAt,
-      wasAllocatedTo: q.Job.selectedBodyshopId // just info, optional
-    }));
-  
+      .filter(q => q.job.selectedBodyshopId && q.job.selectedBodyshopId !== bodyshopId)
+      .map(q => ({
+        jobId: q.job.id,
+        createdAt: q.job.createdAt,
+        quoteDate: q.createdAt,
+        allQuotes: q.job.quotes.map(quote => ({
+          bodyshopId: quote.bodyshopId,
+          bodyshopName: quote.bodyshop?.name || 'N/A',
+          price: quote.price,
+          isMine: quote.bodyshopId === bodyshopId,
+          isSelected: quote.bodyshopId === q.job.selectedBodyshopId
+        }))
+      }));
+    
 
-    res.render('bodyshop/unselected-jobs', {
+    const bodyshop = await Bodyshop.findByPk(bodyshopId);
+
+    // Step 3: Render in dashboard under `tab: unselected`
+    res.render('bodyshop/dashboard', {
       title: 'Unselected Jobs',
-      bodyshopName: req.session.bodyshopName,
-      unselectedJobs
+      tab: 'unselected',
+      bodyshopName: bodyshop.name,
+      unselectedJobs,
+      bodyshop,
+      subscriptionMessage: null
     });
 
   } catch (err) {

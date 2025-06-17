@@ -213,43 +213,66 @@
           <% if (unselectedJobs.length === 0) { %>
             <p>No unselected quotes to display.</p>
           <% } else { %>
-            <table class="jobs-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Job ID</th>
-                  <th>Your Quote</th>
-                  <th>Quote Date</th>
-                  <th>Winning Bodyshop ID</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% unselectedJobs.forEach((job, index) => { %>
-                  <tr>
-                    <td><%= index + 1 %></td>
-                    <td>#<%= job.jobId %></td>
-                    <td>£<%= job.quoteAmount %></td>
-                    <td>
-                      <%= new Date(job.quoteDate).toLocaleDateString('en-GB', {
-                        day: '2-digit', month: '2-digit', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit',
-                        hour12: false,
-                        timeZone: 'Europe/London'
-                      }) %>
-                    </td>
-                    <td><%= job.selectedBodyshopId %></td>
-                  </tr>
-                <% }) %>
-              </tbody>
-            </table>
+            <% unselectedJobs.forEach((job, index) => { %>
+              <div class="job-summary collapsible">
+                <div class="summary-header">
+                  <strong>#<%= job.jobId %></strong> — <em>Your Quote: £<%= job.allQuotes.find(q => q.isMine)?.price %></em> —
+                  <small><%= new Date(job.quoteDate).toLocaleDateString('en-GB', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit',
+                    hour12: false, timeZone: 'Europe/London'
+                  }) %></small>
+                </div>
+                <div class="summary-content" style="display: none;">
+                  <table class="jobs-table">
+                    <thead>
+                      <tr>
+                        <th>Bodyshop</th>
+                        <th>ID</th>
+                        <th>Quote (£)</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% job.allQuotes.forEach(q => { %>
+                        <tr class="<%= q.isSelected ? 'highlight-selected' : q.isMine ? 'highlight-mine' : '' %>">
+                          <td><%= q.bodyshopName %></td>
+                          <td><%= q.bodyshopId %></td>
+                          <td>£<%= q.price %></td>
+                          <td>
+                            <% if (q.isSelected) { %>
+                              <span class="badge badge-allocated">Selected</span>
+                            <% } else if (q.isMine) { %>
+                              <span class="badge badge-info">Your Quote</span>
+                            <% } else { %>
+                              —
+                            <% } %>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            <% }) %>
           <% } %>
         </section>
+        
+        
       <% } %>
       
 
   </div> 
 
 </div> 
+<script>
+  document.querySelectorAll('.summary-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const content = header.nextElementSibling;
+      content.style.display = content.style.display === 'none' ? 'block' : 'none';
+    });
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
 <script>

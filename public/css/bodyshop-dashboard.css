@@ -201,3 +201,21 @@
   background-color: #6c757d;
   color: white;
 }
+
+.highlight-selected {
+  background-color: #d9f2e6;
+  font-weight: bold;
+}
+.highlight-mine {
+  background-color: #e6f0ff;
+}
+.summary-header {
+  cursor: pointer;
+  padding: 10px;
+  background-color: #f3f3f3;
+  border: 1px solid #ddd;
+}
+.summary-content {
+  border: 1px solid #ccc;
+  border-top: none;
+}
