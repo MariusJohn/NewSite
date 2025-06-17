@@ -1,10 +1,6 @@
 // routes/bodyshop.js
 import express from 'express';
 const router = express.Router();
-
-import path from 'path'; // Keep if used for path manipulation (unlikely for current routes)
-
-import archiver from 'archiver'; 
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
@@ -13,6 +9,9 @@ import axios from 'axios';
 import crypto from 'crypto';
 import { Job, Quote, Bodyshop, sequelize } from '../models/index.js'; 
 import { requireBodyshopLogin } from '../middleware/auth.js'; 
+import { getUnselectedJobs } from '../controllers/bodyshopUnselectedJobsController.js';
+
+
 import { submitQuote } from '../controllers/bodyshopController.js';
 
 
@@ -137,7 +136,10 @@ router.post('/register', async (req, res) => {
             area: normalizedArea,
             latitude: lat,
             longitude: lng,
-            verificationToken
+            verificationToken,
+            subscriptionType: 'free',
+            subscriptionStatus: 'trial',
+            subscriptionEndsAt: trialEndsAt
         });
 
         // Send verification email
@@ -257,11 +259,21 @@ router.post('/login', async (req, res) => {
             return res.render('bodyshop/login', { error: 'Your account has not been approved by the admin yet.' });
         }
 
+        if (bodyshop.subscriptionType === 'free') {
+            const expiry = bodyshop.subscriptionEndsAt || new Date(new Date(bodyshop.createdAt).setFullYear(new Date(bodyshop.createdAt).getFullYear() + 1));
+            req.session.subscriptionMessage = '🎉 You’re on a 1-year free trial. Expires: ' + expiry.toDateString();
+          }
+          
+
         // Set session
         req.session.bodyshopId = bodyshop.id;
         req.session.bodyshopName = bodyshop.name;
         req.session.bodyshopEmail = bodyshop.email;
         req.session.loggedIn = true;
+      
+
+
+
 
         console.log(`✅ Bodyshop ${email} logged in successfully.`);
         res.redirect('/bodyshop/dashboard');
@@ -278,6 +290,9 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
         const tab = req.query.tab || 'available';
         const bodyshop = await Bodyshop.findByPk(req.session.bodyshopId);
 
+        const subscriptionMessage = req.session.subscriptionMessage;
+        delete req.session.subscriptionMessage;
+
         if (!bodyshop.latitude || !bodyshop.longitude) {
             return res.render('bodyshop/dashboard', {
                 title: 'Bodyshop Dashboard',
@@ -288,8 +303,9 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
                 jobs: [],
                 quotedJobs: [],
                 selectedJobs:[],
-                tab
-            });
+                tab,
+                subscriptionMessage
+          });
         }
 
         // Convert radius to meters (1 mile = 1609.34 meters)
@@ -364,7 +380,8 @@ router.get('/dashboard', requireBodyshopLogin, async (req, res) => {
       jobs,
       quotedJobs,
       selectedJobs,
-      tab
+      tab,
+      subscriptionMessage
     });
 
 
@@ -431,6 +448,10 @@ router.post('/quote/:jobId', requireBodyshopLogin, async (req, res) => {
       res.status(500).send('Server error while submitting quote.');
     }
   });
+
+// === GET: Unselected Jobs ===
+  router.get('/dashboard/unselected', requireBodyshopLogin, getUnselectedJobs);
+
 
 
 // === GET: Request Password Reset Page ===

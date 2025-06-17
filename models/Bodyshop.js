@@ -70,6 +70,21 @@ Bodyshop.init({
         allowNull: false,
         defaultValue: 'active',
       },
+      subscriptionStatus: {
+        type: DataTypes.STRING, 
+        allowNull: false,
+        defaultValue: 'trial'
+      },
+      subscriptionType: {
+        type: DataTypes.STRING, 
+        allowNull: false,
+        defaultValue: 'free'
+      },
+      subscriptionEndsAt: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      
       
 }, {
     sequelize,

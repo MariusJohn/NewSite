@@ -11,7 +11,10 @@ import customerRoutes from './routes/customer.js';
 import adminRoutes from './routes/admin.js';
 import indexRoutes from './routes/index.js';
 import servicesRoutes from './routes/services.js';
+
 import bodyshopRoutes from './routes/bodyshop.js';
+import bodyshopSubscriptionRoutes from './routes/bodyshop-subscription.js';
+import webhookRoutes from './routes/webhook.js';
 import contactRoutes from './routes/contact.js';
 import publicJobsRoutes from './routes/public-jobs.js';
 
@@ -35,6 +38,9 @@ const port = process.env.PORT || 3000;
 
 // ======= DEBUG ENV =======
 console.log('DEBUG ENV:', process.env.NODE_ENV);
+
+
+
 
 // ======= MIDDLEWARE =======
 app.use(cookieParser());
@@ -64,6 +70,7 @@ if (process.env.NODE_ENV !== 'production') {
 app.use(express.static(path.join(process.cwd(), 'public')));
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use('/webhook', webhookRoutes); 
 app.use(bodyParser.json());
 
 app.set('views', path.join(process.cwd(), 'views'));
@@ -79,6 +86,7 @@ app.use('/jobs', publicJobsRoutes);
 app.use('/', indexRoutes);
 app.use('/services', servicesRoutes);
 app.use('/bodyshop', bodyshopRoutes);
+app.use('/bodyshop', bodyshopSubscriptionRoutes);
 app.use('/contact', contactRoutes);
 app.use('/', customerRoutes);
 app.use('/', staticRoutes);

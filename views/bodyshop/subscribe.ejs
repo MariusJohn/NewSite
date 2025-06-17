@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Subscribe - My Car Quote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/bodyshop-register.css">
+
+  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="page-wrapper">
+
+    <%- include('../partials/header') %>
+
+    <main>
+      <div class="register-wrapper">
+        <h1>Subscribe to Continue</h1>
+
+        <% if (!trialExpired) { %>
+          <p class="info-msg">🎉 You are currently on a <strong>free trial</strong> until <strong><%= new Date(trialEndsAt).toDateString() %></strong>.</p>
+          <p class="form-subtitle">You don’t need to pay until your trial ends.</p>
+        <% } else { %>
+          <p class="error-msg">⚠️ Your free trial has ended. Please choose a subscription plan to continue using the platform.</p>
+        <% } %>
+
+        <form action="/bodyshop/subscribe" method="POST" class="register-form">
+
+          <label><input type="radio" name="plan" value="monthly" required> £60/month (Auto-renewing, cancel anytime)</label>
+
+          <label><input type="radio" name="plan" value="3m"> £120 – 3 months (One-time payment)</label>
+
+          <label><input type="radio" name="plan" value="6m"> £350 – 6 months (One-time payment)</label>
+
+          <label><input type="radio" name="plan" value="12m"> £650 – 12 months (One-time payment)</label>
+
+          <button type="submit" class="register-btn">Continue to Payment</button>
+        </form>
+
+        <p class="form-footer-link">
+          Need help? <a href="/contact">Contact support</a>.
+        </p>
+      </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+  </div>
+
+  <script src="/js/navbar-toggle.js"></script>
+</body>
+</html>

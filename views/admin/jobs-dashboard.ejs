@@ -14,7 +14,18 @@
 </head>
 
 <body>
+
+
+
 <div class="admin-dashboard-container">
+
+  <% if (subscriptionMessage) { %>
+    <div style="background: #dff0d8; color: #3c763d; padding: 1rem; margin: 1rem;">
+      <%= subscriptionMessage %>
+    </div>
+  <% } %>
+  
+
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -43,12 +54,10 @@
 
     <!-- Main Content -->
     <div class="main-content">
+
         <h1>Submitted Jobs</h1>
 
-        <% if (jobs.length === 0) { %>
-            <p>No jobs available at the moment.</p>
-        <% } else { %>
-            <table class="jobs-table">
+          <table class="jobs-table">
                 <thead>
                     <tr>
                         <th>Job ID</th>
