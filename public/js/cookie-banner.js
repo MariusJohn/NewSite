@@ -1,20 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("✅ Cookie banner script running");
+  setTimeout(() => {
+    const banner = document.getElementById('cookie-banner');
+    const accept = document.getElementById('accept-cookies');
+    if (!banner || !accept) return;
 
-  const cookieBanner = document.getElementById('cookie-banner');
-  const acceptBtn = document.getElementById('accept-cookies');
+    if (!localStorage.getItem('cookiesAccepted')) {
+      banner.classList.remove('hidden');
+    }
 
-  console.log("cookieBanner:", cookieBanner);
-  console.log("acceptBtn:", acceptBtn);
-
-  if (!cookieBanner || !acceptBtn) return;
-
-  if (!localStorage.getItem('cookiesAccepted')) {
-    cookieBanner.classList.remove('hidden');
-  }
-
-  acceptBtn.addEventListener('click', () => {
-    cookieBanner.classList.add('hidden');
-    localStorage.setItem('cookiesAccepted', 'true');
-  });
+    accept.addEventListener('click', () => {
+      localStorage.setItem('cookiesAccepted', 'true');
+      banner.classList.add('hidden');
+    });
+  }, 100); // Small delay for safety
 });

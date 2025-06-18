@@ -11,7 +11,7 @@ import { Job, Quote, Bodyshop, sequelize } from '../models/index.js';
 import { requireBodyshopLogin } from '../middleware/auth.js'; 
 import { getUnselectedJobs } from '../controllers/bodyshopUnselectedJobsController.js';
 import { checkSubscriptionActive } from '../middleware/subscriptionCheck.js';
-
+import jwt from 'jsonwebtoken'; 
 
 import { submitQuote } from '../controllers/bodyshopController.js';
 
@@ -76,135 +76,172 @@ router.get('/register', (req, res) => {
 
 // === POST Registration Handler with Password Validation ===
 router.post('/register', async (req, res) => {
-    const { name, email, password, phone, confirmPassword, area } = req.body;
+  const { name, email, password, phone, confirmPassword, area } = req.body;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  const postcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
+  const phoneRegex = /^07\d{9}$/;
+  const normalizedArea = area.replace(/\s+/g, '').toUpperCase();
 
-    // Password strength check
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-    const postcodeRegex = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
-    const phoneRegex = /^07\d{9}$/;
+  if (!phoneRegex.test(phone)) {
+    return res.render('bodyshop/register', { error: 'Please enter a valid UK phone number (07...)' });
+  }
+  if (!passwordRegex.test(password)) {
+    return res.render('bodyshop/register', { error: 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.' });
+  }
+  if (!postcodeRegex.test(normalizedArea)) {
+    return res.render('bodyshop/register', { error: 'Please enter a valid UK postcode.' });
+  }
+  if (password !== confirmPassword) {
+    return res.render('bodyshop/register', { error: 'Passwords do not match.' });
+  }
 
-    // Normalize postcode for consistent storage
-    const normalizedArea = area.replace(/\s+/g, '').toUpperCase();
-
-    if (!phoneRegex.test(phone)) {
-        return res.render('bodyshop/register', { error: 'Please enter a valid UK phone number (07...)' });
+  try {
+    const existing = await Bodyshop.findOne({ where: { email } });
+    if (existing) {
+      return res.render('bodyshop/register', { error: 'This email is already registered.' });
     }
 
-    if (!passwordRegex.test(password)) {
-        return res.render('bodyshop/register', { error: 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.' });
+    // Get coordinates from OpenCage
+    const apiKey = process.env.OPENCAGE_API_KEY;
+    const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
+      params: { q: normalizedArea, key: apiKey, countrycode: 'gb', limit: 1 }
+    });
+
+    if (!response.data.results.length) {
+      return res.render('bodyshop/register', { error: 'Unable to find coordinates for the given postcode.' });
     }
 
-    if (!postcodeRegex.test(normalizedArea)) {
-        return res.render('bodyshop/register', { error: 'Please enter a valid UK postcode.' });
-    }
+    const { lat, lng } = response.data.results[0].geometry;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const trialEndsAt = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 
-    if (password !== confirmPassword) {
-        return res.render('bodyshop/register', { error: 'Passwords do not match.' });
-    }
+    // Create JWT payload
+    const payload = {
+      name,
+      email,
+      phone,
+      password: hashedPassword,
+      area: normalizedArea,
+      latitude: lat,
+      longitude: lng,
+      trialEndsAt,
+    };
+
+    console.log(process.env.JWT_SECRET)
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '72h' });
+    const verificationUrl = `http://${req.headers.host}/bodyshop/verify/${token}`;
+
+    // Send verification email
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.ionos.co.uk',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    console.log('⚠️ Reached transporter setup...');
+
 
     try {
-        const existing = await Bodyshop.findOne({ where: { email } });
-        if (existing) {
-            return res.render('bodyshop/register', { error: 'This email is already registered.' });
-        }
 
-        // Fetching coordinates from OpenCage API
-        const apiKey = process.env.OPENCAGE_API_KEY;
-        const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
-            params: {
-                q: normalizedArea,
-                key: apiKey,
-                countrycode: 'gb',
-                limit: 1
-            }
-        });
-
-        if (!response.data || !response.data.results || response.data.results.length === 0) {
-            return res.render('bodyshop/register', { error: 'Unable to find coordinates for the given postcode.' });
-        }
-
-        const { lat, lng } = response.data.results[0].geometry;
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const verificationToken = crypto.randomBytes(32).toString('hex');
-
-        const trialEndsAt = new Date();
-        trialEndsAt.setFullYear(trialEndsAt.getFullYear() + 1);
+        await transporter.verify();
+        console.log('✅ SMTP server is ready to send emails.');
+      } catch (err) {
+        console.error('❌ SMTP verification failed:', err);
+      }
+      
 
 
-        // Create the bodyshop
-        await Bodyshop.create({
-            name,
-            email,
-            phone,
-            password: hashedPassword,
-            area: normalizedArea,
-            latitude: lat,
-            longitude: lng,
-            verificationToken,
-            subscriptionType: 'free',
-            subscriptionStatus: 'trial',
-            subscriptionEndsAt: trialEndsAt
-        });
+      const mailOptions = {
+        from: '"My Car Quote" <noreply@mcquote.co.uk>',
+        to: email,
+        subject: 'Verify Your Bodyshop Account',
+        text: `Welcome to My Car Quote!
+      
+      Please verify your email by clicking the link below:
+      ${verificationUrl}
+      
+      This link expires in 72 hours. If you didn't request this, you can safely ignore it.`,
+      
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5;">
+            <h2 style="color: #002f5c;">Welcome to <span style="color: #0071c5;">My Car Quote</span></h2>
+            <p>Thank you for registering your bodyshop with us.</p>
+            <p>Please verify your email address by clicking the button below:</p>
+            <a href="${verificationUrl}" style="display: inline-block; margin: 12px 0; padding: 10px 20px; background-color: #28a745; color: #fff; text-decoration: none; border-radius: 5px;">
+              ✅ Verify My Email
+            </a>
+            <p>This link will expire in <strong>72 hours</strong>.</p>
+            <hr style="margin-top: 20px;" />
+            <p style="font-size: 12px; color: #777;">If you didn’t request this email, you can ignore it. No changes will be made to your account.</p>
+          </div>
+        `
+      };
+      
+      
 
-        // Send verification email
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.ionos.co.uk',
-            port: 587,
-            secure: false,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
-            }
-        });
+    await transporter.sendMail(mailOptions);
+    console.log(`📧 Verification email sent to ${email}`);
 
-        const verificationUrl = `http://${req.headers.host}/bodyshop/verify/${verificationToken}`;
+    res.render('bodyshop/register', {
+      error: 'Registration successful! Please check your email to verify your account.'
+    });
+  } catch (error) {
+    console.error('❌ Outer registration error:', error.message, error.stack);
+    res.render('bodyshop/register', { error: 'Registration failed. Please try again later.' });
+  
+  }
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Verify Your Bodyshop Account',
-            html: `
-            <div>
-                <h2>Welcome to My Car Quote</h2>
-                <p>Thank you for registering your bodyshop. Please verify your email by clicking the link below:</p>
-                <a href="${verificationUrl}" style="background-color:#25D366;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Verify Email</a>
-                <p>If you did not register, please ignore this email.</p>
-            </div>
-            `
-        };
-
-        await transporter.sendMail(mailOptions);
-        console.log(`📧 Verification email sent to ${email}`);
-
-        res.render('bodyshop/register', { error: 'Registration successful! Please check your email to verify your account.' });
-    } catch (err) {
-        console.error(err);
-        res.render('bodyshop/register', { error: 'Registration failed. Try again later.' });
-    }
 });
+
+
 
 // === GET: Verify Bodyshop Email ===
 router.get('/verify/:token', async (req, res) => {
-    try {
-        const token = req.params.token;
-        const bodyshop = await Bodyshop.findOne({ where: { verificationToken: token } });
+  const token = req.params.token;
 
-        if (!bodyshop) {
-            return res.status(400).send('Invalid or expired verification token.');
-        }
+  try {
+    // 1. Decode token
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const { name, email, phone, password, area, latitude, longitude, trialEndsAt } = payload;
 
-        // Mark as verified
-        bodyshop.verified = true;
-        bodyshop.verificationToken = null;
-        await bodyshop.save();
-
-        res.send('✅ Your email has been successfully verified. You can now log in.');
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error. Please try again later.');
+    // 2. Check if user already verified
+    const existing = await Bodyshop.findOne({ where: { email } });
+    if (existing) {
+      return res.send('✅ Your account is already verified or awaiting admin approval.');
     }
+
+    // 3. Create Bodyshop record
+    await Bodyshop.create({
+      name,
+      email,
+      phone,
+      password,
+      area,
+      latitude,
+      longitude,
+      verified: true,
+      adminApproved: false,
+      status: 'pending',
+      subscriptionType: 'free',
+      subscriptionStatus: 'trial',
+      subscriptionEndsAt: trialEndsAt
+    });
+
+    return res.render('bodyshop/verification-confirmed', {
+      message: '✅ Email verified! Your account is under review by the admin team.'
+    });
+
+  } catch (err) {
+    console.error('❌ Email verification failed:', err);
+    return res.status(400).send('Verification link is invalid or has expired.');
+  }
 });
+
 
 // GET: Bodyshop Login Page
 router.get('/login', (req, res) => {

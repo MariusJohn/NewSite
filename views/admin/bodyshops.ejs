@@ -11,7 +11,7 @@
   <div class="admin-dashboard-container">
     <!-- Consistent Sidebar -->
     <div class="sidebar" id="sidebar">
-      <button id="toggleSidebar" class="sidebar-toggle">☰</button>
+  
       <a href="/."><img src="/img/logo.svg" alt="My Car Quote Logo"></a>
       <h2>Admin Panel</h2>
       <ul class="menu">
@@ -23,11 +23,14 @@
         <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
         <li><a href="/jobs/admin/quotes">Jobs with Quotes</a></li>
         <li><a href="/jobs/admin/bodyshops" class="active">Bodyshops</a></li>
-        <li>
-          <form action="/admin/logout" method="POST" style="display: inline;">
-            <button type="submit" class="logout-btn">Logout</button>
-          </form>
-        </li>
+      </ul> <!-- close your .menu list -->
+
+      <div class="logout-container">
+        <form action="/admin/logout" method="POST">
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+      </div>
+      
       </ul>
     </div>
 
