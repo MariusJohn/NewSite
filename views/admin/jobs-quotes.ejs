@@ -24,6 +24,11 @@
           <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
           <li><a href="/jobs/admin/quotes" class="active">Jobs with Quotes</a></li>
           <li><a href="/jobs/admin/bodyshops">Bodyshops</a></li>
+          <li>
+            <form action="/admin/logout" method="POST">
+              <button type="submit" class="logout-btn">Logout</button>
+            </form>
+          </li>
         </ul>
       </div>
 

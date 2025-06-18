@@ -162,7 +162,7 @@ body {
     font-weight: 600;
     display: inline-block;
   }
-  
+
   .badge.active {
     background-color: #007bff;
     color: white;
@@ -177,6 +177,29 @@ body {
     background-color: #ffc107;
     color: #212529;
   }
+
+  .badge.trial {
+    background-color: #17a2b8; /* Teal */
+    color: white;
+  }
+  
+  .badge.paid {
+    background-color: #28a745; /* Green */
+    color: white;
+  }
+  
+  .badge.expired {
+    background-color: #dc3545; /* Red */
+    color: white;
+  }
+  
+
+  .badge + .badge {
+    margin-top: 4px;
+    display: block;
+  }
+  
+  
   
   .bodyshops-table td {
     vertical-align: middle;

@@ -37,32 +37,74 @@
 
       <table class="bodyshops-table">
         <thead>
-            <tr>
-              <th>Bodyshop Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Location</th>
-              <th>Verified</th>
-              <th>Admin Approved</th>
-             </tr>
-          </thead>
+          <tr>
+            <th>Bodyshop Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Location</th>
+            <th>Verified</th>
+            <th>Admin Approved</th>
+            <th>Subscription</th>
+            <th>Subscription Ends</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        
           
-        <tbody>
+          <tbody>
             <% bodyshops.forEach(bodyshop => { %>
               <tr>
                 <td style="word-break: break-word;"><%= bodyshop.name %></td>
                 <td style="word-break: break-word;"><%= bodyshop.email %></td>
                 <td><%= bodyshop.phone %></td>
                 <td><%= bodyshop.area %></td>
+          
+                <!-- ✅ Verified Status -->
+                <td>
+                  <% if (bodyshop.verified) { %>
+                    <span class="badge active">Verified</span>
+                  <% } else { %>
+                    <span class="badge pending">Unverified</span>
+                  <% } %>
+                </td>
+          
+                <!-- 🛡️ Admin Approved / Inactive / Pending -->
                 <td>
                   <% if (bodyshop.status === 'inactive') { %>
                     <span class="badge inactive">Inactive</span>
-                  <% } else if (bodyshop.verified && bodyshop.adminApproved) { %>
+                  <% } else if (bodyshop.adminApproved) { %>
                     <span class="badge active">Approved</span>
-                  <% } else if (!bodyshop.adminApproved) { %>
+                  <% } else { %>
                     <span class="badge pending">Pending</span>
                   <% } %>
                 </td>
+          
+                <!-- 💳 Subscription Status -->
+                <td>
+                  <% if (bodyshop.subscriptionStatus === 'trial') { %>
+                    <span class="badge trial">Trial</span>
+                  <% } else if (bodyshop.subscriptionStatus === 'active') { %>
+                    <span class="badge paid">Paid</span>
+                  <% } else { %>
+                    <span class="badge pending">Unknown</span>
+                  <% } %>
+                </td>
+
+                <!-- 📅 Subscription Ends-->
+
+                <td>
+                  <% if (bodyshop.subscriptionEndsAt) { %>
+                    <%= new Date(bodyshop.subscriptionEndsAt).toLocaleDateString('en-GB', {
+                      day: '2-digit', month: '2-digit', year: 'numeric'
+                    }) %>
+                  <% } else { %>
+                    <span class="badge pending">N/A</span>
+                  <% } %>
+                </td>
+                
+
+          
+                <!-- 🔘 Actions -->
                 <td>
                   <% if (bodyshop.status === 'inactive') { %>
                     <form action="/jobs/admin/bodyshops/<%= bodyshop.id %>/reactivate" method="POST" style="display:inline;">
@@ -82,6 +124,7 @@
               </tr>
             <% }) %>
           </tbody>
+          
           
       </table>
     </div>
