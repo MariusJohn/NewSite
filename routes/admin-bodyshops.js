@@ -1,55 +1,51 @@
 // routes/admin-bodyshops.js
 import express from 'express';
 const router = express.Router();
-
+import { Op } from 'sequelize';
 import { Bodyshop, Job } from '../models/index.js';
 
 
 
 // Show all bodyshops pending approval
 router.get('/', async (req, res) => {
-    try {
-        // Fetch bodyshops
-        const bodyshops = await Bodyshop.findAll({
-          attributes: [
-            'id',
-            'name',
-            'email',
-            'phone',
-            'area',
-            'verified',
-            'adminApproved',
-            'status',
-            'subscriptionType',
-            'subscriptionStatus',
-            'subscriptionEndsAt'
-          ],
-          
-            order: [['createdAt', 'DESC']]
-          });
-          
-        // Fetch job counts
-        const totalCount = await Job.count();
-        const liveCount = await Job.count({ where: { status: 'pending' } });
-        const approvedCount = await Job.count({ where: { status: 'approved' } });
-        const rejectedCount = await Job.count({ where: { status: 'rejected' } });
-        const archivedCount = await Job.count({ where: { status: 'archived' } });
-        const deletedCount = await Job.count({ where: { status: 'deleted' } });
+  try {
+    const search = req.query.search || '';
 
-        // Render the template
-        res.render('admin/bodyshops', {
-            bodyshops,
-            totalCount,
-            liveCount,
-            approvedCount,
-            rejectedCount,
-            archivedCount,
-            deletedCount
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Internal Server Error');
-    }
+    const bodyshops = await Bodyshop.findAll({
+      where: search
+        ? {
+            [Op.or]: [
+              { name: { [Op.iLike]: `%${search}%` } },
+              { area: { [Op.iLike]: `%${search}%` } } // area = postcode in your case
+            ]
+          }
+        : {},
+      attributes: ['id', 'name', 'email', 'phone', 'area', 'verified', 'adminApproved', 'status', 'subscriptionStatus', 'subscriptionEndsAt'],
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Job stats (unchanged)
+    const totalCount = await Job.count();
+    const liveCount = await Job.count({ where: { status: 'pending' } });
+    const approvedCount = await Job.count({ where: { status: 'approved' } });
+    const rejectedCount = await Job.count({ where: { status: 'rejected' } });
+    const archivedCount = await Job.count({ where: { status: 'archived' } });
+    const deletedCount = await Job.count({ where: { status: 'deleted' } });
+
+    res.render('admin/bodyshops', {
+      bodyshops,
+      totalCount,
+      liveCount,
+      approvedCount,
+      rejectedCount,
+      archivedCount,
+      deletedCount,
+      search
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
 });
 
 // Approve bodyshop
