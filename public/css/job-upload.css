@@ -15,10 +15,12 @@ body {
 }
 
 .logo-jobUpload img {
-  width: 200px;
+  width: clamp(140px, 25vw, 240px);
   height: auto;
-  max-width: 100%;
+  display: block;
+  margin: 0 auto;
 }
+
 
 .upload-main {
   min-height: 80vh;
@@ -99,6 +101,9 @@ body {
 }
 
 @media screen and (max-width: 600px) {
+  .logo-jobUpload img {
+    width: 250px;
+  }
   .upload-container {
     padding: 20px;
   }
@@ -111,3 +116,4 @@ body {
     display: none;
   }
 }
+

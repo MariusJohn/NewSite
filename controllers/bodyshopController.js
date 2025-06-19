@@ -16,7 +16,8 @@ export const submitQuote = async (req, res) => {
       await Quote.create({
         jobId,
         bodyshopId,
-        price: parseFloat(quoteAmount),
+        price: parseFloat(price),
+        notes: notes || null,
         email
       });
   

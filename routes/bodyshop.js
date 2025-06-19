@@ -154,33 +154,45 @@ router.post('/register', async (req, res) => {
         console.error('❌ SMTP verification failed:', err);
       }
       
-
-
       const mailOptions = {
         from: '"My Car Quote" <noreply@mcquote.co.uk>',
         to: email,
-        subject: 'Verify Your Bodyshop Account',
-        text: `Welcome to My Car Quote!
-      
-      Please verify your email by clicking the link below:
-      ${verificationUrl}
-      
-      This link expires in 72 hours. If you didn't request this, you can safely ignore it.`,
-      
+        subject: '📧 Verify Your Bodyshop Account',
         html: `
-          <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5;">
-            <h2 style="color: #002f5c;">Welcome to <span style="color: #0071c5;">My Car Quote</span></h2>
-            <p>Thank you for registering your bodyshop with us.</p>
-            <p>Please verify your email address by clicking the button below:</p>
-            <a href="${verificationUrl}" style="display: inline-block; margin: 12px 0; padding: 10px 20px; background-color: #28a745; color: #fff; text-decoration: none; border-radius: 5px;">
-              ✅ Verify My Email
-            </a>
+          <div style="font-family: Arial, sans-serif; color: #002f5c; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="https://mcquote.co.uk/img/logo.svg" alt="My Car Quote Logo" style="height: 60px;" />
+            </div>
+      
+            <h2 style="color: #002f5c;">Verify Your Bodyshop Email</h2>
+      
+            <p>Thank you for registering your bodyshop with My Car Quote.</p>
+            <p>To complete your registration, please verify your email by clicking the button below:</p>
+      
+            <p style="text-align: center; margin: 20px 0;">
+              <a href="${verificationUrl}" style="
+                display: inline-block;
+                padding: 12px 24px;
+                background-color: #28a745;
+                color: #fff;
+                font-weight: bold;
+                text-decoration: none;
+                border-radius: 5px;
+              ">✅ Verify My Email</a>
+            </p>
+      
             <p>This link will expire in <strong>72 hours</strong>.</p>
-            <hr style="margin-top: 20px;" />
-            <p style="font-size: 12px; color: #777;">If you didn’t request this email, you can ignore it. No changes will be made to your account.</p>
+      
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc;" />
+      
+            <p style="font-size: 13px; color: #999;">
+              If you didn’t request this, please ignore this message.<br/>
+              No changes will be made unless the link is used.
+            </p>
           </div>
         `
       };
+      
       
       
 

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Job Scheduler Flow</title>
+  <link rel="stylesheet" href="/css/admin-dashboard.css" />
+  <link rel="stylesheet" href="/css/reset.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f3f8fc;
+      padding: 2rem;
+      color: #002f5c;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    th {
+      background: #e8f1fa;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Job Scheduler Flow</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Stage</th>
+        <th>Condition</th>
+        <th>Action</th>
+        <th>Email Triggered</th>
+        <th>Outcome</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1. Job Created</td>
+        <td>Customer uploads job</td>
+        <td>Job saved with status 'approved'</td>
+        <td>None</td>
+        <td>Scheduler will monitor job</td>
+      </tr>
+      <tr>
+        <td>2. Early Payment Trigger</td>
+        <td>2+ quotes within 24h</td>
+        <td>Trigger payment immediately</td>
+        <td>payment-request.ejs</td>
+        <td>Job set to 'pending_payment'</td>
+      </tr>
+      <tr>
+        <td>3. After 24h</td>
+        <td>0 quotes</td>
+        <td>Offer extend or cancel</td>
+        <td>no-quotes.ejs</td>
+        <td>Job waits for customer action</td>
+      </tr>
+      <tr>
+        <td>4. After 24h</td>
+        <td>1 quote</td>
+        <td>Offer extend or pay</td>
+        <td>single-quote.ejs</td>
+        <td>Job waits for customer action</td>
+      </tr>
+      <tr>
+        <td>5. After 24h</td>
+        <td>2+ quotes</td>
+        <td>Offer payment only</td>
+        <td>multiple-quotes.ejs</td>
+        <td>Job status remains 'approved'</td>
+      </tr>
+      <tr>
+        <td>6. If customer extends</td>
+        <td>job.extended = true</td>
+        <td>Wait until 48h from creation</td>
+        <td>None</td>
+        <td>Evaluated at 48h stage</td>
+      </tr>
+      <tr>
+        <td>7. At 48h</td>
+        <td>0 quotes and extended</td>
+        <td>Archive the job</td>
+        <td>no-quotes-archive.ejs</td>
+        <td>Job status = 'archived'</td>
+      </tr>
+      <tr>
+        <td>8. At 48h</td>
+        <td>0 quotes and not extended</td>
+        <td>Delete job and images</td>
+        <td>job-deleted.ejs</td>
+        <td>Job removed from DB, logged to DeletedJobs</td>
+      </tr>
+      <tr>
+        <td>9. At 48h</td>
+        <td>1+ quotes and not paid</td>
+        <td>Trigger payment</td>
+        <td>payment-request.ejs</td>
+        <td>Job set to 'pending_payment'</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- New Table Below -->
+  <h1>Job Flow Logic (Alternative Format)</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Step</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Job is created and saved with status 'approved'. Scheduler monitors the job.</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>If 2+ quotes are received within 24 hours, payment is triggered immediately.</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>If no quotes are received after 24 hours, the customer is offered to extend or cancel the job.</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>If 1 quote is received after 24 hours, the customer is offered to extend or pay.</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>If 2+ quotes are received after 24 hours, the customer is offered payment only.</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>If the customer extends the job, it waits until 48 hours from creation for further evaluation.</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>If no quotes are received and the job was extended, it is archived.</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>If no quotes are received and the job was not extended, it is deleted along with its images.</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>If 1+ quotes are received and the job is not paid, payment is triggered.</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <!-- New Table Below -->
+  <h1>Job Handling from Quote Creation to Payment</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Step</th>
+        <th>Description</th>
+        <th>Controller</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Customer uploads job, and it is saved with status 'approved'.</td>
+        <td>jobController.js</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Bodyshops submit quotes for the job.</td>
+        <td>bodyshopController.js</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Customer receives email notifications for quotes.</td>
+        <td>emailController.js</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Customer selects a quote and proceeds to payment.</td>
+        <td>paymentController.js</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Job status is updated to 'pending_payment' or 'processed'.</td>
+        <td>jobController.js</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>Final emails are sent to the customer and bodyshop.</td>
+        <td>emailController.js</td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>

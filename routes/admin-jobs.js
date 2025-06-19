@@ -1,5 +1,6 @@
 // routes/admin-jobs.js
 import express from 'express';
+import adminAuth from '../middleware/adminAuth.js';
 import crypto from 'crypto';
 import multer from 'multer';
 import sharp from 'sharp';
@@ -17,6 +18,8 @@ import { exportQuotesToCSV } from '../controllers/exportQuotesToCSV.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
 import { hardDeleteJob } from '../controllers/hardDeleteJob.js';
 import { softDeleteProcessedJob } from '../controllers/adminJobDeleteController.js';
+
+
 
 dotenv.config();
 
@@ -277,5 +280,12 @@ router.get('/quotes/export-csv', exportQuotesToCSV);
 
 // === CUSTOMER ONE-TIME ACTIONS ===
 router.get('/jobs/action/:jobId/:token', handleJobAction);
+
+// === ADMIN JOB FLOW PAGE ===
+router.get('/job-flow', adminAuth, (req, res) => {
+  res.render('admin/job-flow');
+});
+
+
 
 export default router;

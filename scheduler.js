@@ -10,7 +10,7 @@ import fs from 'fs';
 import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import { DeletedJob, Job, Quote, Bodyshop } from './models/index.js';
 import { sendMonthlyProcessedReport } from './controllers/monthlyReportController.js';
-
+import { logScheduler } from './helpers/schedulerLogger.js';
 
 dotenv.config();
 
@@ -38,8 +38,10 @@ async function sendHtmlEmail(to, subject, html) {
   try {
     await transporter.sendMail({ from: `"My Car Quote" <${process.env.EMAIL_USER}>`, to, subject, html });
     console.log(`✅ Email sent: ${subject} -> ${to}`);
+    await logScheduler(`✅ Email sent: ${subject} -> ${to}`);
   } catch (err) {
     console.error(`❌ Email failed: ${subject} -> ${to}`, err);
+    await logScheduler(`❌ Email failed: ${subject} -> ${to}`);
   }
 }
 
@@ -91,7 +93,7 @@ async function sendCustomerJobDeletedEmail(job) {
   const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'job-deleted.ejs'), {
     customerName: job.customerName,
     job,
-    logoUrl: `${baseUrl}/img/logo.svg`,
+    logoUrl: `${baseUrl}/img/logo-true.svg`,
     homeUrl: `${baseUrl}/`,
     newRequestUrl: `${baseUrl}/jobs/upload`
   });
@@ -104,10 +106,9 @@ export async function runSchedulerNow() {
     return;
   }
   global.schedulerRunning = true;
-  
+  const dryRun = process.argv.includes('--dry-run');
 
   console.log('=== Scheduler started ===');
-  const dryRun = process.argv.includes('--dry-run');
   if (dryRun) console.log('=== DRY RUN MODE ENABLED ===');
 
   const summary = {
@@ -135,18 +136,17 @@ export async function runSchedulerNow() {
       const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
       const remaining = Math.max(0, bodyshopsInRange - quoteCount);
 
-      if (quoteCount >= 2 && !job.extensionRequestedAt && job.createdAt > cutoff24h) {
+      // EARLY TRIGGER: Send payment request as soon as 2+ quotes received
+      if (quoteCount >= 2 && !job.paid && job.status !== 'pending_payment') {
         if (!dryRun) await sendCustomerPaymentEmail(job);
-        job.extensionRequestedAt = now;
-        job.emailSentAt = null;
-        await job.save();
         summary.earlyEmails.push(job.id);
         continue;
       }
 
+      // 24h logic
       if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
         try {
-          if (!job.emailSentAt) { // prevent repeat
+          if (!job.emailSentAt) {
             if (quoteCount === 0) {
               await sendCustomerNoQuotesEmail(job);
               summary.noQuotes.push(job.id);
@@ -168,7 +168,6 @@ export async function runSchedulerNow() {
         }
         continue;
       }
-      
 
       if (job.extended && job.extensionRequestedAt && !job.emailSentAt) {
         job.emailSentAt = new Date();
@@ -179,11 +178,6 @@ export async function runSchedulerNow() {
         if (!dryRun) await sendCustomerPaymentEmail(job);
         summary.paymentRequested.push(job.id);
       }
-
-      console.log(`cutoff48h: ${cutoff48h.toISOString()}`);
-      console.log(`Job #${job.id} createdAt: ${job.createdAt.toISOString()}`);
-      console.log(`Job #${job.id} extended: ${job.extended}`);
-      console.log(`Job #${job.id} quoteCount: ${quoteCount}`);
 
       if (job.createdAt <= cutoff48h) {
         if (quoteCount === 0) {
@@ -200,8 +194,6 @@ export async function runSchedulerNow() {
               job.emailSentAt = now;
               await job.save();
             }
-            
-
 
             if (!dryRun) {
               await sendHtmlEmail(job.customerEmail, `Job #${job.id} – No Quotes Received`, html);
@@ -218,8 +210,6 @@ export async function runSchedulerNow() {
                 secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
               }
             });
-
-
 
             async function deleteJobImagesFromS3(imageKeys = []) {
               if (!imageKeys.length) return;
@@ -272,7 +262,6 @@ export async function runSchedulerNow() {
 
 cron.schedule('0 * * * *', runSchedulerNow);
 
-
 cron.schedule('59 23 28-31 * *', async () => {
   const now = new Date();
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -282,25 +271,10 @@ cron.schedule('59 23 28-31 * *', async () => {
   }
 });
 
-
 if (process.argv[1].endsWith('scheduler.js')) {
   runSchedulerNow();
 }
 
-
-
-  if (process.argv.includes('--send-report')) {
-    await sendMonthlyProcessedReport();
-  }
-  
-  cron.schedule('59 23 28-31 * *', async () => {
-    const now = new Date();
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-    if (now.getDate() === lastDay) {
-      console.log('📅 Running monthly processed report scheduler...');
-      await sendMonthlyProcessedReport();
-    }
-  });
-
-  
-
+if (process.argv.includes('--send-report')) {
+  await sendMonthlyProcessedReport();
+}

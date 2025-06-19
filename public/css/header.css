@@ -17,20 +17,16 @@
   flex-wrap: wrap;
 }
 
-.logo {
-  width: 160px;
-  flex-shrink: 0;
-}
 
 .logo img {
-  width: 160px;
-  height: auto;
-  display: block;
-  object-fit: contain;
-  image-rendering: -webkit-optimize-contrast;
-  backface-visibility: hidden;
-  filter: brightness(0) invert(1);
+  height: 50px;
+  width: auto;
+  image-rendering: auto;
+
 }
+
+
+
 
 
 .nav-links {
@@ -133,7 +129,7 @@
 /* ✅ Media Query for Mobile */
 @media (max-width: 768px) {
   .logo {
-    width: 120px;
+    width: auto;
   }
 
   .nav-links {

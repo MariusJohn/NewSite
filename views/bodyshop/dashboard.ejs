@@ -15,7 +15,7 @@
 <!-- Sidebar -->
   <div class="sidebar">
     <div class="logo-wrapper">
-     <img src="/img/logo.svg" alt="My Car Quote Logo">
+     <img src="/img/logo-true.svg" alt="My Car Quote Logo">
     </div>
     
     <% if (subscriptionMessage) { %>
@@ -97,8 +97,12 @@
                   <td>
                     <form action="/bodyshop/quote/<%= job.id %>" method="POST">
                       <input type="number" name="price" placeholder="£" class="quote-input" required>
+
+                      <textarea name="notes" placeholder="Add notes (optional)" class="quote-notes-input" rows="2"></textarea>
                       <button class="btn">Submit</button>
                     </form>
+                    
+                    
                   </td>
                 </tr>
               <% }) %>
@@ -265,25 +269,32 @@
   </div> 
 
 </div> 
+
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+
+
 <script>
-  document.querySelectorAll('.summary-header').forEach(header => {
-    header.addEventListener('click', () => {
-      const content = header.nextElementSibling;
-      content.style.display = content.style.display === 'none' ? 'block' : 'none';
+  document.addEventListener('DOMContentLoaded', () => {
+    // ✅ Alert auto-remove
+    const alertBox = document.querySelector('.alert.success');
+    if (alertBox) {
+      setTimeout(() => alertBox.remove(), 5000);
+    }
+
+    // ✅ Lightbox for all image previews
+    const lightbox = GLightbox({ selector: '.glightbox' });
+
+    // ✅ Expand/collapse for unselected jobs
+    const summaryHeaders = document.querySelectorAll('.summary-header');
+    summaryHeaders.forEach(header => {
+      header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        if (content) {
+          content.style.display = content.style.display === 'none' ? 'block' : 'none';
+        }
+      });
     });
   });
 </script>
-
-<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
-<script>
-  const lightbox = GLightbox({ selector: '.glightbox' });
-</script>
-<script>
-  const alertBox = document.querySelector('.alert.success');
-  if (alertBox) {
-    setTimeout(() => alertBox.remove(), 5000);
-  }
-</script>
-
 </body>
 </html>

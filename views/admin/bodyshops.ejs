@@ -12,7 +12,7 @@
     <!-- Consistent Sidebar -->
     <div class="sidebar" id="sidebar">
   
-      <a href="/."><img src="/img/logo.svg" alt="My Car Quote Logo"></a>
+      <a href="/."><img src="/img/logo-true.svg" alt="My Car Quote Logo"></a>
       <h2>Admin Panel</h2>
       <ul class="menu">
         <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
@@ -150,9 +150,17 @@
   </div>
 
   <script>
-    document.getElementById("toggleSidebar").addEventListener("click", () => {
-      document.getElementById("sidebar").classList.toggle("collapsed");
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggleBtn = document.getElementById("toggleSidebar");
+      const sidebar = document.getElementById("sidebar");
+  
+      if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener("click", () => {
+          sidebar.classList.toggle("collapsed");
+        });
+      }
     });
   </script>
+  
 </body>
 </html>

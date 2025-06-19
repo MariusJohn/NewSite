@@ -3,6 +3,7 @@ import express from 'express';
 const router = express.Router();
 import speakeasy from 'speakeasy';
 import dotenv from 'dotenv';
+import { runSchedulerNow } from '../scheduler.js';
 
 dotenv.config();
 
@@ -79,6 +80,18 @@ router.get('/', (req, res) => {
     return res.redirect('/jobs/admin');
   } else {
     res.render('admin/login', { error: null });
+  }
+});
+
+
+// === MANUAL SCHEDULER RUN ===
+router.post('/scheduler/manual-run', async (req, res) => {
+  try {
+    await runSchedulerNow(); // or spawn `node scheduler.js`
+    res.redirect('/jobs/admin/quotes');
+  } catch (err) {
+    console.error('Manual scheduler run failed:', err);
+    res.status(500).send('Scheduler error');
   }
 });
 

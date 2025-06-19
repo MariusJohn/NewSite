@@ -5,8 +5,23 @@
 <% if (quotes && quotes.length) { %>
   <% quotes.forEach(q => { %>
     <div class="quote-box">
-      <p>Quote: £<%= q.price %></p>
-      <p>Notes: <%= q.notes %></p>
+      <p>
+        Quote:
+        <% if (paid) { %>
+          £<%= q.price %>
+        <% } else { %>
+          <em>Hidden until payment</em>
+        <% } %>
+      </p>
+      
+      <p>Notes:
+        <% if (paid) { %>
+          <%= q.notes %>
+        <% } else { %>
+          <em>Hidden until payment</em>
+        <% } %>
+      </p>
+    
       <% if (paid && q.bodyshop) { %>
        
         <p>Bodyshop: <%= q.bodyshop.name %> (<%= q.bodyshop.email %> | <%= q.bodyshop.phone %>)</p>

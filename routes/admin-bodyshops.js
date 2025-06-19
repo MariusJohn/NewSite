@@ -69,12 +69,40 @@ router.post('/:id/approve', async (req, res) => {
         to: bodyshop.email,
         subject: '✅ Your Bodyshop Has Been Approved',
         html: `
-          <p>Hello <strong>${bodyshop.name}</strong>,</p>
-          <p>Your bodyshop account has been <strong>approved</strong>.</p>
-          <p>You can now <a href="http://${req.headers.host}/bodyshop/login">log in</a> and begin submitting quotes.</p>
-          <p>Welcome to My Car Quote!</p>
+          <div style="font-family: Arial, sans-serif; color: #002f5c; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="https://mcquote.co.uk/img/logo-true.svg" alt="My Car Quote Logo" style="height: 60px;" />
+            </div>
+      
+            <h2 style="color: #25D366;">Welcome, ${bodyshop.name}!</h2>
+      
+            <p>Your bodyshop account has been <strong>approved</strong>.</p>
+      
+            <p>You can now log in to view jobs and submit quotes:</p>
+      
+            <p>
+              <a href="http://${req.headers.host}/bodyshop/login" style="
+                display: inline-block;
+                padding: 12px 20px;
+                background-color: #002f5c;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 5px;
+              ">
+                🔐 Log In to Dashboard
+              </a>
+            </p>
+      
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc;" />
+      
+            <p style="font-size: 13px; color: #999;">
+              This email was sent by My Car Quote | <a href="https://mcquote.co.uk">mcquote.co.uk</a><br/>
+              If you didn’t request this, please ignore this email.
+            </p>
+          </div>
         `
       });
+      
 
       res.redirect('/jobs/admin/bodyshops');
     } else {
@@ -130,12 +158,40 @@ router.post('/:id/reactivate', async (req, res) => {
         to: bodyshop.email,
         subject: '🔄 Your Bodyshop Account Has Been Reactivated',
         html: `
-          <p>Hello <strong>${bodyshop.name}</strong>,</p>
-          <p>Your bodyshop account has been <strong>reinstated</strong> and is now active again.</p>
-          <p>You can resume quoting by <a href="http://${req.headers.host}/bodyshop/login">logging in here</a>.</p>
-          <p>Welcome back to My Car Quote!</p>
+          <div style="font-family: Arial, sans-serif; color: #002f5c; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="https://mcquote.co.uk/img/logo-true.svg" alt="My Car Quote Logo" style="height: 60px;" />
+            </div>
+      
+            <h2 style="color: #25D366;">Welcome Back, ${bodyshop.name}!</h2>
+      
+            <p>Your bodyshop account has been <strong>reinstated</strong> and is now active again.</p>
+      
+            <p>You can resume quoting on new jobs by logging into your dashboard:</p>
+      
+            <p>
+              <a href="http://${req.headers.host}/bodyshop/login" style="
+                display: inline-block;
+                padding: 12px 20px;
+                background-color: #002f5c;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 5px;
+              ">
+                🔐 Log In to Dashboard
+              </a>
+            </p>
+      
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc;" />
+      
+            <p style="font-size: 13px; color: #999;">
+              This email was sent by My Car Quote | <a href="https://mcquote.co.uk">mcquote.co.uk</a><br/>
+              If you didn’t request this change, please ignore this message.
+            </p>
+          </div>
         `
       });
+      
 
       res.redirect('/jobs/admin/bodyshops');
     } else {

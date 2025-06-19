@@ -216,6 +216,28 @@ body {
 .elapsed-warning { color: #ff9800; font-weight: 600; }
 .elapsed-critical { color: #c62828; font-weight: 600; }
 
+
+.highlight {
+  background-color: #dff0d8; 
+  font-weight: 600;
+}
+
+
+.btn-scheduler {
+  background-color: #0077cc;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: bold;
+  margin-left: 10px;
+  border: none;
+  cursor: pointer;
+}
+.btn-scheduler:hover {
+  background-color: #005fa3;
+}
+
+
 @media (max-width: 768px) {
   .admin-dashboard-container {
     flex-direction: column;

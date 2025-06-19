@@ -109,8 +109,11 @@ if (bodyshopMatch) {
       if (!file.buffer?.length) continue;
 
       const compressedBuffer = await sharp(file.buffer)
-        .resize({ width: 1920, withoutEnlargement: true })
-        .jpeg({ quality: 75 })
+        .resize({ width: 1600, withoutEnlargement: true })
+        .jpeg({ quality: 60,
+          mozjpeg: true,
+          progressive: true,
+         })
         .toBuffer();
 
       const s3Key = `job-images/${crypto.randomUUID()}.jpg`;

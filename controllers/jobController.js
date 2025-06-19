@@ -51,8 +51,8 @@ export const getJobFilterOptions = (filter) => {
       whereClause.paid = false;
       includeClause.push({
         model: Quote,
-        as: QUOTES_ALIAS, // *** IMPORTANT: Use the alias here ***
-        required: true // Ensures only jobs with at least one quote are returned
+        as: QUOTES_ALIAS, 
+        required: true 
       });
       break;
 
@@ -62,19 +62,19 @@ export const getJobFilterOptions = (filter) => {
       includeClause.push(
         {
           model: Quote,
-          as: QUOTES_ALIAS, // *** IMPORTANT: Use the alias here ***
-          required: false // Include quotes if they exist
+          as: QUOTES_ALIAS,
+          required: false 
         },
         {
           model: Bodyshop,
-          as: SELECTED_BODYSHOP_ALIAS, // *** IMPORTANT: Use the alias here ***
-          required: true // Ensures only jobs with an allocated bodyshop are returned
+          as: SELECTED_BODYSHOP_ALIAS, 
+          required: true 
         }
       );
       break;
 
     default:
-      whereClause.status = { [Op.not]: 'deleted' }; // fallback to total
+      whereClause.status = { [Op.not]: 'deleted' }; 
       break;
   }
 
@@ -85,7 +85,7 @@ export const getJobFilterOptions = (filter) => {
 
 /**
  * Fetches counts for various job filters.
- * @returns {object} An object containing all job counts.
+ * @returns {object} 
  */
 export const getJobCounts = async () => {
   const totalCount = await Job.count({ where: { status: { [Op.not]: 'deleted' } } });
