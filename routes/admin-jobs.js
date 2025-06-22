@@ -158,7 +158,7 @@ router.get('/', async (req, res) => {
     const counts = await getJobCounts();
 
     // This is the template being rendered
-    res.render('admin/jobs-dashboard', { jobs, ...counts, filter });
+    res.render('admin/jobs-dashboard', { jobs, ...counts, filter, csrfToken: req.csrfToken() });
 
   } catch (err) {
     console.error('❌ Dashboard Error in /jobs/admin handler:', err); // Keep error log
@@ -181,7 +181,8 @@ router.get('/jobs/deleted', async (req, res) => {
     res.render('admin/jobs-deleted', {
       jobs: deletedJobs,
       currentPage: 'deleted',
-      deletedJobCount: deletedJobs.length
+      deletedJobCount: deletedJobs.length,
+      csrfToken: req.csrfToken()
     });
   } catch (err) {
     console.error('❌ Failed to load deleted jobs:', err);

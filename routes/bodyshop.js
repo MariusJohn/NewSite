@@ -155,7 +155,7 @@ router.post('/register', async (req, res) => {
       }
       
       const mailOptions = {
-        from: '"My Car Quote" <noreply@mcquote.co.uk>',
+        from: '"My Car Quote" <office@mcquote.co.uk>',
         to: email,
         subject: '📧 Verify Your Bodyshop Account',
         html: `

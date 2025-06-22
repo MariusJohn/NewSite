@@ -54,6 +54,7 @@ uploads/
 database.sqlite
 cors.json
 
+hashPassword.js
 
 .DS_Store
 gitleaks-report.json

@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
+import csurf from 'csurf';
 import { sequelize } from './models/index.js';
 
 import customerRoutes from './routes/customer.js';
@@ -30,21 +31,29 @@ import { runSchedulerNow } from './scheduler.js';
 
 import devRoutes from './routes/dev.js';
 
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// ======= DEBUG ENV =======
-console.log('DEBUG ENV:', process.env.NODE_ENV);
-
-
-
-
 // ======= MIDDLEWARE =======
 app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
+// CSRF Protection Middleware
+const csrfProtection = csurf({ cookie: true });
+app.use(csrfProtection);
+
+// Pass CSRF Token to Views
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken ? req.csrfToken() : null;
+  next();
+});
+
+// Session Middleware
 app.use(session({
   secret: process.env.SESSION_SECRET || 'SESSION_KEY',
   resave: false,
@@ -52,34 +61,45 @@ app.use(session({
   rolling: true,
   cookie: {
     name: 'admin.sid',
-    secure: false, // Set to true if using HTTPS
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 15 * 60 * 1000 // 15 minutes
+    sameSite: 'lax',
+    maxAge: 15 * 60 * 1000
   }
 }));
 
+// ======= SECURITY MIDDLEWARE =======
+app.use((req, res, next) => {
+  if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
+    return res.redirect(`https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
 
 // ======= DEV ROUTES =======
 if (process.env.NODE_ENV !== 'production') {
   app.use('/', devRoutes);
 }
 
-
 // ======= STATIC & VIEW SETUP =======
 app.use(express.static(path.join(process.cwd(), 'public')));
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use('/webhook', webhookRoutes); 
-app.use(bodyParser.json());
+app.use('/webhook', webhookRoutes);
 
 app.set('views', path.join(process.cwd(), 'views'));
 app.set('view engine', 'ejs');
+
+// Rate limiting for login attempts
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Too many login attempts. Please try again later.'
+});
 
 // ======= ROUTES =======
 app.use('/admin', adminRoutes);
 app.use('/jobs/admin', adminAuth, adminJobsRoutes);
 app.use('/jobs/admin/bodyshops', adminAuth, adminBodyshopRoutes);
-
 
 app.use('/jobs', publicJobsRoutes);
 app.use('/', indexRoutes);
@@ -103,6 +123,10 @@ app.get('/session-test', (req, res) => {
 
 // ======= ERROR HANDLER =======
 app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    console.error('CSRF token validation failed:', err);
+    return res.status(403).send('Invalid CSRF token');
+  }
   console.error(err);
   res.status(500).send('Internal Server Error');
 });
@@ -118,7 +142,7 @@ sequelize.sync()
     app.listen(port, '0.0.0.0', (err) => {
       if (err) {
         console.error('❌ Error starting server:', err);
-        process.exit(1);  // Exit if binding fails
+        process.exit(1); // Exit if binding fails
       } else {
         console.log(`✅ Server running on port ${port}`);
       }
@@ -126,10 +150,8 @@ sequelize.sync()
   })
   .catch(err => {
     console.error('❌ Failed to sync database:', err);
-    process.exit(1);  // Exit if DB sync fails
+    process.exit(1); // Exit if DB sync fails
   });
-
-
 
 // ======= SCHEDULER =======
 cron.schedule('0 * * * *', runSchedulerNow);

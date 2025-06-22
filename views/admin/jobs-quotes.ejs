@@ -26,6 +26,7 @@
           <li><a href="/jobs/admin/bodyshops">Bodyshops</a></li>
           <li>
             <form action="/admin/logout" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
               <button type="submit" class="logout-btn">Logout</button>
             </form>
           </li>

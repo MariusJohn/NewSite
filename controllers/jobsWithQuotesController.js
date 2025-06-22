@@ -23,6 +23,7 @@ export async function renderJobsWithQuotes(req, res) {
 
     res.render('admin/jobs-quotes', { 
               jobs,
+              csrfToken: req.csrfToken() ,
               ...counts
      });
   } catch (err) {

@@ -47,7 +47,8 @@ router.get('/', async (req, res) => {
       rejectedCount,
       archivedCount,
       deletedCount,
-      search
+      search,
+      csrfToken: req.csrfToken()
     });
   } catch (error) {
     console.error(error);
@@ -65,7 +66,7 @@ router.post('/:id/approve', async (req, res) => {
       await bodyshop.save();
 
       await transporter.sendMail({
-        from: '"My Car Quote" <noreply@mcquote.co.uk>',
+        from: '"My Car Quote" <office@mcquote.co.uk>',
         to: bodyshop.email,
         subject: '✅ Your Bodyshop Has Been Approved',
         html: `
@@ -124,7 +125,7 @@ router.post('/:id/reject', async (req, res) => {
       await bodyshop.save();
 
       await transporter.sendMail({
-        from: '"My Car Quote" <noreply@mcquote.co.uk>',
+        from: '"My Car Quote" <office@mcquote.co.uk>',
         to: bodyshop.email,
         subject: '❌ Your Bodyshop Registration Was Not Approved',
         html: `
@@ -154,7 +155,7 @@ router.post('/:id/reactivate', async (req, res) => {
       await bodyshop.save();
 
       await transporter.sendMail({
-        from: '"My Car Quote" <noreply@mcquote.co.uk>',
+        from: '"My Car Quote" <office@mcquote.co.uk>',
         to: bodyshop.email,
         subject: '🔄 Your Bodyshop Account Has Been Reactivated',
         html: `

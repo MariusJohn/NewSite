@@ -21,16 +21,19 @@
     <p class="error-msg"><%= error %></p>
   <% } %>
   <form method="POST" action="/admin/login">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    
     <input type="email" name="email" placeholder="Admin Email" required>
     <input type="password" name="password" placeholder="Password" required>
     <input type="text" name="token" placeholder="Enter 2FA Code" required />
-
+  
     <select name="role" required>
       <option value="admin">Administrator</option>
       <option value="approver">Approver</option>
     </select>
     <button type="submit">Log In</button>
   </form>
+
 </div>
 
 <%- include('../partials/footer') %>
