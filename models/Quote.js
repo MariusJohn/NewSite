@@ -67,4 +67,6 @@ Quote.init({
     timestamps: true
 });
 
+
+
 export default Quote;

@@ -3,6 +3,22 @@ const router = express.Router();
 import { Op } from 'sequelize';
 import { Bodyshop, Job } from '../models/index.js';
 import nodemailer from 'nodemailer';
+import csurf from 'csurf';
+import adminAuth from '../middleware/adminAuth.js';
+
+
+
+// Apply adminAuth middleware to all routes in this file
+router.use(adminAuth);
+
+router.use(csurf({ cookie: true }));
+
+router.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
+
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.ionos.co.uk',
@@ -13,6 +29,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS
   }
 });
+
 
 // Show all bodyshops
 router.get('/', async (req, res) => {

@@ -14,7 +14,7 @@ import { checkSubscriptionActive } from '../middleware/subscriptionCheck.js';
 import jwt from 'jsonwebtoken'; 
 
 import { submitQuote } from '../controllers/bodyshopController.js';
-
+import { geocodeAddress } from '../utils/geocode.js'; 
 
 dotenv.config(); // Keep this as it is after the import
 
@@ -102,16 +102,23 @@ router.post('/register', async (req, res) => {
     }
 
     // Get coordinates from OpenCage
-    const apiKey = process.env.OPENCAGE_API_KEY;
-    const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json`, {
-      params: { q: normalizedArea, key: apiKey, countrycode: 'gb', limit: 1 }
-    });
-
-    if (!response.data.results.length) {
-      return res.render('bodyshop/register', { error: 'Unable to find coordinates for the given postcode.' });
+    let geoData;
+    try {
+        geoData = await geocodeAddress(normalizedArea); 
+    } catch (geoError) {
+       
+        console.error('❌ Geocoding error during registration:', geoError.message);
+        return res.render('bodyshop/register', { error: 'Failed to process postcode. Please try again later.' });
     }
 
-    const { lat, lng } = response.data.results[0].geometry;
+    if (!geoData) {
+    
+      return res.render('bodyshop/register', { error: 'Unable to find coordinates for the given postcode. Please enter a more specific postcode.' });
+    }
+
+    const { lat, lng } = geoData;
+
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
     const trialEndsAt = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
 
@@ -404,6 +411,7 @@ router.get('/dashboard', requireBodyshopLogin, checkSubscriptionActive, async (r
           if (quote) {
             job.quoteAmount = quote.price;
             job.quoteDate = quote.createdAt;
+            job.quoteNotes = quote.notes;
             job.allocated = quote.allocated || false;
             quotedJobs.push(job);
           } else {

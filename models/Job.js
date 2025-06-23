@@ -170,4 +170,5 @@ const Job = sequelize.define('Job', {
 
 
 
+
 export default Job;

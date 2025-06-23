@@ -99,7 +99,13 @@
                     <% } %>
                   </td>
                   <td><%= job.daysPending %></td>
-                  <td><%= job.quoteStatus || '—' %></td>
+                  <td>
+                    <% if (job.quoteCount > 0) { %>
+                      <span class="badge badge-info"><%= job.quoteStatus %></span>
+                    <% } else { %>
+                      <span class="badge badge-default">no_quotes</span>
+                    <% } %>
+                  </td>
                   <td><%= new Date(job.createdAt).toLocaleDateString() %></td>
                   <td>
                     <a href="#" class="toggle-quotes btn btn-view" data-job-id="<%= job.id %>"></a>

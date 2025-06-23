@@ -160,6 +160,11 @@
                     <% if (job.allocated) { %>
                       <span class="badge badge-allocated">Allocated</span>
                     <% } %>
+                    <% if (job.quoteNotes) { %>
+                      <div class="quote-notes-display">
+                        <strong>Notes:</strong> <%= job.quoteNotes %>
+                      </div>
+                    <% } %>
                   </td>
                 </tr>
               <% }) %>

@@ -10,11 +10,16 @@ import { randomUUID } from 'crypto';
 import { Job, Bodyshop } from '../models/index.js';
 import { jobUploadLimiter } from '../middleware/rateLimiter.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
+import * as csurf from 'csurf'; 
+import { geocodeAddress } from '../utils/geocode.js'; 
+import { verifyRecaptcha } from '../middleware/recaptchaVerify.js'; 
 
 dotenv.config();
 
 const router = express.Router();
-const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
+
+const csrfProtection = csurf({ cookie: true });
+
 
 // === AWS S3 Client ===
 const s3Client = new S3Client({
@@ -33,12 +38,18 @@ const upload = multer({
 });
 
 // === GET: Upload form ===
-router.get('/upload', (req, res) => {
-  res.render('jobs/upload');
+router.get('/upload', csrfProtection, (req, res) => {
+  const csrfToken = req.csrfToken ? req.csrfToken() : null;
+  console.log('CSRF Token for upload form:', csrfToken);
+  res.render('jobs/upload', {
+    recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
+    csrfToken: csrfToken,
+  });
 });
 
 // === POST: Upload form submission ===
-router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, res) => {
+
+router.post('/upload', jobUploadLimiter, csrfProtection, upload.array('images', 8), verifyRecaptcha, async (req, res) => {
   try {
     const phoneRegex = /^07\d{9}$/;
     const { name, email, location, telephone } = req.body;
@@ -55,45 +66,31 @@ router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, 
       });
     }
 
-    const token = req.body['g-recaptcha-response'];
-    if (!token) {
-      return res.status(400).render('jobs/upload-error', {
-        title: 'Captcha Error',
-        message: 'Captcha verification failed. Please try again.'
-      });
+    // --- REPLACED RECAPTCHA VERIFICATION WITH MIDDLEWARE ---
+    // The verifyRecaptcha middleware now handles this.
+    // If it reaches here, reCAPTCHA is already verified.
+
+    let geoData;
+    try {
+        geoData = await geocodeAddress(safeLocation); // NEW: Use the geocode utility
+    } catch (geoError) {
+        // Handle errors thrown by geocodeAddress (e.g., API issues)
+        console.error('❌ Geocoding error:', geoError.message);
+        return res.status(500).render('jobs/upload-error', {
+            title: 'Location Error',
+            message: 'Failed to process location. Please try again later.'
+        });
     }
 
-    const verifyResponse = await axios.post('https://www.google.com/recaptcha/api/siteverify', null, {
-      params: {
-        secret: RECAPTCHA_SECRET_KEY,
-        response: token
-      }
-    });
-
-    if (!verifyResponse.data.success) {
-      return res.status(400).render('jobs/upload-error', {
-        title: 'Captcha Error',
-        message: 'Captcha failed verification. Please try again.'
-      });
-    }
-
-    const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
-      params: {
-        q: location,
-        key: process.env.OPENCAGE_API_KEY,
-        countrycode: 'gb',
-        limit: 1
-      }
-    });
-
-    if (!geoRes.data.results?.length) {
+    if (!geoData) {
+     
       return res.status(400).render('jobs/upload-error', {
         title: 'Location Error',
-        message: 'Unable to find coordinates for the given postcode.'
+        message: 'Unable to find a precise location for the given address/postcode. Please try a more specific address.'
       });
     }
 
-    const { lat, lng } = geoRes.data.results[0].geometry;
+    const { lat, lng } = geoData; 
     const uploadedS3Urls = [];
 
     for (const file of req.files || []) {
@@ -144,7 +141,6 @@ router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, 
     });
   }
 });
-
 
 router.get('/action/:jobId/:token', (req, res, next) => {
   console.log('🔔 Route hit:', req.originalUrl);

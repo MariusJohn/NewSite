@@ -134,8 +134,33 @@
                             </td>
 
                             <td>
-                                <%= job.quoteStatus || 'no_quotes' %>
+                              <% if (job.quoteCount > 0) { %>
+                                <span class="badge badge-info"><%= job.quoteStatus %></span>
+                              <% } else { %>
+                                <span class="badge badge-default">no_quotes</span>
+                              <% } %>
                             </td>
+                            <% if (job.quotes && job.quotes.length > 0) { %>
+                              <tr>
+                                <td colspan="7" style="background: #f9fcff; padding: 10px 20px;">
+                                  <strong>Quotes:</strong>
+                                  <ul>
+                                    <% job.quotes.forEach(q => { %>
+                                      <li>
+                                        £<%= q.price %> –
+                                        <% if (q.bodyshop) { %>
+                                          <%= q.bodyshop.name %> (<%= q.bodyshop.email %>)
+                                        <% } else { %>
+                                          Unknown Bodyshop
+                                        <% } %>
+                                      </li>
+                                    <% }) %>
+                                  </ul>
+                                </td>
+                              </tr>
+                            <% } %>
+                            
+                            
                                 <td class="job-actions">
                                     <% if (job.status === 'pending') { %>
                                         

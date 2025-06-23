@@ -41,7 +41,8 @@ export async function exportJobsWithQuotesCSV(req, res) {
         as: 'quotes',
         required: true,
         include: [{ model: Bodyshop,
-          as: 'bodyshop'
+          as: 'bodyshop',
+          attributes: ['name', 'postcode']
          }]
       }]
     });

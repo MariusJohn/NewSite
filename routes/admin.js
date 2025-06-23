@@ -1,3 +1,4 @@
+// Route: /admin
 import express from 'express';
 const router = express.Router();
 import speakeasy from 'speakeasy';
@@ -6,6 +7,7 @@ import { runSchedulerNow } from '../scheduler.js';
 import bcrypt from 'bcrypt';
 import rateLimit from 'express-rate-limit';
 import csurf from 'csurf';
+import adminAuth from '../middleware/adminAuth.js';
 
 dotenv.config();
 
@@ -14,14 +16,17 @@ if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD || !process.env.ADMI
   throw new Error('❌ Missing required environment variables for admin authentication');
 }
 
+
+router.use(adminAuth);
+
+
 // CSRF Protection Middleware
 const csrfProtection = csurf({ cookie: true });
 
 
-
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 login attempts per window
+  max: 15, // Limit each IP to 5 login attempts per window
   message: 'Too many login attempts. Please try again later.',
   handler: (req, res) => {
     console.warn(`Rate limit reached for IP: ${req.ip}`);
@@ -82,6 +87,7 @@ router.post('/login', loginLimiter, csrfProtection, async (req, res) => {
     res.redirect('/jobs/admin');
   });
 });
+
 
 
 

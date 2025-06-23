@@ -14,61 +14,56 @@
 
 <div class="page-wrapper">
 
-
   <div class="logo-jobUpload">
     <a href="/">
       <img src="/img/logo-true.svg" alt="My Car Quote Logo">      
-  </a>
-</div>
+    </a>
+  </div>
 
-<main class="upload-main">
-  <section class="upload-container">
-    <h1>Submit Your Vehicle Images</h1>
-    <p class="upload-subtext">Please fill out the form and upload 5 to 8 images (max 5MB each)</p>
+  <main class="upload-main">
+    <section class="upload-container">
+      <h1>Submit Your Vehicle Images</h1>
+      <p class="upload-subtext">Please fill out the form and upload 5 to 8 images (max 5MB each)</p>
 
-    <form id="uploadForm" action="/jobs/upload" method="POST" enctype="multipart/form-data" class="upload-form">
-      
-      <label for="name">Full Name:</label>
-      <input type="text" id="name" name="name" placeholder="Your full name" required>
-      <span class="error-message" id="name-error"></span>
+      <form id="uploadForm" action="/jobs/upload" method="POST" enctype="multipart/form-data" class="upload-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
-      <label for="email">Email Address:</label>
-      <input type="email" id="email" name="email" placeholder="Your email address" required>
-      <span class="error-message" id="email-error"></span>
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" name="customerName" placeholder="Your full name" required>
+        <span class="error-message" id="name-error"></span>
 
-      <label for="telephone">Telephone number:</label>
-      <input type="tel" id="telephone" name="telephone" placeholder="Your phone number" required>
-      <span class="error-message" id="phone-error"></span>
+        <label for="email">Email Address:</label>
+        <input type="email" id="email" name="email" placeholder="Your email address" required>
+        <span class="error-message" id="email-error"></span>
 
-      <label for="location">Location (Postcode):</label>
-      <input type="text" id="location" name="location" placeholder="Your post code" required>
-      <span class="error-message" id="postcode-error"></span>
+        <label for="telephone">Telephone number:</label>
+        <input type="tel" id="telephone" name="telephone" placeholder="Your phone number" required>
+        <span class="error-message" id="phone-error"></span>
 
-      <label for="images">Upload Images:</label>
-      <input type="file" id="images" name="images" multiple accept="image/*" required>
-      <span class="error-message" id="images-error"></span>
+        <label for="location">Location (Postcode):</label>
+        <input type="text" id="location" name="postcode" placeholder="Your post code" required>
+        <span class="error-message" id="postcode-error"></span>
 
-      <div class="g-recaptcha" data-sitekey="<%= process.env.RECAPTCHA_SITE_KEY %>"></div>
+        <label for="images">Upload Images:</label>
+        <input type="file" id="images" name="images" multiple accept="image/*" required>
+        <span class="error-message" id="images-error"></span>
 
-      <button type="submit" class="upload-btn" id="submitBtn">Submit Job</button>
+        <div class="g-recaptcha" data-sitekey="<%= recaptchaSiteKey %>"></div> 
 
-      <p id="form-error-message" style="color: rgb(41, 250, 26); display: none;"></p>
-    </form>
-  </section>
-</main>
+        <button type="submit" class="upload-btn" id="submitBtn">Submit Job</button>
+
+        <p id="form-error-message" style="color: rgb(41, 250, 26); display: none;"></p>
+      </form>
+    </section>
+  </main>
 
 </div>
 
 <%- include('../partials/footer') %>
-
 <%- include('../partials/cookie-banner') %>
-
-
 
 <script src="/js/navbar-toggle.js"></script>
 <script src="/js/job-upload.js"></script>
 <script src="/js/cookie-banner.js"></script>
 </body>
-
-
 </html>

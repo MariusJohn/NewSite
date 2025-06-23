@@ -1,4 +1,3 @@
-// middleware/adminAuth.js
 export default function adminAuth(req, res, next) {
     // Allow access to the login and logout pages directly
     if (req.originalUrl.startsWith('/admin/login') || req.originalUrl.startsWith('/admin/logout')) {
@@ -11,19 +10,19 @@ export default function adminAuth(req, res, next) {
         if (req.session) {
             req.session.destroy(err => {
                 if (err) {
-                    console.error('Session destroy error in adminAuth:', err); // Keep error log
+                    console.error('Session destroy error in adminAuth:', err); // Log session destroy errors
                 }
-                res.clearCookie('admin.sid'); // Clear the session cookie.
-                return res.redirect('/admin/login?expired=true'); // Redirect to login page with an 'expired' flag.
+                res.clearCookie('admin.sid'); // Clear the session cookie
+                return res.redirect('/admin/login?expired=true'); // Redirect to login page with an 'expired' flag
             });
         } else {
-            // If no session exists (e.g., first visit to a protected page), just redirect.
+            // If no session exists (e.g., first visit to a protected page), just redirect
             return res.redirect('/admin/login?expired=true');
         }
     } else {
-        // If authenticated and not expired, update last activity.
+        // If authenticated and not expired, update last activity
         req.session.lastActivity = Date.now();
         req.session.idleExpired = false; // Reset idleExpired flag
-        next(); // Proceed
+        next(); // Proceed to the next middleware or route handler
     }
-  }
+}

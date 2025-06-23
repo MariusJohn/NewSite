@@ -1,4 +1,4 @@
-// routes/admin-jobs.js
+// routes/admin-jobs
 import express from 'express';
 import adminAuth from '../middleware/adminAuth.js';
 import crypto from 'crypto';
@@ -7,6 +7,7 @@ import sharp from 'sharp';
 import axios from 'axios';
 import archiver from 'archiver';
 import fetch from 'node-fetch';
+import csurf from 'csurf';
 import dotenv from 'dotenv';
 import { Job, Quote, Bodyshop } from '../models/index.js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
@@ -20,10 +21,11 @@ import { hardDeleteJob } from '../controllers/hardDeleteJob.js';
 import { softDeleteProcessedJob } from '../controllers/adminJobDeleteController.js';
 
 
-
 dotenv.config();
 
-const router = express.Router();
+
+
+
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
 
 const s3Client = new S3Client({
@@ -34,16 +36,24 @@ const s3Client = new S3Client({
   },
 });
 
+const router = express.Router();
+
+const csrfProtection = csurf({ cookie: true });
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 8 * 1024 * 1024 },
 });
+
+
+router.use(adminAuth);
 
 // === JOB UPLOAD ROUTES ===
 router.get('/upload', (req, res) => {
   res.render('jobs/upload');
 });
 
+// Middleware to verify reCAPTCHA ===
 router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, res) => {
   try {
     const { name, email, location, telephone, ['g-recaptcha-response']: token } = req.body;
@@ -74,7 +84,7 @@ router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, 
       });
     }
 
-    const geoRes = await axios.get('https://api.opencagedata.com/geocode/v1/json', {
+    const geoRes = await axios.get('https://api.opencagedata.com//v1/json', {
       params: { q: location, key: process.env.OPENCAGE_API_KEY, countrycode: 'gb', limit: 1 },
     });
 
@@ -135,16 +145,26 @@ router.post('/upload', jobUploadLimiter, upload.array('images', 8), async (req, 
 
 
 // === ADMIN DASHBOARD ===
-router.get('/', async (req, res) => {
+router.get('/', csrfProtection, async (req, res) => {
   try {
     const filter = req.query.filter || 'total';
     const { whereClause, includeClause } = getJobFilterOptions(filter);
 
+    includeClause.push({
+      model: 'quotes',
+      attributes: ['id'], 
+    });
+
     const jobs = await Job.findAll({
       where: whereClause,
-      include: includeClause,
+      include: [{
+        model: Quote,
+        as: 'quotes',
+        attributes: ['id']
+      }],
       order: [['createdAt', 'DESC']]
     });
+    
 
     // Add daysPending calculation
     const now = new Date();
@@ -153,8 +173,13 @@ router.get('/', async (req, res) => {
       const msInDay = 1000 * 60 * 60 * 24;
       const daysPending = Math.floor((now - createdAt) / msInDay);
       job.dataValues.daysPending = daysPending;
-    });
 
+      const quoteCount = job.quotes?.length || 0;
+      job.dataValues.quoteCount = quoteCount;
+      job.dataValues.quoteStatus = quoteCount > 0 ? `${quoteCount} quote${quoteCount > 1 ? 's' : ''}` : 'no_quotes';
+    });
+   
+   
     const counts = await getJobCounts();
 
     // This is the template being rendered
@@ -254,6 +279,8 @@ router.post('/:jobId/restore-deleted', async (req, res) => {
 // === HARD DELETE POST === //
 router.post('/:jobId/hard-delete', hardDeleteJob);
 
+
+
 // === IMAGE DOWNLOAD AS ZIP ===
 router.get('/download/:jobId', async (req, res) => {
   const job = await Job.findByPk(req.params.jobId);
@@ -272,7 +299,7 @@ router.get('/download/:jobId', async (req, res) => {
 });
 
 // === JOB QUOTES VIEW ===
-router.get('/quotes', renderJobsWithQuotes);
+router.get('/quotes', csrfProtection,renderJobsWithQuotes);
 router.get('/quotes/export', exportJobsWithQuotesCSV);
 router.get('/quotes/remind', remindUnselectedJobs);
 router.post('/remind/:jobId', remindBodyshops);
