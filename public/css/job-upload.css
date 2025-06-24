@@ -100,6 +100,79 @@ body {
   background-color: #1da955;
 }
 
+
+.upload-modal-overlay {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.upload-modal-content {
+  background-color: white;
+  max-width: 400px;
+  width: 100%;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.upload-modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #002f5c;
+}
+
+.upload-modal-content ol {
+  text-align: left;
+  padding-left: 20px;
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.upload-modal-content li {
+  margin-bottom: 10px;
+}
+
+.upload-modal-content .final-tip {
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.modal-close-btn {
+  background-color: #002f5c;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.choose-file-btn {
+  margin-top: 10px;
+  padding: 10px 18px;
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+
+
+
 @media screen and (max-width: 600px) {
   .logo-jobUpload img {
     width: 250px;

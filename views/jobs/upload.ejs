@@ -45,8 +45,12 @@
         <span class="error-message" id="postcode-error"></span>
 
         <label for="images">Upload Images:</label>
-        <input type="file" id="images" name="images" multiple accept="image/*" required>
+        <button type="button" id="showInstructionsBtn" class="choose-file-btn">Choose Files</button>
+        <input type="file" id="images" name="images" accept="image/*" multiple required hidden>
         <span class="error-message" id="images-error"></span>
+        
+        
+         
 
         <div class="g-recaptcha" data-sitekey="<%= recaptchaSiteKey %>"></div> 
 
@@ -54,6 +58,23 @@
 
         <p id="form-error-message" style="color: rgb(41, 250, 26); display: none;"></p>
       </form>
+                  <!-- Upload Instructions Modal -->
+                  <div id="uploadInstructionsModal" class="upload-modal-overlay">
+                    <div class="upload-modal-content">
+                      <h2>Upload Guide</h2>
+                      <ol>
+                        <li>📸 1 photo of the <strong>FRONT </strong>of your car</li>
+                        <li>📸 1 photo of the <strong>BACK </strong> of your car</li>
+                        <li>📸 1 photo of the <strong>DAMAGED SIDE </strong>of your car</li>
+                        <li>📸 1 photo with the  <strong>OVERALL DAMAGE</strong></li>
+                        <li>📸 1 photo or more <strong>close-up photos of the damage</strong></li>
+                      </ol>
+                      <p class="final-tip" style="color: blue;"><strong>Then choose and attach your pictures from your phone gallery.</strong></p>
+                      <button id="closeModalBtn" class="modal-close-btn">Got it</button>
+                    </div>
+                  </div>
+
+
     </section>
   </main>
 
@@ -62,7 +83,6 @@
 <%- include('../partials/footer') %>
 <%- include('../partials/cookie-banner') %>
 
-<script src="/js/navbar-toggle.js"></script>
 <script src="/js/job-upload.js"></script>
 <script src="/js/cookie-banner.js"></script>
 </body>

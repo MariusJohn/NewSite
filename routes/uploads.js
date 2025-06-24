@@ -33,8 +33,8 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 8 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    if (!['image/jpeg', 'image/png', 'image/heic'].includes(file.mimetype)) {
-      return cb(new Error('Only .jpeg, .png, and .heic files are allowed!'));
+    if (file.mimetype !== 'image/jpeg') {
+      return cb(new Error('Only JPEG images are allowed!'));
     }
     cb(null, true);
   },
