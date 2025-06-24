@@ -1,16 +1,15 @@
-<!--no-quotes.ejs email page-->
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>No Quotes Yet - My Car Quote</title>
+  <title>No Quotes Yet – My Car Quote</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
+      background: #f3f8fc;
       padding: 20px;
-      color: #333;
+      color: #002f5c;
     }
     .box {
       max-width: 600px;
@@ -19,22 +18,23 @@
       border-radius: 8px;
       padding: 30px;
       box-sizing: border-box;
+      text-align: center;
     }
-    h2 { font-size: 24px; margin-bottom: 20px; }
-    p { font-size: 16px; margin-bottom: 16px; line-height: 1.6; }
+    img.logo {
+      max-width: 160px;
+      margin-bottom: 20px;
+    }
+    h2 { font-size: 22px; margin-bottom: 16px; }
+    p { font-size: 16px; margin-bottom: 18px; line-height: 1.5; }
     .btn {
       display: inline-block;
-      margin-top: 10px;
-      padding: 12px 20px;
+      margin: 8px 5px;
+      padding: 12px 24px;
       background: #007bff;
       color: white;
       text-decoration: none;
       border-radius: 5px;
       font-weight: bold;
-      white-space: nowrap;
-      max-width: 100%;
-      text-align: center;
-      box-sizing: border-box;
     }
     .btn-danger { background: #dc3545; }
     .small { font-size: 12px; color: #666; margin-top: 30px; }
@@ -43,20 +43,32 @@
       .btn {
         display: block;
         width: 100%;
-        font-size: 16px;
+        margin: 10px 0;
       }
     }
   </style>
 </head>
 <body>
   <div class="box">
+    <img src="<%= logoUrl %>" alt="My Car Quote Logo" style="max-width: 160px; margin-bottom: 20px;">
+
     <h2>Hello<%= customerName ? ` ${customerName}` : '' %>,</h2>
-    <p>Your job request <strong>#<%= job.id %></strong> hasn’t received any quotes yet.</p>
+    <p>We are sorry but your job request <strong>#<%= job.id %></strong> hasn’t received any quotes yet.</p>
     <p>Would you like to keep it active for another 24 hours to give local bodyshops more time to respond?</p>
 
-    <a class="btn" href="<%= extendUrl %>">Yes, Extend My Job</a>
-    <a class="btn btn-danger" href="<%= cancelUrl %>">No, Cancel My Job</a>
-    
+    <% if (extendUrl && cancelUrl) { %>
+      <a class="btn" href="<%= extendUrl %>">Yes, Extend My Job</a>
+      <a class="btn btn-danger" href="<%= cancelUrl %>">No, Cancel My Job</a>
+    <% } else { %>
+      <form method="POST" action="<%= baseUrl ? baseUrl : 'http://localhost:3000' %>/jobs/action/<%= job.id %>">
+        <input type="hidden" name="extendToken" value="<%= job.extendToken %>">
+        <button type="submit" class="btn">Yes, Extend My Job</button>
+      </form>
+      <form method="POST" action="<%= baseUrl ? baseUrl : 'http://localhost:3000' %>/jobs/action/<%= job.id %>">
+        <input type="hidden" name="cancelToken" value="<%= job.cancelToken %>">
+        <button type="submit" class="btn btn-danger">No, Cancel My Job</button>
+      </form>
+    <% } %>
 
     <p class="small">Thanks for using My Car Quote — helping you get fast, fair repair quotes.</p>
   </div>

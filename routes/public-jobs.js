@@ -13,6 +13,8 @@ import { handleJobAction } from '../controllers/customerJobActionsController.js'
 import * as csurf from 'csurf'; 
 import { geocodeAddress } from '../utils/geocode.js'; 
 import { verifyRecaptcha } from '../middleware/recaptchaVerify.js'; 
+import { Job } from '../models/index.js';
+
 
 dotenv.config();
 
@@ -65,6 +67,10 @@ router.post('/upload', jobUploadLimiter, csrfProtection, upload.array('images', 
         message: 'Please enter a valid UK phone number (07...).'
       });
     }
+
+
+
+
 
     // --- REPLACED RECAPTCHA VERIFICATION WITH MIDDLEWARE ---
     // The verifyRecaptcha middleware now handles this.
@@ -146,5 +152,36 @@ router.get('/action/:jobId/:token', (req, res, next) => {
   console.log('🔔 Route hit:', req.originalUrl);
   next();
 }, handleJobAction);
+
+
+
+// === POST: Extend job via secure token ===
+router.post('/jobs/extend/:token', async (req, res) => {
+  try {
+    const job = await Job.findOne({ where: { extendToken: req.params.token } });
+
+    if (!job) {
+      return res.status(404).render('jobs/action-expired');
+    }
+
+    if (job.extendTokenUsed || job.extended) {
+      return res.render('jobs/already-extended', { job });
+    }
+
+    job.extended = true;
+    job.extendTokenUsed = true;
+    job.extensionRequestedAt = new Date();
+    await job.save();
+
+    res.render('jobs/extended-confirmation', { job });
+  } catch (err) {
+    console.error('❌ Extend Error:', err);
+    res.status(500).render('jobs/action-error', {
+      message: 'Unable to extend the job. Please try again later.'
+    });
+  }
+});
+
+
 
 export default router;

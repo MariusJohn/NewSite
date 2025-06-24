@@ -43,12 +43,13 @@
           <div style="text-align: right; margin-bottom: 1rem;">
             <a href="/jobs/admin/quotes/export-csv" class="btn btn-export">📥 Export CSV</a>
             <form action="/admin/scheduler/manual-run" method="POST" style="display:inline;">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
               <button type="submit" class="btn btn-scheduler">🕒 Run Scheduler</button>
             </form>
+            
           </div>
-          
-          
-             
+                    
+           
 
             <table class="quotes-table">
               <thead>
@@ -59,7 +60,6 @@
                   <th>Quote</th>
                   <th>Status</th>
                   <th>Days Pending</th>
-                  <th>Quote Status</th>
                   <th>Date Uploaded</th>
                   <th>Actions</th>
                 </tr>
@@ -84,46 +84,57 @@
                   </td>
                   <td><%= job.quotes?.length || 0 %></td>
                   <td>
-                    <% if (!job.quotes || job.quotes.length === 0) { %>
-                      <span class="status-badge warning">Unquoted</span>
-                    <% } else if (job.status === 'processed') { %>
-                      <span class="status-badge processed">Processed ✅</span>
-                    <% } else if (job.status === 'paid') { %>
-                      <span class="status-badge paid">Paid (Awaiting selection)</span>
-                    <% } else if (job.status === 'quoted') { %>
-                      <span class="status-badge quoted">Quoted</span>
-                    <% } else if (job.status === 'waiting_customer_selection') { %>
-                      <span class="status-badge warning">Waiting</span>
+                    <% if (job.paid && job.selectedBodyshopId) { %>
+                      <span class="status-badge processed">Paid_BS Selected</span>
+                    <% } else if (job.paid && !job.selectedBodyshopId) { %>
+                      <span class="status-badge paid">Paid_BS NOT Selected</span>
+                    <% } else if (!job.paid && (job.quotes?.length || 0) >= 1 && job.daysPending >= 2) { %>
+                      <span class="status-badge danger">Unpaid (Overdue)</span>
+                    <% } else if (!job.paid && (job.quotes?.length || 0) >= 1) { %>
+                      <span class="status-badge unpaid">Unpaid</span>
                     <% } else { %>
                       <span class="status-badge"><%= job.status %></span>
                     <% } %>
                   </td>
-                  <td><%= job.daysPending %></td>
-                  <td>
-                    <% if (job.quoteCount > 0) { %>
-                      <span class="badge badge-info"><%= job.quoteStatus %></span>
-                    <% } else { %>
-                      <span class="badge badge-default">no_quotes</span>
-                    <% } %>
-                  </td>
+                  <td><%= typeof job.daysPending !== 'undefined' ? job.daysPending : '—' %></td>
+
+     
                   <td><%= new Date(job.createdAt).toLocaleDateString() %></td>
+
+
                   <td>
-                    <a href="#" class="toggle-quotes btn btn-view" data-job-id="<%= job.id %>"></a>
-                    
-                  
+                    <!-- Toggle Quotes -->
+                    <a href="#" class="toggle-quotes btn btn-view" data-job-id="<%= job.id %>" title="View Quotes"></a>
+
+                    <!-- Remind Button: job with < 2 quotes and < 2 days old -->
+                    <% if ((job.quotes?.length || 0) < 2 && job.daysPending < 2) { 
+                      const reminderSent = remindedJobs && remindedJobs.includes(job.id); %>
+                   
+                   <form action="/jobs/admin/<%= job.id %>/remind" method="POST" style="display:inline;">
+                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                     <button type="submit" class="btn btn-remind" <%= reminderSent ? 'disabled' : '' %>>
+                       <%= reminderSent ? 'Reminder Sent' : 'Remind' %>
+                     </button>
+                   </form>
+                 
+                 <% } %>
+                 
+
+                    <!-- Archive -->
                     <% if (job.status === 'paid') { %>
                       <form action="/jobs/admin/<%= job.id %>/archive" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-archive">Archive</button>
                       </form>
                     <% } %>
-                  
+
+                    <!-- Delete -->
                     <% if (job.status === 'processed') { %>
                       <form action="/jobs/admin/<%= job.id %>/soft-delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this processed job?');">
                         <button type="submit" class="btn btn-danger">Delete</button>
                       </form>
-                      
                     <% } %>
                   </td>
+
                   
                 </tr>
                 <tr class="quote-details" id="quotes-<%= job.id %>" style="display:none;">

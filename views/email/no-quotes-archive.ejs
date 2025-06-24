@@ -3,14 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <title>Job #<%= job.id %> – No Quotes Received</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      color: #333;
+    }
+    .box {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      border-radius: 8px;
+      padding: 30px;
+      box-sizing: border-box;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo img {
+      max-width: 160px;
+      height: auto;
+    }
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .footer-links {
+      margin-top: 30px;
+      font-size: 12px;
+      text-align: center;
+    }
+    .footer-links a {
+      margin: 0 10px;
+      color: #007bff;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; color: #333;">
-  <h2>Hello <%= customerName %>,</h2>
+<body>
+  <div class="box">
+    <div class="logo">
+      <a href="<%= homeUrl || 'http://localhost:3000' %>">
+        <img src="<%= logoUrl || (baseUrl + '/img/logo-true.svg') %>" alt="My Car Quote Logo">
+      </a>
+    </div>
 
-  <p>We’re sorry to inform you that your request (Job #<%= job.id %>) has been automatically closed after 48 hours because no bodyshops submitted quotes, even after your extension.</p>
+    <h2>Hello <%= customerName %>,</h2>
 
-  <p>You can <a href="<%= newRequestUrl %>">submit a new request</a> at any time or return to our <a href="<%= homeUrl %>">home page</a>.</p>
+    <p>We’re sorry to inform you that your request (Job <strong>#<%= job.id %></strong>) has been automatically closed after 48 hours because no bodyshops submitted quotes, even after your extension.</p>
 
-  <p>Thank you for using My Car Quote.<br>The My Car Quote Team</p>
+    <p>You can <a href="<%= newRequestUrl || (baseUrl + '/jobs/upload') %>">submit a new request</a> at any time or return to our <a href="<%= homeUrl || baseUrl %>">home page</a>.</p>
+
+    <p>Thank you for using My Car Quote.</p>
+
+    <div class="footer-links">
+      <a href="<%= homeUrl || baseUrl %>">Home</a> |
+      <a href="<%= newRequestUrl || (baseUrl + '/jobs/upload') %>">New Request</a>
+    </div>
+  </div>
 </body>
 </html>

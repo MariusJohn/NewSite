@@ -1,3 +1,4 @@
+<!--===Views//Email//job-deleted.ejs===-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,13 +15,22 @@
 
     .box {
       max-width: 720px;
-      width: 100%;
       margin: auto;
       background: #fff;
       border-radius: 10px;
       padding: 50px 40px;
       box-sizing: border-box;
       text-align: center;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .logo img {
+      max-width: 160px;
+      height: auto;
     }
 
     h2 {
@@ -86,18 +96,20 @@
   </style>
 </head>
 <body>
-  <div style="text-align:center; margin-bottom: 20px;">
-    <img src="<%= logoUrl || 'http://localhost:3000/img/logo-true.svg' %>" alt="My Car Quote Logo" style="max-width: 150px;">
+  <div class="logo">
+    <a href="<%= homeUrl || baseUrl %>">
+      <img src="<%= logoUrl || (baseUrl + '/img/logo-true.svg') %>" alt="My Car Quote Logo" />
+    </a>
   </div>
 
   <div class="box">
     <h2>Hello<%= customerName ? ' ' + customerName : '' %>,</h2>
-    <p>Unfortunately, your job request <strong>#<%= job.id %></strong> did not receive any quotes within 48 hours and has now been removed from our system.</p>
-    <p>If you'd like to try again, you're welcome to submit a new request at any time.</p>
+    <p>Your job request <strong>#<%= job.id %></strong> unfortunately received no quotes within 48 hours and has been automatically removed.</p>
+    <p>You’re welcome to submit a new request at any time.</p>
 
     <div class="btn-group">
       <a class="btn" href="<%= newRequestUrl %>">Submit New Request</a>
-      <a class="btn btn-exit" href="<%= homeUrl %>">Exit</a>
+      <a class="btn btn-exit" href="<%= homeUrl %>">Return to Homepage</a>
     </div>
 
     <p class="small">Thank you for using My Car Quote.</p>

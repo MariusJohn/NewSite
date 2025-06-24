@@ -22,7 +22,7 @@ const sampleJob = {
   customerEmail: 'test@example.com'
 };
 
-router.get('/email/:template', async (req, res) => {
+router.get('/:template', async (req, res) => {
   const template = req.params.template;
 
   try {
@@ -30,12 +30,12 @@ router.get('/email/:template', async (req, res) => {
       customerName: sampleJob.customerName,
       job: sampleJob,
       remaining: 2,
-      extendUrl: `${baseUrl}/extend/${sampleJob.id}`,
-      cancelUrl: `${baseUrl}/cancel/${sampleJob.id}`,
-      paymentUrl: `${baseUrl}/payment?jobId=${sampleJob.id}`,
-      logoUrl: `${baseUrl}/img/logo-true.svg`,
-      homeUrl: `${baseUrl}/`,
-      newRequestUrl: `${baseUrl}/jobs/upload`
+      extendUrl: `${BASE_URL}/extend/${sampleJob.id}`,
+      cancelUrl: `${BASE_URL}/cancel/${sampleJob.id}`,
+      paymentUrl: `${BASE_URL}/payment?jobId=${sampleJob.id}`,
+      logoUrl: `${BASE_URL}/img/logo-true.svg`,
+      homeUrl: `${BASE_URL}/`,
+      newRequestUrl: `${BASE_URL}/jobs/upload`
     });
 
     res.send(html);

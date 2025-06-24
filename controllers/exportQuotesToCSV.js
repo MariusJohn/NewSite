@@ -1,3 +1,4 @@
+//controllers/exportQuotesToCSV.js
 import { Job, Quote, Bodyshop } from '../models/index.js'; 
 import { Parser } from 'json2csv'; 
 import { Op } from 'sequelize';
@@ -35,16 +36,20 @@ export const exportQuotesToCSV = async (req, res) => {
           Customer: job.customerName,
           Email: job.customerEmail,
           Phone: job.customerPhone,
-          Bodyshop: quote.bodyshop?.name || 'N/A', 
+          Bodyshop: quote.bodyshop?.name || ' ', 
           QuotePrice: quote.price,
           QuoteNotes: quote.notes,
-          QuoteDate: quote.createdAt.toISOString().split('T')[0],
+          QuoteDate: quote.createdAt?.toISOString()?.split('T')[0] || '',
           JobStatus: job.status
         });
       });
     });
 
-    const parser = new Parser();
+  
+
+
+    const fields = ['JobID', 'CustomerName', 'Email', 'Phone', 'Bodyshop', 'QuotePrice', 'QuoteNotes', 'QuoteDate', 'JobStatus'];
+    const parser = new Parser({ fields });
     const csv = parser.parse(rows);
 
     res.header('Content-Type', 'text/csv');

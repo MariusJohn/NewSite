@@ -1,3 +1,4 @@
+//app.js
 import express from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
@@ -148,8 +149,9 @@ app.use('/', customerRoutes);
 app.use('/', staticRoutes);
 app.use('/payment', paymentRoutes);
 
-if (process.env.NODE_ENV !== 'development') {
-  app.use('/preview', emailPreviewRoutes);
+if (process.env.NODE_ENV === 'development') {
+  console.log('📩 Email preview routes ENABLED');
+  app.use('/email', emailPreviewRoutes);
 }
 
 app.get('/session-test', (req, res) => {

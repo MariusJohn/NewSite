@@ -13,9 +13,9 @@ import { Job, Quote, Bodyshop } from '../models/index.js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { jobUploadLimiter } from '../middleware/rateLimiter.js';
 import { getJobFilterOptions, getJobCounts } from '../controllers/jobController.js';
-import { renderJobsWithQuotes, exportJobsWithQuotesCSV, remindUnselectedJobs } from '../controllers/jobsWithQuotesController.js';
-import { showJobsWithQuotes, remindBodyshops } from '../controllers/adminJobsController.js';
 import { exportQuotesToCSV } from '../controllers/exportQuotesToCSV.js';
+import { renderJobsWithQuotes } from '../controllers/jobsWithQuotesController.js';
+import { remindUnselectedJobs, remindBodyshops } from '../controllers/adminJobsController.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
 import { hardDeleteJob } from '../controllers/hardDeleteJob.js';
 import { softDeleteProcessedJob } from '../controllers/adminJobDeleteController.js';
@@ -300,9 +300,8 @@ router.get('/download/:jobId', async (req, res) => {
 
 // === JOB QUOTES VIEW ===
 router.get('/quotes', csrfProtection,renderJobsWithQuotes);
-router.get('/quotes/export', exportJobsWithQuotesCSV);
 router.get('/quotes/remind', remindUnselectedJobs);
-router.post('/remind/:jobId', remindBodyshops);
+router.post('/:jobId/remind', remindBodyshops);
 router.get('/quotes/export-csv', exportQuotesToCSV);
 
 

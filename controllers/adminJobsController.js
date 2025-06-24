@@ -1,12 +1,12 @@
-//controllers/adminJobController.js
+//controllers/adminJobsController.js
 import { Job, Quote, Bodyshop } from '../models/index.js';
+import { Parser } from 'json2csv';
 import { sendHtmlMail } from '../utils/sendMail.js';
 
-
-// Helper: Calculate distance in km
+// === Helper: Haversine Distance ===
 function getDistanceInKm(lat1, lon1, lat2, lon2) {
   const toRad = deg => deg * (Math.PI / 180);
-  const R = 6371;
+  const R = 6371; // Earth radius in km
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a =
@@ -17,31 +17,55 @@ function getDistanceInKm(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-// ✅ View Jobs with Quotes
-export const showJobsWithQuotes = async (req, res) => {
+// ✅ Export Jobs with Quotes to CSV
+export async function exportJobsWithQuotesCSV(req, res) {
   try {
     const jobs = await Job.findAll({
-      where: { paid: false },
-      include: [
-        {
-          model: Quote,
-          include: [Bodyshop],
-        }
-      ],
-      order: [['createdAt', 'DESC']]
+      include: [{
+        model: Quote,
+        as: 'quotes',
+        required: true,
+        include: [{
+          model: Bodyshop,
+          as: 'bodyshop',
+          attributes: ['name', 'postcode']  // ✅ keep postcode, not email
+        }]
+      }]
     });
 
+    const data = [];
 
+    jobs.forEach(job => {
+      job.quotes.forEach(quote => {
+        data.push({
+          JobID: job.id,
+          CustomerName: job.customerName,
+          CustomerEmail: job.customerEmail,
+          Location: job.location,
+          QuotePrice: quote.price,
+          QuoteNotes: quote.notes,
+          QuoteDate: quote.createdAt,
+          Selected: job.selectedBodyshopId === quote.bodyshopId ? 'Yes' : '',
+          Bodyshop: quote.bodyshop?.name,
+          BodyshopPostcode: quote.bodyshop?.postcode
+        });
+      });
+    });
 
-    res.render('admin/jobs-quotes', { jobs });
+    const parser = new Parser();
+    const csv = parser.parse(data);
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment('jobs-with-quotes.csv');
+    res.send(csv);
   } catch (err) {
-    console.error('❌ Failed to load jobs with quotes:', err);
-    res.status(500).send('Error loading jobs.');
+    console.error('❌ Failed to export CSV:', err);
+    res.status(500).send('Failed to generate CSV');
   }
-};
+}
 
-// ✅ Send Reminder to Nearby Bodyshops
-export const remindBodyshops = async (req, res) => {
+// ✅ Manual  Reminder to Nearby Bodyshops (for specific job)
+export async function remindBodyshops(req, res) {
   const { jobId } = req.params;
   try {
     const job = await Job.findByPk(jobId);
@@ -67,11 +91,56 @@ export const remindBodyshops = async (req, res) => {
       );
     }
 
-    console.log(`✅ Reminder sent to ${nearbyShops.length} bodyshops for Job #${job.id}`);
-    res.redirect('/admin/jobs/quotes');
+        // ✅ Store reminder status in session
+        if (!req.session.remindedJobs) req.session.remindedJobs = [];
+        if (!req.session.remindedJobs.includes(job.id)) {
+          req.session.remindedJobs.push(job.id);
+        }
 
+    console.log(`✅ Reminder sent to ${nearbyShops.length} bodyshops for Job #${job.id}`);
+    res.redirect('/jobs/admin/quotes');
   } catch (err) {
     console.error('❌ Reminder error:', err);
     res.status(500).send('Error sending reminders.');
   }
-};
+}
+
+// ✅ Send Reminder to Bodyshops (for all unselected jobs)
+export async function remindUnselectedJobs(req, res) {
+  try {
+    const jobs = await Job.findAll({
+      include: [{
+        model: Quote,
+        as: 'quotes',
+        required: true,
+        include: [{
+          model: Bodyshop,
+          as: 'bodyshop'
+        }]
+      }],
+      where: {
+        selectedBodyshopId: null
+      }
+    });
+
+    for (const job of jobs) {
+      for (const quote of job.quotes) {
+        if (quote.bodyshop?.email) {
+          await sendHtmlMail(
+            quote.bodyshop.email,
+            `Reminder: Job #${job.id} still open for customer`,
+            `<p>The customer has not yet selected a bodyshop.</p>
+             <p><strong>Quote:</strong> £${quote.price}</p>
+             <p><strong>Notes:</strong> ${quote.notes}</p>
+             <p><a href="${process.env.BASE_URL}/bodyshop/dashboard">Review or update your quote</a></p>`
+          );
+        }
+      }
+    }
+
+    res.send('Reminders sent to bodyshops for unselected jobs.');
+  } catch (err) {
+    console.error('❌ Failed to send reminders:', err);
+    res.status(500).send('Reminder job failed');
+  }
+}

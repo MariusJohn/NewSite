@@ -237,6 +237,34 @@ body {
   background-color: #005fa3;
 }
 
+/* Updated & New Badges */
+.status-badge.processed {
+  background-color: #28a745; /* Green */
+  color: #fff;
+}
+
+.status-badge.paid {
+  background-color: #ff851b; /* Orange */
+  color: #fff;
+}
+
+.status-badge.unpaid {
+  background-color: #0074d9; /* Blue */
+  color: #fff;
+}
+
+.status-badge.danger {
+  background-color: #dc3545; /* Red for overdue */
+  color: #fff;
+}
+
+/* Optional: fallback neutral badge */
+.status-badge.default {
+  background-color: #adb5bd;
+  color: #fff;
+}
+
+
 
 @media (max-width: 768px) {
   .admin-dashboard-container {
