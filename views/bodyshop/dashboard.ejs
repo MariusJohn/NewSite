@@ -82,13 +82,36 @@
                   </td>
                   <td><%= (job.distance / 1609.34).toFixed(2) %> mi</td>
                   <td>
-                    <div class="image-preview-block">
-                      <% job.images.forEach((img, i) => { %>
-                        <a href="<%= img %>" class="glightbox" data-gallery="job-<%= job.id %>">
-                          <img src="<%= img %>" class="thumb-img">
-                        </a>
-                      <% }) %>
-                    </div>
+                      <div class="image-preview-block">
+                        <%
+                          let parsedImages = [];
+
+                          if (Array.isArray(job.images)) {
+                            parsedImages = job.images;
+                          } else if (typeof job.images === 'string') {
+                            try {
+                              parsedImages = job.images
+                                .replace(/[{}"]/g, '')
+                                .split(',')
+                                .map(i => i.trim())
+                                .filter(Boolean);
+                            } catch (err) {
+                              parsedImages = [];
+                            }
+                          }
+                        %>
+
+                        <% if (parsedImages.length > 0) { %>
+                          <% parsedImages.forEach((img, idx) => { %>
+                            <a href="<%= img %>" class="glightbox" data-gallery="job-<%= job.id %>">
+                              <img src="<%= img %>" class="thumb-img" />
+                            </a>
+                          <% }) %>
+                        <% } else { %>
+                          <span class="badge badge-warning">No images</span>
+                        <% } %>
+                      </div>
+
                   </td>
                   <td>
                     <% const days = Math.floor((new Date() - new Date(job.createdAt)) / (1000 * 60 * 60 * 24)); %>
@@ -143,13 +166,36 @@
                   </td>
                   <td><%= (job.distance / 1609.34).toFixed(2) %> mi</td>
                   <td>
-                    <div class="image-preview-block">
-                      <% job.images.forEach((img, i) => { %>
-                        <a href="<%= img %>" class="glightbox" data-gallery="quoted-<%= job.id %>">
-                          <img src="<%= img %>" class="thumb-img">
-                        </a>
-                      <% }) %>
-                    </div>
+                        <div class="image-preview-block">
+                          <%
+                            let parsedImages = [];
+
+                            if (Array.isArray(job.images)) {
+                              parsedImages = job.images;
+                            } else if (typeof job.images === 'string') {
+                              try {
+                                parsedImages = job.images
+                                  .replace(/[{}"]/g, '')
+                                  .split(',')
+                                  .map(i => i.trim())
+                                  .filter(Boolean);
+                              } catch (err) {
+                                parsedImages = [];
+                              }
+                            }
+                          %>
+
+                          <% if (parsedImages.length > 0) { %>
+                            <% parsedImages.forEach((img, idx) => { %>
+                              <a href="<%= img %>" class="glightbox" data-gallery="job-<%= job.id %>">
+                                <img src="<%= img %>" class="thumb-img" />
+                              </a>
+                            <% }) %>
+                          <% } else { %>
+                            <span class="badge badge-warning">No images</span>
+                          <% } %>
+                        </div>
+
                   </td>
                   <td>
                     <% const quotedDays = Math.floor((new Date() - new Date(job.quoteDate)) / (1000 * 60 * 60 * 24)); %>
@@ -200,13 +246,36 @@
                   <td><%= job.customerPhone %></td>
                   <td><%= job.customerEmail %></td>
                   <td>
-                    <div class="image-preview-block">
-                      <% job.images.forEach((img, i) => { %>
-                        <a href="<%= img %>" class="glightbox" data-gallery="selected-<%= job.id %>">
-                          <img src="<%= img %>" class="thumb-img">
-                        </a>
-                      <% }) %>
-                    </div>
+                      <div class="image-preview-block">
+                        <%
+                          let parsedImages = [];
+
+                          if (Array.isArray(job.images)) {
+                            parsedImages = job.images;
+                          } else if (typeof job.images === 'string') {
+                            try {
+                              parsedImages = job.images
+                                .replace(/[{}"]/g, '')
+                                .split(',')
+                                .map(i => i.trim())
+                                .filter(Boolean);
+                            } catch (err) {
+                              parsedImages = [];
+                            }
+                          }
+                        %>
+
+                        <% if (parsedImages.length > 0) { %>
+                          <% parsedImages.forEach((img, idx) => { %>
+                            <a href="<%= img %>" class="glightbox" data-gallery="job-<%= job.id %>">
+                              <img src="<%= img %>" class="thumb-img" />
+                            </a>
+                          <% }) %>
+                        <% } else { %>
+                          <span class="badge badge-warning">No images</span>
+                        <% } %>
+                      </div>
+
                   </td>
                 </tr>
               <% }) %>
@@ -301,5 +370,6 @@
     });
   });
 </script>
+<script src="/public/js/bodyshop-submmision-save.js"></script>
 </body>
 </html>

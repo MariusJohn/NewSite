@@ -67,7 +67,8 @@
 <body>
   <div class="box">
     <div class="logo">
-      <a href="<%= homeUrl || 'http://localhost:3000' %>">
+      <a href=""<%= homeUrl || baseUrl || 'https://mcquote.co.uk' %>"
+">
         <img src="<%= logoUrl || (baseUrl + '/img/logo-true.svg') %>" alt="My Car Quote Logo" />
       </a>
     </div>
@@ -76,12 +77,15 @@
     <p>Your job request <strong>#<%= job.id %></strong> has received 1 quote.</p>
     <p><%= remaining %> more bodyshop(s) may still respond.</p>
 
-    <a class="btn" href="<%= extendUrl || ('http://localhost:3000/jobs/action/' + job.id + '/mock-extend?action=extend') %>">Yes, Extend & Wait</a>
-    <a class="btn btn-success" href="<%= paymentUrl || ('http://localhost:3000/payment?jobId=' + job.id) %>">No, Proceed to Payment</a>
+<a class="btn" href="<%= extendUrl || (baseUrl + '/jobs/action/' + job.id + '/mock-extend?action=extend') %>">Yes, Extend & Wait</a>
+
+<a class="btn btn-success" href="<%= paymentUrl || (baseUrl + '/payment?jobId=' + job.id) %>">No, Proceed to Payment</a>
+
 
     <div class="footer-links">
       <a href="<%= newRequestUrl || 'http://localhost:3000/jobs/upload' %>">New Request</a> |
-      <a href="<%= homeUrl || 'http://localhost:3000' %>">My Car Quote</a>
+      <a href=""<%= homeUrl || baseUrl || 'https://mcquote.co.uk' %>"
+">My Car Quote</a>
     </div>
   </div>
 </body>

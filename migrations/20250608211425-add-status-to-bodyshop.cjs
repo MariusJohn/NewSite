@@ -1,12 +1,15 @@
+'use strict';
 
-export async function up(queryInterface, Sequelize) {
+module.exports = {
+  async up(queryInterface, Sequelize) {
   await queryInterface.addColumn('Bodyshops', 'status', {
     type: Sequelize.STRING,
     allowNull: false,
     defaultValue: 'active',
   });
-}
+},
 
-export async function down(queryInterface) {
+async down(queryInterface, Sequelize) {
   await queryInterface.removeColumn('Bodyshops', 'status');
 }
+};

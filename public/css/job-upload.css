@@ -170,6 +170,29 @@ body {
   font-weight: 500;
 }
 
+.upload-file-wrapper {
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#images-error {
+  display: block;
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 13px;
+  color: #cc0000;
+  text-align: center;
+}
+
+
+.upload-feedback {
+  display: block;
+  font-size: 13px;
+  margin-top: 6px;
+  color: #0066cc;
+  text-align: center;
+}
 
 
 

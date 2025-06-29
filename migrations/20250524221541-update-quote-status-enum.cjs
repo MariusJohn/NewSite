@@ -1,4 +1,7 @@
-export async function up(queryInterface, Sequelize) {
+'use strict';
+
+module.exports = {
+  async up(queryInterface, Sequelize) {
   await queryInterface.sequelize.query(`
     DO $$
     BEGIN
@@ -20,8 +23,9 @@ export async function up(queryInterface, Sequelize) {
     END
     $$;
   `);
-}
+},
 
-export async function down(queryInterface, Sequelize) {
+async down(queryInterface, Sequelize) {
 
 }
+};

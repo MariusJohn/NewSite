@@ -102,38 +102,35 @@
                   <td><%= new Date(job.createdAt).toLocaleDateString() %></td>
 
 
-                  <td>
-                    <!-- Toggle Quotes -->
-                    <a href="#" class="toggle-quotes btn btn-view" data-job-id="<%= job.id %>" title="View Quotes"></a>
+                      <td class="action-cell">
+                        <div class="action-buttons">
+                          <!-- Toggle Quotes -->
+                          <a href="#" class="toggle-quotes btn btn-view" data-job-id="<%= job.id %>" title="View Quotes"></a>
 
-                    <!-- Remind Button: job with < 2 quotes and < 2 days old -->
-                    <% if ((job.quotes?.length || 0) < 2 && job.daysPending < 2) { 
-                      const reminderSent = remindedJobs && remindedJobs.includes(job.id); %>
-                   
-                   <form action="/jobs/admin/<%= job.id %>/remind" method="POST" style="display:inline;">
-                     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                     <button type="submit" class="btn btn-remind" <%= reminderSent ? 'disabled' : '' %>>
-                       <%= reminderSent ? 'Reminder Sent' : 'Remind' %>
-                     </button>
-                   </form>
-                 
-                 <% } %>
-                 
-
-                    <!-- Archive -->
-                    <% if (job.status === 'paid') { %>
-                      <form action="/jobs/admin/<%= job.id %>/archive" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-archive">Archive</button>
+                          <!-- Request Payment -->
+                      <form action="/jobs/admin/<%= job.id %>/resend-payment" method="POST" style="display:inline;">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <button type="submit" class="btn btn-warning">💳 Request Payment</button>
                       </form>
-                    <% } %>
 
-                    <!-- Delete -->
-                    <% if (job.status === 'processed') { %>
-                      <form action="/jobs/admin/<%= job.id %>/soft-delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this processed job?');">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                      </form>
-                    <% } %>
-                  </td>
+
+
+                          <!-- Archive -->
+                          <% if (job.quotes && job.quotes.length > 0) { %>
+                            <form action="/jobs/admin/<%= job.id %>/archive" method="POST" style="display:inline;">
+                              <button type="submit" class="btn btn-archive">🗂 Archive</button>
+                            </form>
+                          <% } %>
+
+                          <!-- Delete -->
+                          <% if (!job.paid && job.quotes?.length > 0 && job.daysPending >= 2) { %>
+                            <form action="/jobs/admin/<%= job.id %>/soft-delete" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this job?');">
+                              <button type="submit" class="btn btn-danger">🗑 Delete</button>
+                            </form>
+                          <% } %>
+                        </div>
+                      </td>
+
 
                   
                 </tr>
@@ -164,15 +161,39 @@
                       </tbody>
                     </table>
 
-                    <% if (job.images && job.images.length) { %>
-                      <div class="image-gallery">
-                        <% job.images.forEach((img, idx) => { %>
-                          <a href="<%= img %>" class="glightbox<%= job.id %>" data-gallery="job-<%= job.id %>">
-                            <img src="<%= img %>" alt="Job Image <%= idx + 1 %>" class="job-image-preview" />
-                          </a>
-                        <% }) %>
-                      </div>
-                    <% } %>
+                            <%
+                              let parsedImages = [];
+
+                              if (Array.isArray(job.images)) {
+                                parsedImages = job.images;
+                              } else if (typeof job.images === 'string') {
+                                try {
+                                  parsedImages = job.images
+                                    .replace(/[{}"]/g, '')
+                                    .split(',')
+                                    .map(i => i.trim())
+                                    .filter(Boolean);
+                                } catch (err) {
+                                  parsedImages = [];
+                                }
+                              }
+                            %>
+
+                            <% if (parsedImages.length > 0) { %>
+                              <div class="image-gallery">
+                                <% parsedImages.forEach((img, idx) => { %>
+                                  <a href="<%= img %>" 
+                                    class="glightbox"
+                                    data-gallery="job-<%= job.id %>"
+                                    data-title="Job Image <%= idx + 1 %>">
+                                    <img src="<%= img %>" alt="Job Image" class="job-image-preview" />
+                                  </a>
+                                <% }) %>
+                              </div>
+                            <% } else { %>
+                              <span class="badge badge-warning">No images</span>
+                            <% } %>
+
                   </td>
                 </tr>
                 <% }) %>

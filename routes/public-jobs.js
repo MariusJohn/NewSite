@@ -2,7 +2,6 @@
 import express from 'express';
 import crypto from 'crypto';
 import multer from 'multer';
-import axios from 'axios';
 import sharp from 'sharp';
 import dotenv from 'dotenv';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
@@ -10,10 +9,10 @@ import { randomUUID } from 'crypto';
 import { Job, Bodyshop } from '../models/index.js';
 import { jobUploadLimiter } from '../middleware/rateLimiter.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
-import * as csurf from 'csurf'; 
+import csurf from 'csurf';
 import { geocodeAddress } from '../utils/geocode.js'; 
 import { verifyRecaptcha } from '../middleware/recaptchaVerify.js'; 
-import { Job } from '../models/index.js';
+
 
 
 dotenv.config();
@@ -21,6 +20,10 @@ dotenv.config();
 const router = express.Router();
 
 const csrfProtection = csurf({ cookie: true });
+
+
+
+
 
 
 // === AWS S3 Client ===
@@ -69,12 +72,6 @@ router.post('/upload', jobUploadLimiter, csrfProtection, upload.array('images', 
     }
 
 
-
-
-
-    // --- REPLACED RECAPTCHA VERIFICATION WITH MIDDLEWARE ---
-    // The verifyRecaptcha middleware now handles this.
-    // If it reaches here, reCAPTCHA is already verified.
 
     let geoData;
     try {
@@ -148,10 +145,8 @@ router.post('/upload', jobUploadLimiter, csrfProtection, upload.array('images', 
   }
 });
 
-router.get('/action/:jobId/:token', (req, res, next) => {
-  console.log('🔔 Route hit:', req.originalUrl);
-  next();
-}, handleJobAction);
+router.get('/action/:jobId/:token', handleJobAction);
+
 
 
 

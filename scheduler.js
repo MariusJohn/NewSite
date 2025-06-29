@@ -17,7 +17,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const EMAIL_VIEWS_PATH = path.join(__dirname, 'views', 'email');
-const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+const baseUrl = process.env.BASE_URL || 'https://mcquote.co.uk';
 
 export const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -82,12 +82,19 @@ async function sendCustomerPaymentEmail(job) {
   const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'payment-request.ejs'), {
     customerName: job.customerName,
     job,
-    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
+    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`,
+    homeUrl: `${baseUrl}/`,
+    logoUrl: `${baseUrl}/img/logo-true.svg`,
+    newRequestUrl: `${baseUrl}/jobs/upload`
   });
+
   await sendHtmlEmail(job.customerEmail, `Quotes Ready for Job #${job.id} – View Now`, html);
   job.status = 'pending_payment';
   await job.save();
 }
+
+export { sendCustomerPaymentEmail };
+
 
 async function sendCustomerJobDeletedEmail(job) {
   const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'job-deleted.ejs'), {
@@ -132,16 +139,25 @@ export async function runSchedulerNow() {
     });
 
     for (const job of jobs) {
-      const quoteCount = job.quotes?.length || 0;
+      const quoteCount = await Quote.count({ where: { jobId: job.id } });
       const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
       const remaining = Math.max(0, bodyshopsInRange - quoteCount);
-
+      
+      
+      const jobAgeMinutes = (new Date() - new Date(job.createdAt)) / 1000 / 60;
+      console.log(`🕒 Job #${job.id} – age: ${jobAgeMinutes.toFixed(2)}min, quotes: ${quoteCount}`);
       // EARLY TRIGGER: Send payment request as soon as 2+ quotes received
-      if (quoteCount >= 2 && !job.paid && job.status !== 'pending_payment') {
+      if (
+        quoteCount >= 3 &&
+        jobAgeMinutes >= 10 &&
+        !job.paid &&
+        job.status !== 'pending_payment'
+      ) {
         if (!dryRun) await sendCustomerPaymentEmail(job);
         summary.earlyEmails.push(job.id);
         continue;
       }
+      
 
       // 24h logic
       if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {

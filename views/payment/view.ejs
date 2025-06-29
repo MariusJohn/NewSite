@@ -46,11 +46,13 @@
 <% } %>
 
 <% if (!paid) { %>
-  <form action="/payment/checkout" method="POST">
-    <input type="hidden" name="jobId" value="<%= job.id %>">
-    <button type="submit">Pay £<%= paymentAmount %></button>
-    <p><small>Secure Stripe payment. Bodyshop details will be revealed after successful payment.</small></p>
-  </form>
+<form action="/payment/checkout" method="POST">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="jobId" value="<%= job.id %>">
+  <button type="submit">Pay £<%= paymentAmount %></button>
+  <p><small>Secure Stripe payment. Bodyshop details will be revealed after successful payment.</small></p>
+</form>
+
 <% } else { %>
   <p class="paid">Payment complete. Quotes unlocked.</p>
 <% } %>

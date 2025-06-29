@@ -1,6 +1,7 @@
 //app.js
 import express from 'express';
 import session from 'express-session';
+import flash from 'connect-flash';
 import helmet from 'helmet';
 import path from 'path';
 import { Pool } from 'pg'; 
@@ -11,7 +12,7 @@ import cron from 'node-cron';
 import csurf from 'csurf';
 import connectPgSimple from 'connect-pg-simple'; 
 import { sequelize as db } from './models/index.js';
-
+import publicJobsRoutes from './routes/public-jobs.js';
 import customerRoutes from './routes/customer.js';
 import adminRoutes from './routes/admin.js';
 import indexRoutes from './routes/index.js';
@@ -40,6 +41,7 @@ import rateLimit from 'express-rate-limit';
 dotenv.config();
 
 const app = express();
+const _dirname = path.resolve();
 const port = process.env.PORT || 3000;
 
 const sessionDbPool = new Pool({
@@ -63,12 +65,6 @@ sessionDbPool.connect((err, client, release) => {
   });
 });
 
-app.use((req, res, next) => {
-  if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !== 'https') {
-    return res.redirect(`https://${req.headers.host}${req.url}`);
-  }
-  next();
-});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -84,6 +80,8 @@ app.use(helmet({
       connectSrc: ["'self'", "https://www.google.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      formAction: ["'self'", "https://mcquote.co.uk", "https://checkout.stripe.com"]
+
     },
   },
 }));
@@ -96,13 +94,13 @@ const sessionStore = new PgSession({
 });
 
 app.use(session({
+  name: 'admin.sid', 
   store: sessionStore,
-  secret: process.env.SESSION_SECRET ,
-  resave: false, 
-  saveUninitialized: false, 
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
   rolling: true,
   cookie: {
-    name: 'admin.sid',
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     sameSite: 'lax',
@@ -110,8 +108,10 @@ app.use(session({
   }
 }));
 
+app.use(flash()); 
+
 const csrfProtection = csurf({ cookie: true });
-//app.use(csrfProtection);
+
 
 app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken ? req.csrfToken() : null;
@@ -140,6 +140,7 @@ app.use('/jobs/admin', adminAuth, adminJobsRoutes);
 app.use('/jobs/admin/bodyshops', adminAuth, adminBodyshopRoutes);
 
 app.use('/jobs', uploadsRoutes); 
+app.use('/jobs', publicJobsRoutes);
 app.use('/', indexRoutes);
 app.use('/services', servicesRoutes);
 app.use('/bodyshop', bodyshopRoutes);
@@ -178,22 +179,22 @@ if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is missing in .env file');
 }
 
-db.sync() 
+db.sync()
   .then(() => {
-    console.log('Database synced');
-    app.listen(port, '0.0.0.0', (err) => {
-      if (err) {
-        console.error('Error starting server:', err);
-        process.exit(1);
-      } else {
-        console.log(`Server running on port ${port}`);
-      }
+    console.log('✅ Database synced');
+
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`✅ Server running on http://localhost:${port}`);
     });
+
+    // Keep the app alive even if nothing is pending
+    setInterval(() => {}, 1000); // Keeps Node alive for debugging
   })
   .catch(err => {
-    console.error('Failed to sync database:', err);
+    console.error('❌ Failed to sync database:', err);
     process.exit(1);
   });
+
 
 cron.schedule('0 * * * *', runSchedulerNow);
 

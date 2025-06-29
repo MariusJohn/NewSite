@@ -128,15 +128,18 @@
                 <td>
                   <% if (bodyshop.status === 'inactive') { %>
                     <form action="/jobs/admin/bodyshops/<%= bodyshop.id %>/reactivate" method="POST" style="display:inline;">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-approve">Reactivate</button>
                     </form>
                   <% } else { %>
                     <% if (!bodyshop.adminApproved) { %>
-                      <form action="/jobs/admin/bodyshops/<%= bodyshop.id %>/approve" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-approve">Approve</button>
-                      </form>
+                    <form action="/jobs/admin/bodyshops/<%= bodyshop.id %>/approve" method="POST" style="display:inline;">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button type="submit" class="btn btn-approve">Approve</button>
+                    </form>
                     <% } %>
                     <form action="/jobs/admin/bodyshops/<%= bodyshop.id %>/reject" method="POST" style="display:inline;">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                       <button type="submit" class="btn btn-reject">Reject</button>
                     </form>
                   <% } %>

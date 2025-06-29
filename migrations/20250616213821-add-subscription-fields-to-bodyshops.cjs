@@ -1,4 +1,7 @@
-export async function up(queryInterface, Sequelize) {
+'use strict';
+
+module.exports = {
+  async up(queryInterface, Sequelize) {
   await queryInterface.addColumn('Bodyshops', 'subscriptionStatus', {
     type: Sequelize.STRING,
     allowNull: false,
@@ -15,10 +18,11 @@ export async function up(queryInterface, Sequelize) {
     type: Sequelize.DATE,
     allowNull: true
   });
-}
+},
 
-export async function down(queryInterface, Sequelize) {
+async down(queryInterface, Sequelize) {
   await queryInterface.removeColumn('Bodyshops', 'subscriptionStatus');
   await queryInterface.removeColumn('Bodyshops', 'subscriptionType');
   await queryInterface.removeColumn('Bodyshops', 'subscriptionEndsAt');
 }
+};

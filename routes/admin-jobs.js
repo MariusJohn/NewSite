@@ -18,8 +18,8 @@ import { renderJobsWithQuotes } from '../controllers/jobsWithQuotesController.js
 import { remindUnselectedJobs, remindBodyshops } from '../controllers/adminJobsController.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
 import { hardDeleteJob } from '../controllers/hardDeleteJob.js';
-import { softDeleteProcessedJob } from '../controllers/adminJobDeleteController.js';
-
+import { softDeleteQuotedJob } from '../controllers/adminJobDeleteController.js';
+import { resendPaymentEmail } from '../controllers/adminJobsController.js';
 
 dotenv.config();
 
@@ -253,7 +253,7 @@ router.post('/:jobId/restore', async (req, res) => {
 });
 
 // === SOFT DELETE PROCESSED JOB ===
-router.post('/:jobId/soft-delete', softDeleteProcessedJob);
+router.post('/:jobId/soft-delete', adminAuth, softDeleteQuotedJob);
 
 
 // === DELETE AND RESTORE ARCHIVED JOBS ===
@@ -303,6 +303,10 @@ router.get('/quotes', csrfProtection,renderJobsWithQuotes);
 router.get('/quotes/remind', remindUnselectedJobs);
 router.post('/:jobId/remind', remindBodyshops);
 router.get('/quotes/export-csv', exportQuotesToCSV);
+
+// === ADMIN RESEND PAYMENT-REQUEST EMAIL===
+router.post('/:id/resend-payment', adminAuth, csrfProtection, resendPaymentEmail);
+
 
 
 // === CUSTOMER ONE-TIME ACTIONS ===

@@ -44,10 +44,13 @@
         <input type="text" id="location" name="postcode" placeholder="Your post code" required>
         <span class="error-message" id="postcode-error"></span>
 
-        <label for="images">Upload Images:</label>
-        <button type="button" id="showInstructionsBtn" class="choose-file-btn">Choose Files</button>
-        <input type="file" id="images" name="images" accept="image/*" multiple required hidden>
-        <span class="error-message" id="images-error"></span>
+        <div class="upload-file-wrapper">
+          <button type="button" id="showInstructionsBtn" class="choose-file-btn">Choose Files</button>
+          <input type="file" id="images" name="images" accept="image/*" multiple required hidden>
+          <span id="images-feedback" class="upload-feedback"></span>
+          <span id="images-error" class="error-message"></span>
+        </div>
+        
         
         
          

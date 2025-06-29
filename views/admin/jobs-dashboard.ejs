@@ -110,19 +110,40 @@
                               
                             <td>
                                 <div class="image-gallery">
-                                  <% if (job.images && job.images.length > 0) { %>
-                                    <% job.images.forEach((img, idx) => { %>
-                                      <a href="<%= img %>" 
-                                         class="glightbox"
-                                         data-gallery="job-<%= job.id %>"
-                                         data-title="Job Image <%= idx + 1 %>">
-                                        <img src="<%= img %>" alt="Job Image" class="thumb-img">
-                                      </a>
-                                    <% }) %>
-                                  <% } else { %>
-                                    <p>No images available</p>
-                                  <% } %>
-                                </div>
+  <%
+    let parsedImages = [];
+
+    if (Array.isArray(job.images)) {
+      parsedImages = job.images;
+    } else if (typeof job.images === 'string') {
+      try {
+        parsedImages = job.images
+          .replace(/[{}"]/g, '')
+          .split(',')
+          .map(i => i.trim())
+          .filter(Boolean);
+      } catch (err) {
+        parsedImages = [];
+      }
+    }
+  %>
+
+  <% if (parsedImages.length > 0) { %>
+    <% parsedImages.forEach((img, idx) => { %>
+      <a href="<%= img %>" 
+         class="glightbox"
+         data-gallery="job-<%= job.id %>"
+         data-title="Job Image <%= idx + 1 %>">
+        <img src="<%= img %>" alt="Job Image" class="thumb-img" />
+      </a>
+    <% }) %>
+  <% } else { %>
+    <span class="badge badge-warning">No images</span>
+  <% } %>
+</div>
+
+
+
                               </td>
                               
                               
@@ -140,25 +161,7 @@
                                 <span class="badge badge-default">no_quotes</span>
                               <% } %>
                             </td>
-                            <% if (job.quotes && job.quotes.length > 0) { %>
-                              <tr>
-                                <td colspan="7" style="background: #f9fcff; padding: 10px 20px;">
-                                  <strong>Quotes:</strong>
-                                  <ul>
-                                    <% job.quotes.forEach(q => { %>
-                                      <li>
-                                        £<%= q.price %> –
-                                        <% if (q.bodyshop) { %>
-                                          <%= q.bodyshop.name %> (<%= q.bodyshop.email %>)
-                                        <% } else { %>
-                                          Unknown Bodyshop
-                                        <% } %>
-                                      </li>
-                                    <% }) %>
-                                  </ul>
-                                </td>
-                              </tr>
-                            <% } %>
+
                             
                             
                                 <td class="job-actions">
@@ -200,11 +203,7 @@
                                         </form>
                                     <% } %>
                                 
-                                    <!-- Download button always shown -->
-                                    <form action="/jobs/admin/download/<%= job.id %>" method="GET">
-                                        <button type="submit" class="btn btn-download">📦 Download Images</button>
-                                      </form>
-                                      
+
                                 </td>
                              
                         </tr>

@@ -1,10 +1,14 @@
-export async function up(queryInterface, Sequelize) {
+'use strict';
+
+module.exports = {
+  async up(queryInterface, Sequelize) {
   await queryInterface.addColumn('Jobs', 'selectedQuoteId', {
     type: Sequelize.INTEGER,
     allowNull: true
   });
-}
+},
 
-export async function down(queryInterface, Sequelize) {
+async down(queryInterface, Sequelize) {
   await queryInterface.removeColumn('Jobs', 'selectedQuoteId');
 }
+};

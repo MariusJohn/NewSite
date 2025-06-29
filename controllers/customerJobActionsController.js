@@ -57,6 +57,9 @@ const handleJobAction = async (req, res) => {
         return res.status(403).render('jobs/action-expired');
       }
 
+      const currentExpiry = job.quoteExpiry || new Date();
+      console.log('📅 Current quoteExpiry:', job.quoteExpiry);
+
       const newExpiry = new Date(job.quoteExpiry.getTime() + 24 * 60 * 60 * 1000);
       await job.update({
         quoteExpiry: newExpiry,

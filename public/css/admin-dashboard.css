@@ -116,32 +116,53 @@ body {
   background-color: #eef4fa;
 }
 
-.jobs-table th:nth-child(1), .jobs-table td:nth-child(1) {
+.jobs-table th:nth-child(1), .jobs-table td:nth-child(1) { /* Job ID */
   width: 60px;
+  text-align: center;
 }
 
-.jobs-table th:nth-child(2), .jobs-table td:nth-child(2) {
+.jobs-table th:nth-child(2), .jobs-table td:nth-child(2) { /* Customer Details */
   width: 220px;
   word-break: break-word;
 }
 
-.jobs-table th:nth-child(3), .jobs-table td:nth-child(3) {
-  width: auto;
-  word-break: break-word;
+.jobs-table th:nth-child(3), .jobs-table td:nth-child(3) { /* Images */
+  width: 320px; /* Increased from auto */
+}
+
+.jobs-table th:nth-child(4), .jobs-table td:nth-child(4) { /* Status */
+  width: 100px;
+  text-align: center;
+}
+
+.jobs-table th:nth-child(5), .jobs-table td:nth-child(5) { /* Days Pending */
+  width: 100px;
+  text-align: center;
+}
+
+.jobs-table th:nth-child(6), .jobs-table td:nth-child(6) { /* Quote Status */
+  width: 120px;
+  text-align: center;
+}
+
+.jobs-table th:nth-child(7), .jobs-table td:nth-child(7) { /* Actions */
+  width: 130px;
+  text-align: center;
 }
 
 .image-gallery {
-  display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 1rem;
+  gap: 12px;
+  justify-content: flex-start;
+  max-width: 100%;
 }
 
+
 .thumb-img, .job-image-preview {
-  width: 100px;
+  width: 80px;
   max-width: 100%;
   object-fit: cover;
-  height: auto;
+  height: 80px;
   border-radius: 6px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -162,7 +183,6 @@ body {
 .btn-remind { background-color: #28a745; color: #ffffff; }
 .btn-reject { background-color: #dc3545; color: #ffffff; }
 .btn-archive { background-color: #6f42c1; color: #ffffff; }
-.btn-download { background-color: #007bff; color: #ffffff; }
 .btn-view { background-color: #17a2b8; color: #ffffff; }
 .btn-export { background-color: #ffc107; color: #212529; }
 
@@ -236,6 +256,39 @@ body {
 .btn-scheduler:hover {
   background-color: #005fa3;
 }
+
+.btn-warning {
+  background-color: #f9c846;
+  color: #002f5c;
+  border: none;
+  padding: 4px 8px; /* Reduced padding */
+  font-size: 13px;   /* Smaller font */
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-warning:hover {
+  background-color: #f5b800;
+}
+
+.btn-warning:hover {
+  background-color: #f5b800;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.action-buttons .btn {
+  margin: 0; /* reset spacing so `gap` takes over */
+}
+
 
 /* Updated & New Badges */
 .status-badge.processed {

@@ -5,7 +5,6 @@ import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv'; 
-import axios from 'axios';
 import crypto from 'crypto';
 import { Job, Quote, Bodyshop, sequelize } from '../models/index.js'; 
 import { requireBodyshopLogin } from '../middleware/auth.js'; 
@@ -16,7 +15,7 @@ import jwt from 'jsonwebtoken';
 import { submitQuote } from '../controllers/bodyshopController.js';
 import { geocodeAddress } from '../utils/geocode.js'; 
 
-dotenv.config(); // Keep this as it is after the import
+dotenv.config(); 
 
 
 // === Haversine distance calculator ===
@@ -168,7 +167,7 @@ router.post('/register', async (req, res) => {
         html: `
           <div style="font-family: Arial, sans-serif; color: #002f5c; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
             <div style="text-align: center; margin-bottom: 20px;">
-              <img src="https://mcquote.co.uk/img/logo.svg" alt="My Car Quote Logo" style="height: 60px;" />
+              <img src="https://mcquote.co.uk/img/logo-true.svg" alt="My Car Quote Logo" style="height: 60px;" />
             </div>
       
             <h2 style="color: #002f5c;">Verify Your Bodyshop Email</h2>

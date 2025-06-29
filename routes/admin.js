@@ -104,7 +104,7 @@ const handleLogout = (req, res) => {
       return res.status(500).send('Logout failed');
     }
 
-    res.clearCookie('connect.sid', {
+    res.clearCookie('admin.sid', {
       path: '/',
       httpOnly: true,
       sameSite: 'lax',

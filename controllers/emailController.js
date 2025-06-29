@@ -5,7 +5,7 @@ export async function sendFinalEmails(job, quote) {
   const customerHtml = `
   <div style="font-family: Arial, sans-serif; color: #002f5c; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
     <div style="text-align: center; margin-bottom: 20px;">
-      <img src="https://localhost:3000/img/logo-true.svg" alt="My Car Quote Logo" style="height: 60px;" />
+      <img src="<%= baseUrl %>/img/logo.svg" alt="My Car Quote Logo"style="height: 60px;" />
     </div>
 
     <h2 style="color: #002f5c;">Bodyshop Details Confirmed</h2>

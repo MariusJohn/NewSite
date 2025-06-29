@@ -1,6 +1,7 @@
 'use strict';
 
-export async function up(queryInterface, Sequelize) {
+module.exports = {
+  async up(queryInterface, Sequelize) {
   await queryInterface.addColumn('Jobs', 'cancelToken', {
     type: Sequelize.STRING,
     allowNull: true,
@@ -10,9 +11,10 @@ export async function up(queryInterface, Sequelize) {
     type: Sequelize.STRING,
     allowNull: true,
   });
-}
+},
 
-export async function down(queryInterface, Sequelize) {
+async down(queryInterface, Sequelize) {
   await queryInterface.removeColumn('Jobs', 'cancelToken');
   await queryInterface.removeColumn('Jobs', 'extendToken');
 }
+};

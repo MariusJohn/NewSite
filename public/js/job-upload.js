@@ -52,18 +52,26 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   
     imagesInput.addEventListener("change", () => {
-      const files = imagesInput.files;
-      if (files.length < MIN_IMAGES || files.length > MAX_IMAGES) {
-        return showError(imagesError, `Please upload between ${MIN_IMAGES} to ${MAX_IMAGES} images.`);
-      }
-      for (const file of files) {
-        if (file.size / (1024 * 1024) > MAX_FILE_SIZE_MB) {
-          return showError(imagesError, `Each image must be smaller than ${MAX_FILE_SIZE_MB}MB.`);
+        const files = imagesInput.files;
+        const feedback = document.getElementById("images-feedback");
+      
+        if (files.length < MIN_IMAGES || files.length > MAX_IMAGES) {
+          feedback.textContent = "";
+          return showError(imagesError, `Please upload between ${MIN_IMAGES} to ${MAX_IMAGES} images.`);
         }
-      }
-      clearError(imagesError);
-    });
-  
+      
+        for (const file of files) {
+          if (file.size / (1024 * 1024) > MAX_FILE_SIZE_MB) {
+            feedback.textContent = "";
+            return showError(imagesError, `Each image must be smaller than ${MAX_FILE_SIZE_MB}MB.`);
+          }
+        }
+      
+        // ✅ Valid selection
+        clearError(imagesError);
+        feedback.textContent = `${files.length} image${files.length === 1 ? "" : "s"} selected.`;
+      });
+      
     // === Modal Instruction Popup ===
     showBtn?.addEventListener("click", () => {
       modal.style.display = "flex";

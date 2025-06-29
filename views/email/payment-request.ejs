@@ -66,20 +66,25 @@
 <body>
   <div class="box">
     <div class="logo">
-      <a href="<%= homeUrl || 'http://localhost:3000' %>">
-        <img src="<%= logoUrl || (baseUrl + '/img/logo-true.svg') %>" alt="My Car Quote Logo" />
-      </a>
+      <a href=""<%= homeUrl || baseUrl || 'https://mcquote.co.uk' %>"
+">
+        <img src="<%- logoUrl %>" alt="My Car Quote Logo" width="160" style="display:block; margin:auto;" />
+
+     </a>
     </div>
 
     <h2>Hello<%= customerName ? ` ${customerName}` : '' %>,</h2>
     <p>Your job request <strong>#<%= job.id %></strong> has received multiple quotes.</p>
     <p>Please proceed to payment to view and compare your offers.</p>
 
-    <a class="btn" href="<%= paymentUrl || ('http://localhost:3000/payment?jobId=' + job.id) %>">Proceed to Payment</a>
+    <a class="btn" href="<%= paymentUrl %>">Proceed to Payment</a>
+
+    
 
     <div class="footer-links">
       <a href="<%= newRequestUrl || 'http://localhost:3000/jobs/upload' %>">New Request</a> |
-      <a href="<%= homeUrl || 'http://localhost:3000' %>">My Car Quote</a>
+      <a href=""<%= homeUrl || baseUrl || 'https://mcquote.co.uk' %>"
+          ">My Car Quote</a>
     </div>
   </div>
 </body>

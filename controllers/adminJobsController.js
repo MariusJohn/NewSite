@@ -2,6 +2,8 @@
 import { Job, Quote, Bodyshop } from '../models/index.js';
 import { Parser } from 'json2csv';
 import { sendHtmlMail } from '../utils/sendMail.js';
+import { sendCustomerPaymentEmail } from '../scheduler.js';
+
 
 // === Helper: Haversine Distance ===
 function getDistanceInKm(lat1, lon1, lat2, lon2) {
@@ -144,3 +146,24 @@ export async function remindUnselectedJobs(req, res) {
     res.status(500).send('Reminder job failed');
   }
 }
+
+// === RESEND PAYEMENT-REQUEST EMAIL FOR A JOB ===
+export async function resendPaymentEmail(req, res) {
+  const { id } = req.params;
+
+  try {
+    const job = await Job.findByPk(id);
+    if (!job) return res.status(404).send('Job not found');
+
+    console.log(`🔁 Re-sending payment email for job ID: ${id}`);
+    console.log(`📧 Sending payment email to: ${job.customerEmail}`);
+
+    await sendCustomerPaymentEmail(job);
+
+    res.redirect('/jobs/admin/quotes'); // use your correct route here
+  } catch (error) {
+    console.error('❌ Failed to re-send payment email:', error);
+    res.redirect('/jobs/admin/quotes'); // fallback with no flash
+  }
+}
+

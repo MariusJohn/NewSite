@@ -1,4 +1,4 @@
-// migrations/YYYYMMDDHHMMSS-create-quote.js
+// migrations/create-quote.js
 'use strict';
 
 module.exports = {

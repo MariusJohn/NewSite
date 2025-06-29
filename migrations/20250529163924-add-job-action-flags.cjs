@@ -1,4 +1,7 @@
-export async function up(queryInterface, Sequelize) {
+'use strict';
+
+module.exports = {
+  async up(queryInterface, Sequelize) {
   await queryInterface.addColumn('Jobs', 'extendTokenUsed', {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
@@ -7,9 +10,10 @@ export async function up(queryInterface, Sequelize) {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
   });
-}
+},
 
-export async function down(queryInterface, Sequelize) {
+async down(queryInterface, Sequelize) {
   await queryInterface.removeColumn('Jobs', 'extendTokenUsed');
   await queryInterface.removeColumn('Jobs', 'cancelTokenUsed');
 }
+};
