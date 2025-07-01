@@ -1,6 +1,7 @@
 // controllers/paymentController.js
 import Stripe from 'stripe';
 import dotenv from 'dotenv';
+import { Job } from '../models/index.js';
 
 dotenv.config();
 
@@ -36,3 +37,31 @@ export async function createCheckoutSession(req, res) {
   
   res.redirect(303, session.url);
 }
+
+
+export async function confirmPayment(req, res) {
+  const { jobId } = req.query;
+
+  if (!jobId) return res.status(400).send('Missing job ID');
+
+  try {
+    const job = await Job.findByPk(jobId);
+    if (!job) return res.status(404).send('Job not found');
+
+    job.paid = true;
+
+    if (job.selectedBodyshopId) {
+      job.status = 'processed';
+    }
+
+
+  } catch (err) {
+    console.error('Payment confirmation error:', err);
+    res.status(500).send('Server error');
+  }
+    await job.save(); 
+
+    res.render('payment/confirm', { job }); 
+
+}
+

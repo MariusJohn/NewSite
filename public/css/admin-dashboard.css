@@ -317,6 +317,22 @@ body {
   color: #fff;
 }
 
+  .logout-container {
+    margin-top: auto;
+    padding-top: 2rem;
+  }
+  
+  .logout-btn {
+    width: 100%;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 12px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+  }
 
 
 @media (max-width: 768px) {

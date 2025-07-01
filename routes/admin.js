@@ -19,6 +19,8 @@ if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD || !process.env.ADMI
 
 router.use(adminAuth);
 
+const ADMIN_BASE = process.env.ADMIN_BASE;
+
 
 // CSRF Protection Middleware
 const csrfProtection = csurf({ cookie: true });
@@ -36,12 +38,13 @@ const loginLimiter = rateLimit({
 // ======= LOGIN ROUTE =======
 router.get('/login', csrfProtection, (req, res) => {
   if (req.session?.isAdmin) {
-    return res.redirect('/jobs/admin');
+    return res.redirect(`/jobs${ADMIN_BASE}`);
   }
   const expired = req.query.expired === 'true';
   res.render('admin/login', {
     error: expired ? 'Session expired. Please log in again.' : null,
-    csrfToken: req.csrfToken() // Pass CSRF token to the view
+    csrfToken: req.csrfToken(),
+    ADMIN_BASE: process.env.ADMIN_BASE
   });
 });
 
@@ -84,7 +87,8 @@ router.post('/login', loginLimiter, csrfProtection, async (req, res) => {
       return res.render('admin/login', { error: 'Login failed. Please try again.', csrfToken: req.csrfToken() });
     }
 
-    res.redirect('/jobs/admin');
+    res.redirect(`/jobs${ADMIN_BASE}`);
+
   });
 });
 
@@ -95,7 +99,7 @@ router.post('/login', loginLimiter, csrfProtection, async (req, res) => {
 // Define the handleLogout function
 const handleLogout = (req, res) => {
   if (!req.session) {
-    return res.redirect('/admin/login');
+    return res.redirect(`${ADMIN_BASE}/login`);
   }
 
   req.session.destroy(err => {
@@ -111,7 +115,8 @@ const handleLogout = (req, res) => {
       secure: process.env.NODE_ENV === 'production'
     });
 
-    return res.redirect('/admin/login');
+   return res.redirect(`${ADMIN_BASE}/login`);
+
   });
 };
 
@@ -122,7 +127,7 @@ router.get('/logout', handleLogout);
 // ======= ADMIN DASHBOARD =======
 router.get('/', (req, res) => {
   if (req.session?.isAdmin) {
-    return res.redirect('/jobs/admin');
+     return res.redirect(`/jobs${ADMIN_BASE}`);
   } else {
     res.render('admin/login', { error: null });
   }
@@ -136,7 +141,7 @@ router.post('/scheduler/manual-run', csrfProtection, async (req, res) => {
 
   try {
     await runSchedulerNow();
-    res.redirect('/jobs/admin/quotes');
+    res.redirect(`/jobs${ADMIN_BASE}/quotes`);
   } catch (err) {
     console.error('Manual scheduler run failed:', err);
     res.status(500).send('An error occurred. Please try again later.');

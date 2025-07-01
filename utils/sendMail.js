@@ -28,7 +28,14 @@ export async function sendHtmlMail(to, subject, html) {
       from: `"My Car Quote" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      html
+      html,
+      attachments: [
+        {
+          filename: 'logo-email.png',
+          path: path.join(__dirname, '../public/img/logo-email.png'),
+          cid: 'logoemailcid' 
+        }
+      ]
     });
 
     console.log(`✅ HTML Email sent to ${to}: ${info.messageId}`);
@@ -36,6 +43,7 @@ export async function sendHtmlMail(to, subject, html) {
     console.error(`❌ Failed to send HTML email to ${to}:`, err);
   }
 }
+
 
 
 

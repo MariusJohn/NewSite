@@ -7,6 +7,7 @@
     <title>My Car Quote - Admin Dashboard</title>
     <link rel="stylesheet" href="/css/admin-dashboard.css">
     <link rel="stylesheet" href="/css/reset.css">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -28,15 +29,15 @@
         </div>
         
         <ul class="menu">
-          <li><a href="/jobs/admin?filter=total">Total Jobs (<%= totalCount %>)</a></li>
-          <li><a href="/jobs/admin?filter=live">Live Jobs (<%= liveCount %>)</a></li>
-          <li><a href="/jobs/admin?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
-          <li><a href="/jobs/admin?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
-          <li><a href="/jobs/admin?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
-          <li><a href="/jobs/admin?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
-          <li><a href="/jobs/admin/quotes">Jobs with Quotes</a></li>
-          <li><a href="/jobs/admin/bodyshops">Bodyshops</a></li>
-          <li><a href="/jobs/admin/job-flow">Job Flow Logic</a></li>
+          <li><a href="/jobs<%= ADMIN_BASE %>?filter=total">Total Jobs (<%= totalCount %>)</a></li>
+          <li><a href="/jobs<%= ADMIN_BASE %>?filter=live">Live Jobs (<%= liveCount %>)</a></li>
+          <li><a href="/jobs<%= ADMIN_BASE %>?filter=approved">Approved Jobs (<%= approvedCount %>)</a></li>
+          <li><a href="/jobs<%= ADMIN_BASE %>?filter=rejected">Rejected Jobs (<%= rejectedCount %>)</a></li>
+          <li><a href="/jobs<%= ADMIN_BASE %>?filter=archived">Archived Jobs (<%= archivedCount %>)</a></li>
+          <li><a href="/jobs<%= ADMIN_BASE %>?filter=deleted">Deleted Jobs (<%= deletedCount %>)</a></li>
+          <li><a href="/jobs<%= ADMIN_BASE %>/quotes">Jobs with Quotes</a></li>
+          <li><a href="/jobs<%= ADMIN_BASE %>/bodyshops">Bodyshops</a></li>
+          <li><a href="/jobs<%= ADMIN_BASE %>/job-flow">Job Flow Logic</a></li>
 
           <li>
             <form action="/admin/logout" method="POST">
@@ -110,46 +111,65 @@
                               
                             <td>
                                 <div class="image-gallery">
-  <%
-    let parsedImages = [];
+                                      <%
+                                        let parsedImages = [];
 
-    if (Array.isArray(job.images)) {
-      parsedImages = job.images;
-    } else if (typeof job.images === 'string') {
-      try {
-        parsedImages = job.images
-          .replace(/[{}"]/g, '')
-          .split(',')
-          .map(i => i.trim())
-          .filter(Boolean);
-      } catch (err) {
-        parsedImages = [];
-      }
-    }
-  %>
+                                        if (Array.isArray(job.images)) {
+                                          parsedImages = job.images;
+                                        } else if (typeof job.images === 'string') {
+                                          try {
+                                            parsedImages = job.images
+                                              .replace(/[{}"]/g, '')
+                                              .split(',')
+                                              .map(i => i.trim())
+                                              .filter(Boolean);
+                                          } catch (err) {
+                                            parsedImages = [];
+                                          }
+                                        }
+                                      %>
 
-  <% if (parsedImages.length > 0) { %>
-    <% parsedImages.forEach((img, idx) => { %>
-      <a href="<%= img %>" 
-         class="glightbox"
-         data-gallery="job-<%= job.id %>"
-         data-title="Job Image <%= idx + 1 %>">
-        <img src="<%= img %>" alt="Job Image" class="thumb-img" />
-      </a>
-    <% }) %>
-  <% } else { %>
-    <span class="badge badge-warning">No images</span>
-  <% } %>
-</div>
+                                      <% if (parsedImages.length > 0) { %>
+                                        <% parsedImages.forEach((img, idx) => { %>
+                                          <a href="<%= img %>" 
+                                            class="glightbox"
+                                            data-gallery="job-<%= job.id %>"
+                                            data-title="Job Image <%= idx + 1 %>">
+                                            <img src="<%= img %>" alt="Job Image" class="thumb-img" />
+                                          </a>
+                                        <% }) %>
+                                      <% } else { %>
+                                        <span class="badge badge-warning">No images</span>
+                                      <% } %>
+                                    </div>
 
 
 
                               </td>
                               
                               
-                            <td>
-                                <span class="status-badge status-<%= job.status %>"><%= job.status || 'Pending' %></span>
-                            </td>
+                                <td>
+                                  <% if (job.paid && job.selectedBodyshopId) { %>
+                                    <span class="status-badge processed">Paid_BS Selected</span>
+                                  <% } else if (job.paid && !job.selectedBodyshopId) { %>
+                                    <span class="status-badge paid">Paid_BS NOT Selected</span>
+                                  <% } else if (!job.paid && (job.quoteCount || 0) >= 1 && job.daysPending >= 2) { %>
+                                    <span class="status-badge danger">Unpaid (Overdue)</span>
+                                  <% } else if (!job.paid && (job.quoteCount || 0) >= 1) { %>
+                                    <span class="status-badge unpaid">Unpaid</span>
+                                  <% } else if (job.status === 'rejected') { %>
+                                    <span class="status-badge rejected">Rejected</span>
+                                  <% } else if (job.status === 'archived') { %>
+                                    <span class="status-badge archived">Archived</span>
+                                  <% } else if (job.status === 'deleted') { %>
+                                    <span class="status-badge deleted">Deleted</span>
+                                  <% } else if (job.status === 'processed') { %>
+                                    <span class="status-badge processed">Processed</span>
+                                  <% } else { %>
+                                    <span class="status-badge"><%= job.status || 'Pending' %></span>
+                                  <% } %>
+                                </td>
+
                             <td>
                                 <%= job.daysPending || 0 %> days
                             </td>
@@ -167,10 +187,10 @@
                                 <td class="job-actions">
                                     <% if (job.status === 'pending') { %>
                                         
-                                        <form action="/jobs/admin/<%= job.id %>/approve" method="POST">
+                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/approve" method="POST">
                                             <button type="submit" class="btn btn-remind">Approve</button>
                                           </form>
-                                          <form action="/jobs/admin/<%= job.id %>/reject" method="POST">
+                                          <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/reject" method="POST">
                                             <button type="submit" class="btn btn-reject">Reject</button>
                                           </form>
                                          
@@ -179,26 +199,26 @@
                                         <em>Approved</em>
                                 
                                     <% } else if (job.status === 'rejected') { %>
-                                        <form action="/jobs/admin/<%= job.id %>/restore" method="POST">
+                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/restore" method="POST">
                                             <button type="submit" class="restore-btn">Restore</button>
                                         </form>
-                                        <form action="/jobs/admin/<%= job.id %>/archive" method="POST" onsubmit="return confirm('Are you sure you want to archive this job? This action can be reversed.')">
+                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/archive" method="POST" onsubmit="return confirm('Are you sure you want to archive this job? This action can be reversed.')">
                                             <button type="submit">Archive</button>
                                         </form>
                                 
                                     <% } else if (job.status === 'archived') { %>
-                                        <form action="/jobs/admin/<%= job.id %>/restore" method="POST">
+                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/restore" method="POST">
                                             <button type="submit" class="restore-btn">Restore</button>
                                         </form>
-                                        <form action="/jobs/admin/<%= job.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to move this job to the deleted section? This action can still be reversed.')">
+                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to move this job to the deleted section? This action can still be reversed.')">
                                             <button type="submit" class="delete-btn">Move to Deleted</button>
                                         </form>
                                 
                                     <% } else if (job.status === 'deleted') { %>
-                                        <form action="/jobs/admin/<%= job.id %>/restore-deleted" method="POST">
+                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/restore-deleted" method="POST">
                                             <button type="submit" class="restore-btn">Restore</button>
                                         </form>
-                                        <form action="/jobs/admin/<%= job.id %>/hard-delete" method="POST" onsubmit="return confirm('Are you absolutely sure you want to permanently delete this job? This action cannot be undone.')">
+                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/hard-delete" method="POST" onsubmit="return confirm('Are you absolutely sure you want to permanently delete this job? This action cannot be undone.')">
                                             <button type="submit" class="hard-delete-btn">Permanently Delete</button>
                                         </form>
                                     <% } %>

@@ -1,3 +1,4 @@
+//routes/admin-bodyshop.js
 import express from 'express';
 const router = express.Router();
 import { Op } from 'sequelize';
@@ -19,6 +20,7 @@ router.use((req, res, next) => {
 });
 
 
+const ADMIN_BASE = process.env.ADMIN_BASE;
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.ionos.co.uk',
@@ -65,7 +67,8 @@ router.get('/', async (req, res) => {
       archivedCount,
       deletedCount,
       search,
-      csrfToken: req.csrfToken()
+      csrfToken: req.csrfToken(),
+      ADMIN_BASE
     });
   } catch (error) {
     console.error(error);
@@ -82,47 +85,51 @@ router.post('/:id/approve', async (req, res) => {
       bodyshop.status = 'active';      
       await bodyshop.save();
 
-      await transporter.sendMail({
-        from: '"My Car Quote" <office@mcquote.co.uk>',
-        to: bodyshop.email,
-        subject: '✅ Your Bodyshop Has Been Approved',
-        html: `
-          <div style="font-family: Arial, sans-serif; color: #002f5c; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 20px;">
-              <img src="https://mcquote.co.uk/img/logo-true.svg" alt="My Car Quote Logo" style="height: 60px;" />
-            </div>
-      
-            <h2 style="color: #25D366;">Welcome, ${bodyshop.name}!</h2>
-      
-            <p>Your bodyshop account has been <strong>approved</strong>.</p>
-      
-            <p>You can now log in to view jobs and submit quotes:</p>
-      
-            <p>
-              <a href="http://${req.headers.host}/bodyshop/login" style="
-                display: inline-block;
-                padding: 12px 20px;
-                background-color: #002f5c;
-                color: #fff;
-                text-decoration: none;
-                border-radius: 5px;
-              ">
-                🔐 Log In to Dashboard
-              </a>
-            </p>
-      
-            <hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc;" />
-      
-            <p style="font-size: 13px; color: #999;">
-              This email was sent by My Car Quote | <a href="https://mcquote.co.uk">mcquote.co.uk</a><br/>
-              If you didn’t request this, please ignore this email.
-            </p>
-          </div>
-        `
-      });
+await transporter.sendMail({
+  from: '"My Car Quote" <office@mcquote.co.uk>',
+  to: bodyshop.email,
+  subject: '✅ Your Bodyshop Has Been Approved',
+  html: `
+    <div style="font-family: Arial, sans-serif; color: #002f5c; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <img src="cid:logoemailcid" alt="My Car Quote Logo" style="height: 60px;" />
+      </div>
+
+      <h2 style="color: #25D366;">Welcome, ${bodyshop.name}!</h2>
+      <p>Your bodyshop account has been <strong>approved</strong>.</p>
+      <p>You can now log in to view jobs and submit quotes:</p>
+      <p>
+        <a href="https://${req.headers.host}/bodyshop/login" style="
+          display: inline-block;
+          padding: 12px 20px;
+          background-color: #002f5c;
+          color: #fff;
+          text-decoration: none;
+          border-radius: 5px;">
+          🔐 Log In to Dashboard
+        </a>
+      </p>
+
+      <hr style="margin: 30px 0; border: none; border-top: 1px solid #ccc;" />
+      <p style="font-size: 13px; color: #999;">
+        This email was sent by My Car Quote | <a href="https://mcquote.co.uk">mcquote.co.uk</a><br/>
+        If you didn’t request this, please ignore this email.
+      </p>
+    </div>
+  `,
+  attachments: [
+    {
+      filename: 'logo-email.png',
+      path: path.join(process.cwd(), 'public/img/logo-email.png'),
+      cid: 'logoemailcid'
+    }
+  ]
+});
+
       
 
-      res.redirect('/jobs/admin/bodyshops');
+      res.redirect(`/jobs${ADMIN_BASE}/bodyshops`);
+
     } else {
       res.status(404).send('Bodyshop not found');
     }
@@ -152,7 +159,8 @@ router.post('/:id/reject', async (req, res) => {
         `
       });
 
-      res.redirect('/jobs/admin/bodyshops');
+      res.redirect(`/jobs${ADMIN_BASE}/bodyshops`);
+
     } else {
       res.status(404).send('Bodyshop not found');
     }
@@ -178,7 +186,7 @@ router.post('/:id/reactivate', async (req, res) => {
         html: `
           <div style="font-family: Arial, sans-serif; color: #002f5c; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 8px; padding: 20px;">
             <div style="text-align: center; margin-bottom: 20px;">
-              <img src="https://mcquote.co.uk/img/logo-true.svg" alt="My Car Quote Logo" style="height: 60px;" />
+              <img src="cid:logoemailcid" alt="My Car Quote Logo" style="height: 60px;" />
             </div>
       
             <h2 style="color: #25D366;">Welcome Back, ${bodyshop.name}!</h2>
@@ -207,11 +215,18 @@ router.post('/:id/reactivate', async (req, res) => {
               If you didn’t request this change, please ignore this message.
             </p>
           </div>
-        `
-      });
-      
+          `,
+          attachments: [
+            {
+              filename: 'logo-email.png',
+              path: path.join(process.cwd(), 'public/img/logo-email.png'),
+              cid: 'logoemailcid'
+            }
+          ]
+        });
 
-      res.redirect('/jobs/admin/bodyshops');
+      res.redirect(`/jobs${ADMIN_BASE}/bodyshops`);
+
     } else {
       res.status(404).send('Bodyshop not found');
     }

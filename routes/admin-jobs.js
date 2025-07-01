@@ -9,7 +9,7 @@ import archiver from 'archiver';
 import fetch from 'node-fetch';
 import csurf from 'csurf';
 import dotenv from 'dotenv';
-import { Job, Quote, Bodyshop } from '../models/index.js';
+import { Job, Quote } from '../models/index.js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { jobUploadLimiter } from '../middleware/rateLimiter.js';
 import { getJobFilterOptions, getJobCounts } from '../controllers/jobController.js';
@@ -18,12 +18,14 @@ import { renderJobsWithQuotes } from '../controllers/jobsWithQuotesController.js
 import { remindUnselectedJobs, remindBodyshops } from '../controllers/adminJobsController.js';
 import { handleJobAction } from '../controllers/customerJobActionsController.js';
 import { hardDeleteJob } from '../controllers/hardDeleteJob.js';
-import { softDeleteQuotedJob } from '../controllers/adminJobDeleteController.js';
+import { getDeletedJobs, softDeleteQuotedJob } from '../controllers/adminJobDeleteController.js';
 import { resendPaymentEmail } from '../controllers/adminJobsController.js';
+import { archiveJob, getArchivedJobs } from '../controllers/adminJobArchiveController.js';
 
 dotenv.config();
 
 
+const ADMIN_BASE = process.env.ADMIN_BASE;
 
 
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY;
@@ -150,107 +152,107 @@ router.get('/', csrfProtection, async (req, res) => {
     const filter = req.query.filter || 'total';
     const { whereClause, includeClause } = getJobFilterOptions(filter);
 
-    includeClause.push({
-      model: 'quotes',
-      attributes: ['id'], 
-    });
+    // Ensure quotes are included if not already in the clause
+    const hasQuotesIncluded = includeClause.some(
+      (inc) => inc.model === Quote && inc.as === 'quotes'
+    );
+
+    if (!hasQuotesIncluded) {
+      includeClause.push({
+        model: Quote,
+        as: 'quotes',
+        attributes: ['id'],
+      });
+    }
 
     const jobs = await Job.findAll({
       where: whereClause,
-      include: [{
-        model: Quote,
-        as: 'quotes',
-        attributes: ['id']
-      }],
-      order: [['createdAt', 'DESC']]
+      include: includeClause,
+      order: [['createdAt', 'DESC']],
     });
-    
 
-    // Add daysPending calculation
+    // Add daysPending and quote count for UI logic
     const now = new Date();
-    jobs.forEach(job => {
+    jobs.forEach((job) => {
       const createdAt = new Date(job.createdAt);
       const msInDay = 1000 * 60 * 60 * 24;
       const daysPending = Math.floor((now - createdAt) / msInDay);
-      job.dataValues.daysPending = daysPending;
-
       const quoteCount = job.quotes?.length || 0;
+
+      job.dataValues.daysPending = daysPending;
       job.dataValues.quoteCount = quoteCount;
-      job.dataValues.quoteStatus = quoteCount > 0 ? `${quoteCount} quote${quoteCount > 1 ? 's' : ''}` : 'no_quotes';
+      job.dataValues.quoteStatus =
+        quoteCount > 0 ? `${quoteCount} quote${quoteCount > 1 ? 's' : ''}` : 'no_quotes';
     });
-   
-   
+
     const counts = await getJobCounts();
 
-    // This is the template being rendered
-    res.render('admin/jobs-dashboard', { jobs, ...counts, filter, csrfToken: req.csrfToken() });
-
+    res.render('admin/jobs-dashboard', {
+      jobs,
+      ...counts,
+      filter,
+      csrfToken: req.csrfToken(),
+      ADMIN_BASE: process.env.ADMIN_BASE
+    });
   } catch (err) {
-    console.error('❌ Dashboard Error in /jobs/admin handler:', err); // Keep error log
+    console.error('❌ Dashboard Error in /jobs/admin handler:', err);
     res.status(500).send('Internal Server Error');
   }
 });
 
-// === ADMIN SOFT DELETE PROCESSED JOBS === 
-router.get('/jobs/deleted', async (req, res) => {
-  try {
-    const deletedJobs = await Job.findAll({
-      where: { status: 'deleted' },
-      include: [
-        { model: Quote },
-        { model: Bodyshop, as: 'selectedBodyshop' } // Optional
-      ],
-      order: [['updatedAt', 'DESC']]
-    });
-
-    res.render('admin/jobs-deleted', {
-      jobs: deletedJobs,
-      currentPage: 'deleted',
-      deletedJobCount: deletedJobs.length,
-      csrfToken: req.csrfToken()
-    });
-  } catch (err) {
-    console.error('❌ Failed to load deleted jobs:', err);
-    res.status(500).send('Error loading deleted jobs');
-  }
-});
+// === ADMIN  DELETE PROCESSED JOBS === 
+router.get('/jobs/deleted', getDeletedJobs); 
 
 
 // === JOB STATUS ROUTES ===
 router.post('/:id/approve', async (req, res) => {
   await Job.update({ status: 'approved' }, { where: { id: req.params.id } });
-  res.redirect('/jobs/admin?filter=live');
+  res.redirect(`/jobs${ADMIN_BASE}?filter=live`);
+
 });
 
 router.post('/:id/reject', async (req, res) => {
   await Job.update({ status: 'rejected' }, { where: { id: req.params.id } });
-  res.redirect('/jobs/admin?filter=rejected');
+  res.redirect(`/jobs${ADMIN_BASE}?filter=rejected`);
+
 });
-
-
-
 
 
 
 // === ARCHIVE REJECTED JOBS ===
-router.post('/:jobId/archive', async (req, res) => {
-  const job = await Job.findByPk(req.params.jobId);
-  if (job?.status === 'rejected') {
-    await job.update({ status: 'archived' });
-    return res.redirect('/jobs/admin?filter=archived');
+router.post('/:jobId/archive', archiveJob);
+
+
+
+
+// === RESTORE ARCHIVED JOB ===
+router.post('/:jobId/restore', async (req, res) => {
+  try {
+    const job = await Job.findByPk(req.params.jobId, {
+      include: ['quotes']
+    });
+
+    if (!job || job.status !== 'archived') {
+      return res.status(400).send('Only archived jobs can be restored.');
+    }
+
+    let newStatus = 'approved';
+
+    if (job.paid && job.selectedBodyshopId) {
+      newStatus = 'processed';
+    } else if (job.quotes?.length === 0) {
+      newStatus = 'rejected';
+    }
+
+    await job.update({ status: newStatus });
+    res.redirect(`/jobs${ADMIN_BASE}?filter=${newStatus}`);
+
+  } catch (err) {
+    console.error('❌ Restore failed:', err);
+    res.status(500).send('Error restoring job');
   }
-  res.status(400).send('Only rejected jobs can be archived.');
 });
 
-// === RESTORE ARCHIVED JOBS ===
-router.post('/:jobId/restore', async (req, res) => {
-  const job = await Job.findByPk(req.params.jobId);
-  if (job && ['rejected', 'archived'].includes(job.status)) {
-    await job.update({ status: 'pending' });
-    return res.redirect('/jobs/admin?filter=live');
-  }
-  res.status(400).send('Only archived jobs can be restored.');
-});
 
 // === SOFT DELETE PROCESSED JOB ===
 router.post('/:jobId/soft-delete', adminAuth, softDeleteQuotedJob);
@@ -261,7 +263,8 @@ router.post('/:jobId/delete', async (req, res) => {
   const job = await Job.findByPk(req.params.jobId);
   if (job?.status === 'archived') {
     await job.update({ status: 'deleted' });
-    return res.redirect('/jobs/admin?filter=deleted');
+    res.redirect(`/jobs${ADMIN_BASE}?filter=deleted`);
+
   }
   res.status(400).send('Only archived jobs can be deleted.');
 });
@@ -271,7 +274,8 @@ router.post('/:jobId/restore-deleted', async (req, res) => {
   const job = await Job.findByPk(req.params.jobId);
   if (job?.status === 'deleted') {
     await job.update({ status: 'pending' });
-    return res.redirect('/jobs/admin?filter=deleted');
+    res.redirect(`/jobs${ADMIN_BASE}?filter=deleted`);
+
   }
   res.status(400).send('Only deleted jobs can be restored.');
 });

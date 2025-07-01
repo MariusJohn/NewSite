@@ -50,7 +50,8 @@
 </head>
 <body>
   <div class="box">
-    <img src="<%= logoUrl %>" alt="My Car Quote Logo" style="max-width: 160px; margin-bottom: 20px;">
+    <img src="cid:logoemailcid" alt="My Car Quote Logo" width="160" style="display:block; margin:auto;" />
+
 
     <h2>Hello<%= customerName ? ` ${customerName}` : '' %>,</h2>
     <p>We are sorry but your job request <strong>#<%= job.id %></strong> hasn’t received any quotes yet.</p>

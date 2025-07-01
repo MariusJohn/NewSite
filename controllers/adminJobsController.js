@@ -3,6 +3,7 @@ import { Job, Quote, Bodyshop } from '../models/index.js';
 import { Parser } from 'json2csv';
 import { sendHtmlMail } from '../utils/sendMail.js';
 import { sendCustomerPaymentEmail } from '../scheduler.js';
+const ADMIN_BASE = process.env.ADMIN_BASE;
 
 
 // === Helper: Haversine Distance ===
@@ -100,7 +101,8 @@ export async function remindBodyshops(req, res) {
         }
 
     console.log(`✅ Reminder sent to ${nearbyShops.length} bodyshops for Job #${job.id}`);
-    res.redirect('/jobs/admin/quotes');
+    res.redirect(`/jobs${ADMIN_BASE}/quotes`);
+
   } catch (err) {
     console.error('❌ Reminder error:', err);
     res.status(500).send('Error sending reminders.');
@@ -158,12 +160,20 @@ export async function resendPaymentEmail(req, res) {
     console.log(`🔁 Re-sending payment email for job ID: ${id}`);
     console.log(`📧 Sending payment email to: ${job.customerEmail}`);
 
+    // Increment counter before sending
+    job.paymentReminders = (job.paymentReminders || 0) + 1;
+    job.emailSentAt = new Date();
+    await job.save();
+
     await sendCustomerPaymentEmail(job);
 
-    res.redirect('/jobs/admin/quotes'); // use your correct route here
+    res.redirect(`/jobs${ADMIN_BASE}/quotes`);
+
   } catch (error) {
     console.error('❌ Failed to re-send payment email:', error);
-    res.redirect('/jobs/admin/quotes'); // fallback with no flash
+    res.redirect(`/jobs${ADMIN_BASE}/quotes`);
+
   }
 }
+
 

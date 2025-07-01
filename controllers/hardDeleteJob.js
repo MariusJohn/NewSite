@@ -1,9 +1,10 @@
 // controllers/hardDeleteJob.js
-import { Job } from '../models/index.js';
+import { Job, Quote } from '../models/index.js';
 import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
 
 dotenv.config();
+const ADMIN_BASE = process.env.ADMIN_BASE;
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -43,7 +44,7 @@ export const hardDeleteJob = async (req, res) => {
 
     await job.destroy();
     console.log(`✅ Job #${jobId} permanently deleted`);
-    res.redirect('/jobs/admin?filter=deleted');
+    res.redirect(`/jobs${ADMIN_BASE}?filter=deleted`);
   } catch (err) {
     console.error('❌ Error during hard delete:', err);
     res.status(500).send('Server error while deleting job.');

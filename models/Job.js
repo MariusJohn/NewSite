@@ -126,6 +126,13 @@ const Job = sequelize.define('Job', {
     type: DataTypes.DATE,
     allowNull: true
   },
+
+    paymentReminders: {
+  type: DataTypes.INTEGER,
+  allowNull: false,
+  defaultValue: 0
+},
+ 
   cancelToken: {
     type: DataTypes.STRING,
     allowNull: true
@@ -151,8 +158,7 @@ const Job = sequelize.define('Job', {
     allowNull: true,
     defaultValue: null
   }
-  
-  
+
   
 }, {
   timestamps: true,

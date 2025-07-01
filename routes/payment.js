@@ -4,9 +4,10 @@ const router = express.Router();
 
 
 import { Job, Quote, Bodyshop } from '../models/index.js';
-import { createCheckoutSession } from '../controllers/paymentController.js';
+import { createCheckoutSession, confirmPayment } from '../controllers/paymentController.js';
 import { sendFinalEmails } from '../controllers/emailController.js';
 import { syncJobStatus } from '../utils/syncJobStatus.js';
+
 
 import dotenv from 'dotenv';
 
@@ -158,5 +159,8 @@ router.get('/selected/:jobId', async (req, res) => {
     res.status(500).send('Server error.');
   }
 });
+
+
+router.get('/confirm', confirmPayment);
 
 export default router;

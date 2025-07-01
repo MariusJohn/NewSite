@@ -43,6 +43,9 @@ dotenv.config();
 const app = express();
 const _dirname = path.resolve();
 const port = process.env.PORT || 3000;
+const ADMIN_BASE = process.env.ADMIN_BASE;
+
+
 
 const sessionDbPool = new Pool({
   user: process.env.DB_USER,
@@ -135,9 +138,11 @@ const loginLimiter = rateLimit({
   message: 'Too many login attempts. Please try again later.'
 });
 
-app.use('/admin', adminRoutes);
-app.use('/jobs/admin', adminAuth, adminJobsRoutes);
-app.use('/jobs/admin/bodyshops', adminAuth, adminBodyshopRoutes);
+
+app.use(ADMIN_BASE, adminRoutes);
+app.use(`/jobs${ADMIN_BASE}`, adminAuth, adminJobsRoutes);
+app.use(`/jobs${ADMIN_BASE}/bodyshops`, adminAuth, adminBodyshopRoutes);
+
 
 app.use('/jobs', uploadsRoutes); 
 app.use('/jobs', publicJobsRoutes);
@@ -159,6 +164,9 @@ app.get('/session-test', (req, res) => {
   console.log('Session test:', req.session);
   res.send(`isAdmin: ${req.session.isAdmin || 'NOT SET'}`);
 });
+
+app.get('/admin', (req, res) => res.status(404).send('Page not found'));
+
 
 app.use((err, req, res, next) => {
   if (err.code === 'EBADCSRFTOKEN') {

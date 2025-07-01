@@ -20,7 +20,7 @@
   <% if (error) { %>
     <p class="error-msg"><%= error %></p>
   <% } %>
-  <form method="POST" action="/admin/login">
+  <form method="POST" action="<%= ADMIN_BASE %>/login">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     
     <input type="email" name="email" placeholder="Admin Email" required>
