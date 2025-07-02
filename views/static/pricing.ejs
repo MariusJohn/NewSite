@@ -8,25 +8,22 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/pricing.css">
+    <link rel="stylesheet" href="css/collaborators.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-
 </head>
 
 <body>
-
     <div class="page-wrapper">
         <%- include('../partials/header') %>
-            
+        
         <main>
           <section class="pricing-section">
-
-          
             <div class="pricing-intro">
               <div class="pricing-intro-content">
-                <h2>Need an Independent Estimate?</h2><br>
+                <h2>Need an Independent Estimate?</h2>
                 <p>
                   We provide both simple, expert-reviewed quotations and formal software-based reports — ideal for private repairs, lease returns, insurance claims, or dispute resolution.
                 </p>
@@ -45,21 +42,19 @@
                 <p><em>No specialised software used</em></p>
                 <span class="price">£25</span>
               </div>
-          
               <div class="price-card">
                 <h3>Accident Damage Inspection</h3>
                 <p>Comprehensive report for legal or insurance use</p>
                 <p><em>Includes use of specialist estimating software</em></p>
                 <span class="price">£90–£140</span>
               </div>
-          
               <div class="price-card">
                 <h3>Bodyshop Support Package</h3>
-                <p>On-site help or remote assistance for quoting and disputes</p>
+                <h5>Complete VDA service</h5>
+                <p>Remote assistance, desktop inspections, figures matching, invoicing (including AudaInvoice)</p>
                 <p><em>Flexible support tailored to your workflow</em></p>
-                <span class="price">From £150/day</span>
+                <span class="price">From £250/day</span>
               </div>
-          
               <div class="price-card">
                 <h3>Training – Damage Assessment</h3>
                 <p>One-on-one booster for vehicle damage assessors</p>
@@ -68,45 +63,94 @@
               </div>
             </div>
           </section>
-          
 
-            <section class="why-us-section">
-                <h2>Why Choose Our Estimates?</h2>
-                <div class="why-grid">
-                  <div class="why-card">
-                    <h3>Certified Accuracy</h3>
-                    <p>All our estimates are backed by professional assessors with over 20 years of experience.</p><br>
-                    <p><strong>All our assessors are certified by the Institute of Motor Industry UK and hold a valid ATA VDA qualification</strong></p>
+          <section class="why-us-section">
+            <h2>Why Choose Our Estimates?</h2>
+            <div class="why-grid">
+              <div class="why-card">
+                <h3>Certified Accuracy</h3>
+                <p>All our estimates are backed by professional assessors with over 20 years of experience.</p>
+                <p><strong>All our assessors are certified by the Institute of Motor Industry UK and hold a valid ATA VDA qualification</strong></p>
+              </div>
+              <div class="why-card">
+                <h3>Independent Advice</h3>
+                <p>No pressure or bias — just transparent, professional insight.</p>
+                <p><strong>We only advise unbiased technical opinion, we don't promote any third party services</strong></p>
+              </div>
+              <div class="why-card">
+                <h3>Fast Delivery</h3>
+                <p>Most quotes delivered within 24 hours, with support ready if needed.</p>
+                <p><strong>We aim to deliver fast</strong></p>
+              </div>
+            </div>
+          </section>
+
+                <section class="founder-section">
+                  <h2>Founder & Principal Assessor</h2>
+                  <div class="founder-profile">
+                    <img src="/img/founder.png" alt="John Ciuclea">
+                    <div class="collab-info">
+                      <h3>John M Ciuclea</h3>
+                      <p>
+                        Senior ATA IMI Vehicle Damage Assessor with 20+ years of experience across insurance, repair centres,
+                         and advanced estimating platforms. Former bodyshop manager, technical trainer, and motor engineer for major 
+                         insurers like Allianz and Direct Line Group. Committed to helping drivers make informed, fair, and fast repair decisions.
+                      </p>
+                    </div>
                   </div>
-                  <div class="why-card">
-                    <h3>Independent Advice</h3>
-                    <p>No pressure or bias — just transparent, professional insight.</p><br><br>
-                    <p><strong>We only advise unbiased technical opinion, we don't promote any third party services</strong></p>
+                </section>
+
+
+
+             <section class="collaborators-section">
+                <h2>Our Collaborators</h2>
+                
+                <div class="collaborator">
+                  <img src="/img/collab1.jpg" alt="Collaborator 1">
+                  <div class="collab-info">
+                    <h3>Jane Smith</h3>
+                    <p>Certified Vehicle Damage Assessor with 15+ years experience in OEM and fleet work. Specialist in advanced estimating software.</p>
                   </div>
-                  <div class="why-card">
-                    <h3>Fast Delivery</h3>
-                    <p>Most quotes delivered within 24 hours, with support ready if needed.</p><br><br>
-                    <p><strong>We aim to deliver fast</strong></p>
+                </div>
+
+                
+
+                <div class="collaborator">
+                  <img src="/img/collab2.jpg" alt="Collaborator 2">
+                  <div class="collab-info">
+                    <h3>Mark Johnson</h3>
+                    <p>IMI-registered assessor and technical trainer. Provides remote audit support for independent and group bodyshops.</p>
+                  </div>
+                </div>
+
+                <div class="collaborator">
+                  <img src="/img/collab3.jpg" alt="Collaborator 3">
+                  <div class="collab-info">
+                    <h3>Elena Petrova</h3>
+                    <p>Multilingual claim consultant with background in accident liability and third-party negotiation.</p>
+                  </div>
+                </div>
+
+                <div class="collaborator">
+                  <img src="/img/collab4.jpg" alt="Collaborator 4">
+                  <div class="collab-info">
+                    <h3>Tom Green</h3>
+                    <p>Former insurance engineer and VDA with expertise in structural damage assessment and lease return inspections.</p>
                   </div>
                 </div>
               </section>
 
-              <section class="final-cta">
-                <p class="cta-subtext">Ready to get your quote? Send us your photos directly via WhatsApp.</p><br>
-                <a href="https://wa.me/447448589086" class="cta-button" target="_blank">
-                  Send Images via WhatsApp
-                </a>
-              </section>
-              
-            
-        </main>
-        
-     
-        <%- include('../partials/footer') %>
-  
 
+          <section class="final-cta">
+            <p class="cta-subtext">Ready to get your quote? Send us your photos directly via WhatsApp.</p>
+            <a href="https://wa.me/447448589086" class="cta-button" target="_blank">
+              Send Images via WhatsApp
+            </a>
+          </section>
+        </main>
+
+        <%- include('../partials/footer') %>
     </div>
     <script src="/js/navbar-toggle.js"></script>
 </body>
-
 </html>

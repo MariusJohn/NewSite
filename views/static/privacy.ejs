@@ -1,82 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>My Car Quote-Privacy</title>
-        <link rel="stylesheet" href="css/reset.css">
-        <link rel="stylesheet" href="css/header.css">
-        <link rel="stylesheet" href="css/footer.css">
-        <link rel="stylesheet" href="css/privacy.css">
-        <link rel="stylesheet" href="css/cookie.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Car Quote – Policies & Procedures</title>
+    <link rel="stylesheet" href="/css/reset.css" />
+    <link rel="stylesheet" href="/css/header.css" />
+    <link rel="stylesheet" href="/css/footer.css" />
+    <link rel="stylesheet" href="/css/privacy.css" />
+    <link rel="stylesheet" href="/css/cookie.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      .policies-container {
+        display: flex;
+        padding: 40px;
+        gap: 40px;
+        font-family: 'Poppins', sans-serif;
+        background: #f9fbfd;
+      }
+      .sidebar {
+        flex: 1;
+        max-width: 250px;
+      }
+      .sidebar h2 {
+        font-size: 18px;
+        margin-bottom: 20px;
+        font-weight: 600;
+        color: #002f5c;
+      }
+      .sidebar ul {
+        list-style: none;
+        padding: 0;
+      }
+      .sidebar li {
+        margin-bottom: 12px;
+      }
+      .sidebar a {
+        text-decoration: none;
+        color: #002f5c;
+        font-weight: 500;
+      }
+      .content {
+        flex: 3;
+        padding-right: 10px;
+      }
+      .content h1 {
+        font-size: 28px;
+        color: #002f5c;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+      .content h2 {
+        font-size: 20px;
+        color: #004080;
+        margin-top: 30px;
+        margin-bottom: 12px;
+        font-weight: 600;
+      }
+      .content p, .content ul {
+        font-size: 16px;
+        line-height: 1.7;
+        color: #333;
+        margin-bottom: 16px;
+      }
+      .content ul {
+        padding-left: 20px;
+      }
+      strong {
+        font-weight: 600;
+        color: #002f5c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <%- include('../partials/header') %>
+      <section class="policies-container">
+        <div class="sidebar">
+          <h2>Policies & Procedures</h2>
+          <ul>
+            <li><a href="#terms">Terms & Conditions</a></li>
+            <li><a href="#privacy">Privacy Policy</a></li>
+            <li><a href="#cookies">Cookies Policy</a></li>
+            <li><a href="#conduct">Code of Conduct</a></li>
+            <li><a href="#feedback">Feedback Policy</a></li>
+            <li><a href="#payment">Payment Policy</a></li>
+            <li><a href="#email">Email Policy</a></li>
+            <li><a href="#social">Social Media Privacy</a></li>
+            <li><a href="#bodyshop">Bodyshop Data Policy</a></li>
+          </ul>
+        </div>
+        <div class="content">
+          <h1 id="privacy">Privacy Policy</h1>
+          <p>Effective Date: April 29, 2025</p>
 
-       
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
-    </head>
-    
-<body>
-<div class="page-wrapper">
-    <%- include('../partials/header') %>
+          <h2>1. Who We Are</h2>
+          <p>My Car Quote ("we", "our", "us") is operated by My Car Quote Limited , a private limited company 
+            registered in the United Kingdom under company number 16416376 with its registered office at 
+            Manifold Way, Wednesbury, WS10 0GB. We provide an online platform for Customers to request 
+            vehicle repair Quotes from independent Bodyshops.</p>
 
-<section class="privacy-policy">
-  <div class="container-privacy">
-    <h1>Privacy Policy</h1>
-    <p>Effective Date: April 29, 2025</p>
+          <h2>2. What Information We Collect</h2>
+          <ul>
+            <li>Job-related data: name, email address, phone number, postcode, vehicle details through uploaded images</li>
+            <li>Quote interactions: quote views, selection of a Bodyshop</li>
+          </ul>
 
-    <h2>What Information We Collect</h2>
-    <p>When you use our contact form, we collect your name, email address, subject, and message. This information is used solely to respond to your enquiry.</p>
+          <h2>3. Lawful Basis for Processing</h2>
+          <p>We process personal data based on the following legal grounds:</p>
+          <ul>
+            <li>Contractual necessity – to provide the service you request</li>
+            <li>Legitimate interests – to improve service performance and user experience</li>
+            <li>Consent – for optional communications and marketing</li>
+          </ul>
 
-    <h2>Why We Collect Your Data</h2>
-    <ul>
-      <li>To respond to your enquiries</li>
-      <li>To provide customer support</li>
-      <li>To improve our services</li>
-    </ul>
+          <h2>4. How We Use Your Information</h2>
+          <ul>
+            <li>Facilitate the submission of your Job and delivery of Quotes</li>
+            <li>Enable communication with a selected Bodyshop</li>
+            <li>Process secure payments</li>
+            <li>Send service updates and status notifications</li>
+          </ul>
 
-    <h2>How Your Data Is Stored</h2>
-    <p>Your enquiry is sent directly to our secure email inbox at <strong>office@mcquote.co.uk</strong> and is not stored on our web server. We retain the information only as long as needed to support your request.</p>
+          <h2>5. Data Sharing and Third Parties</h2>
+          <p>We do not sell your data. Your data is only shared with Bodyshops after you choose to unlock Quote details. 
+            We work with trusted service providers to process payments, support platform security, and enable core platform features. 
+            These providers only access the minimum data required to perform their function under strict confidentiality agreements.</p>
 
+          <h2>6. International Data Transfers</h2>
+          <p>If your data is transferred outside the UK or EEA, we ensure appropriate safeguards are in place such as Standard Contractual Clauses 
+            approved by relevant authorities or other lawful transfer mechanisms under UK GDPR.</p>
 
-    <h2>Your Rights</h2>
-    <p>Under GDPR, you have the right to access, correct, or request deletion of your personal data at any time. To exercise these rights, email us at <strong>office@mcquote.co.uk</strong>.</p>
+          <h2 id="cookies">7. Cookies</h2>
+          <p>We use cookies to support platform functionality and performance. 
+            Non-essential cookies are only enabled with your consent. 
+            See <a href="#cookies">Cookies Policy</a> for details.</p>
 
-    <h2>Third Parties</h2>
-    <p>We do not share your personal information with any third parties. We do not use your data for marketing without your explicit consent.</p>
+          <h2>8. Data Retention</h2>
+          <p>We retain personal data only as long as needed to fulfil our services and comply with legal obligations.
+            Completed or inactive Jobs are removed from our system after 30 days, with minimal metadata retained securely for audit and record purposes.</p>
 
-    <h2>Data We Automatically Collect</h2>
-    <p>When you interact with our website (e.g., upload a job or submit a form), we may collect certain technical data including your IP address, browser type, and device information. This data is used for security, fraud prevention, and service optimization. Your IP address may also be used to help match you with nearby bodyshops.</p>
+          <h2>9. Your Rights</h2>
+          <p>Under UK data protection law, you have the right to:</p>
+          <ul>
+            <li>Access the personal data we hold about you</li>
+            <li>Correct or update inaccurate information</li>
+            <li>Request deletion of your data</li>
+            <li>Withdraw consent where processing is based on consent</li>
+            <li>Object to processing based on legitimate interests</li>
+            <li>Data portability for information you provided</li>
+            <li>Lodge a complaint with the UK Information Commissioner’s Office (ICO)</li>
+          </ul>
 
-    <h2>Use of Google reCAPTCHA</h2>
-    <p>We use Google reCAPTCHA v2 to protect our forms against bots and abuse. This service may collect information about your device, browser, and IP address as part of the verification process. It is subject to Google's <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</p>
+          <h2>10. Data Security</h2>
+          <p>We implement appropriate technical and organisational measures to protect your data. 
+            All data is encrypted during transmission. We do not store payment card details on our platform.</p>
 
-    <h2>Payments with Stripe</h2>
-    <p>When you make a payment on our website, your transaction is securely processed by Stripe. We do not store your payment card details. Stripe may collect personal data such as your IP address, email, and transaction metadata. Please review <a href="https://stripe.com/gb/privacy" target="_blank" rel="noopener noreferrer">Stripe's Privacy Policy</a> for more information.</p>
+          <h2>11. Business Transfers</h2>
+          <p>In the event of a merger, acquisition, or asset sale, personal data may be transferred to the acquiring entity under the same terms of this policy.</p>
 
-    <h2>Location Services via OpenCage API</h2>
-    <p>We use the OpenCage Geocoding API to convert postcode information into geographic coordinates. This helps us allocate jobs to nearby bodyshops. Your location data is used only for this purpose and is not stored permanently. For details, refer to the <a href="https://opencagedata.com/privacy" target="_blank" rel="noopener noreferrer">OpenCage Privacy Policy</a>.</p>
+          <h2 id="bodyshop">12. Bodyshop Data Collection and Use</h2>
+          <p>When a Bodyshop registers on our platform, we collect the following personal and business data:</p>
+          <ul>
+            <li>Business name and trading details</li>
+            <li>Contact name and email address</li>
+            <li>Phone number and postcode</li>
+            <li>Quotes submitted and job interactions</li>
+            <li>Verification status and admin approvals</li>
+          </ul>
 
-    <h2>Customer Data Retention</h2>
-    <p>We only keep customer information for as long as necessary to provide our service and support your request. Once your job is completed, rejected, or no longer active, your personal data and images are securely deleted from our systems.</p>
-    
-    <p>We do not retain customer data for marketing or profiling purposes. You may request the deletion of your data at any time by contacting us at <strong>office@mcquote.co.uk</strong>.</p>
-    
-    <h2>Contact</h2>
-    <p>If you have questions about this policy or your data, please contact us at <strong>office@mcquote.co.uk</strong>.</p>
-  
+          <p>This data is used to:</p>
+          <ul>
+            <li>Enable login and account management</li>
+            <li>Filter jobs based on location</li>
+            <li>Display quotes to Customers once payment is made</li>
+            <li>Notify Bodyshops of relevant jobs and selections</li>
+            <li>Maintain platform security and service records</li>
+          </ul>
 
-  </div>
-</section>
+          <p>Bodyshop data is stored securely and only accessible by platform administrators. 
+            We do not sell or share Bodyshop data for external marketing purposes.</p>
 
-</div>
+          <p>Bodyshops may request access, correction, or deletion of their data at any time by emailing <strong>office@mcquote.co.uk</strong>. 
+            Deleting an account may result in loss of access to the platform and its services.</p>
 
-  <%- include('../partials/footer') %>
+          <h2>13. Changes to This Policy</h2>
+          <p>We may update this Privacy Policy from time to time to reflect legal or operational changes. 
+            Updates will be published here with revised dates.</p>
 
-  <%- include('../partials/cookie-banner') %>
+          <h1 id="terms">Terms & Conditions</h1>
+<p>Effective Date: April 29, 2025</p>
 
+<h2>1. Introduction</h2>
+<p>These Terms & Conditions (“Terms”) govern your use of the My Car Quote platform. 
+  By accessing or using this website, you agree to these Terms. If you do not agree, you must not use our service.</p>
 
-  <script src="/js/cookie-banner.js"></script>
-<script src="/js/navbar-toggle.js"></script>
-</body>
+<h2>2. Our Service</h2>
+<p>My Car Quote is an online platform that allows vehicle owners (“Customers”) to receive repair Quotes from 
+  local independent garages (“Bodyshops”). We are not a repair provider or insurance broker. We do not guarantee, 
+  endorse, or manage the services or quotes provided by Bodyshops.</p>
+
+<h2>3. User Responsibilities</h2>
+<p>All users must provide accurate and honest information. 
+  Customers must not submit misleading claims or false uploads. 
+  Bodyshops must only submit professional, fair quotes. 
+  Misuse of the platform may result in account restriction or removal.</p>
+
+<h2>4. Quotes and Payments</h2>
+<p>Quotes submitted by Bodyshops are non-binding until direct engagement. 
+  Customers can pay a small fee to unlock full Bodyshop contact details. 
+  This payment is non-refundable. 
+  My Car Quote does not facilitate or guarantee any outcome between the parties.</p>
+
+<h2>5. Bodyshop Account Use</h2>
+<p>Registered Bodyshops are responsible for maintaining accurate business profiles. 
+  We reserve the right to suspend accounts due to misuse, abuse, or persistent inactivity. 
+  Bodyshops must treat all Customer data with confidentiality and comply with UK data protection laws.</p>
+
+<h2>6. Data Privacy</h2>
+<p>Use of the platform is governed by our Privacy Policy.
+  We process Customer and Bodyshop data in accordance with applicable privacy laws 
+  and ensure all third-party services comply with relevant standards.</p>
+
+<h2>7. Intellectual Property</h2>
+<p>All platform content, including text, logos, and visuals, are owned or licensed by My Car Quote. 
+  No content may be copied, distributed, or reused without written permission.</p>
+
+<h2>8. Limitation of Liability</h2>
+<p>We act solely as an intermediary. We are not liable for disputes, losses, or damages arising from Customer-Bodyshop interactions or quotes. 
+  All responsibilities and obligations rest solely with the respective parties.</p>
+
+<h2>9. Modifications</h2>
+<p>We reserve the right to update these Terms as needed. 
+  Changes will be posted with the updated effective date. 
+  Continued use of the platform signifies acceptance of the revised terms.</p>
+
+<h2>10. Contact</h2>
+<p>For questions, email us at <strong>office@mcquote.co.uk</strong>.</p>
+
+<h2 id="cookies">Cookies Policy</h2>
+          <p>We use essential cookies for login sessions and fraud protection. We also use optional cookies for analytics and improvements – these require your consent. You can change your cookie preferences at any time in your browser settings.</p>
+
+          <h2 id="conduct">Code of Conduct</h2>
+          <p>Customers must submit accurate, respectful, and lawful content. Bodyshops must provide honest, professional quotes and services. We reserve the right to suspend access for violations.</p>
+
+          <h2 id="feedback">Feedback Policy</h2>
+          <p>Customer feedback must reflect genuine experiences. We reserve the right to moderate or remove feedback that is false, misleading, or abusive.</p>
+
+          <h2 id="payment">Payment Policy</h2>
+          <p>Customers may pay to unlock quote details. Payments are non-refundable except in cases of verified technical failure. All transactions are handled securely by a third-party processor.</p>
+
+          <h2 id="email">Email Policy</h2>
+          <p>We send important service-related emails (e.g. job updates). Marketing emails are only sent if you explicitly opt-in and include a one-click unsubscribe option.</p>
+
+          <h2 id="social">Social Media Privacy</h2>
+          <p>We do not share customer personal data on social media. With explicit consent, customer testimonials may be featured in dedicated sections such as “What Our Customers Are Saying.”</p>
+        </div>
+      </section>
+      <%- include('../partials/footer') %>
+      <%- include('../partials/cookie-banner') %>
+      <script src="/js/cookie-banner.js"></script>
+      <script src="/js/navbar-toggle.js"></script>
+    </div>
+  </body>
 </html>

@@ -22,8 +22,14 @@ const sampleJob = {
   customerEmail: 'test@example.com'
 };
 
+const allowedTemplates = ['single-quote', 'multiple-quotes', 'job-deleted', 'action-expired'];
+
 router.get('/:template', async (req, res) => {
   const template = req.params.template;
+
+  if (!allowedTemplates.includes(template)) {
+    return res.status(404).send('Template not allowed.');
+  }
 
   try {
     const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, `${template}.ejs`), {

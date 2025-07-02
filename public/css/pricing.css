@@ -9,7 +9,6 @@ body {
 
 main {
   min-height: 60vh;
-
 }
 
 .pricing-container {
@@ -17,8 +16,6 @@ main {
   flex-direction: column;
   gap: 2rem;
 }
-
-
 
 .pricing-section {
   padding: 4rem 1rem;
@@ -45,7 +42,7 @@ main {
   padding: 2rem 1.5rem;
   border-radius: 12px;
   max-width: 1000px;
-  margin: 0 auto 3rem auto; /* spacing before cards */
+  margin: 0 auto 3rem auto;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
   text-align: center;
 }
@@ -64,7 +61,6 @@ main {
   max-width: 800px;
   margin: 0 auto;
 }
-
 
 .pricing-grid {
   margin-top: 2rem;
@@ -121,6 +117,7 @@ main {
   margin-top: 1rem;
 }
 
+/* WHY US SECTION */
 .why-us-section {
   background-color: #ffffff;
   padding: 60px 20px;
@@ -160,6 +157,7 @@ main {
   font-size: 15px;
 }
 
+/* FINAL CTA */
 .final-cta {
   margin-top: 60px;
   padding-bottom: 80px;
@@ -191,13 +189,107 @@ main {
 .final-cta .cta-button:hover {
   background-color: #1ebe5d;
 }
+
+/* COLLABORATORS */
+.collaborators-section {
+  max-width: 1000px;
+  margin: 4rem auto;
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+.collaborators-section h2 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #002f5c;
+}
+
+.collaborator {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 2rem;
+}
+
+.collaborator img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #ccc;
+}
+
+.collab-info h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #002f5c;
+}
+
+.collab-info p {
+  font-size: 1rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* FOUNDER */
+.founder-section {
+  padding: 60px 20px;
+  background: #f9fbfd;
+  text-align: center;
+}
+
+.founder-section h2 {
+  font-size: 2rem;
+  margin-bottom: 40px;
+  color: #002f5c;
+}
+
+.founder-profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  max-width: 1000px;
+  margin: 0 auto;
+  gap: 30px;
+}
+
+.founder-profile img {
+  width: 200px;
+  height: 200px;
+  border-radius: 100px;
+  object-fit: cover;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.founder-profile .collab-info {
+  max-width: 600px;
+  text-align: left;
+}
+
+.founder-profile .collab-info h3 {
+  font-size: 1.5rem;
+  color: #002f5c;
+  margin-bottom: 10px;
+}
+
+.founder-profile .collab-info p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* RESPONSIVE */
 @media screen and (max-width: 768px) {
   .pricing-section {
     padding: 2rem 1rem;
   }
 
   .pricing-grid {
-    grid-template-columns: 1fr; 
+    grid-template-columns: 1fr;
     gap: 1.5rem;
   }
 
@@ -229,5 +321,39 @@ main {
 
   .section-subtitle {
     font-size: 1rem;
+  }
+
+  .collaborator {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .collaborator img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .collab-info h3 {
+    margin-top: 1rem;
+  }
+
+  .collab-info {
+    text-align: center;
+  }
+
+  .founder-profile {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .founder-profile img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .founder-profile .collab-info {
+    text-align: center;
   }
 }

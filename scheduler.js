@@ -34,9 +34,23 @@ transporter.verify(error => {
   else console.log("✅ Email transporter ready");
 });
 
+//
 async function sendHtmlEmail(to, subject, html) {
   try {
-    await transporter.sendMail({ from: `"My Car Quote" <${process.env.EMAIL_USER}>`, to, subject, html });
+    await transporter.sendMail({
+      from: `"My Car Quote" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html,
+      attachments: [
+        {
+          filename: 'logo-true.svg',
+          path: path.join(process.cwd(), 'public', 'img', 'logo-true.svg'),
+          cid: 'logoemailcid' // Must match the "cid:" used in the EJS
+        }
+      ]
+    });
+
     console.log(`✅ Email sent: ${subject} -> ${to}`);
     await logScheduler(`✅ Email sent: ${subject} -> ${to}`);
   } catch (err) {
@@ -62,7 +76,9 @@ async function sendCustomerSingleQuoteEmail(job, remaining) {
     remaining,
     extendUrl: `${baseUrl}/jobs/action/${job.id}/${job.extendToken}?action=extend`,
     cancelUrl: `${baseUrl}/jobs/action/${job.id}/${job.cancelToken}?action=cancel`,
-    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
+    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`,
+    newRequestUrl: `${baseUrl}/jobs/upload`,  
+    homeUrl: baseUrl  
   });
   await sendHtmlEmail(job.customerEmail, `1 Quote Received for Job #${job.id}`, html);
 }
@@ -73,7 +89,9 @@ async function sendCustomerMultipleQuotesEmail(job, remaining) {
     job,
     remaining,
     baseUrl,
-    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`
+    paymentUrl: `${baseUrl}/payment?jobId=${job.id}`,
+    newRequestUrl: `${baseUrl}/jobs/upload`,
+    homeUrl: baseUrl,
   });
   await sendHtmlEmail(job.customerEmail, `Quotes Ready for Job #${job.id}`, html);
 }
@@ -160,41 +178,36 @@ export async function runSchedulerNow() {
       
 
       // 24h logic
-      if (job.createdAt <= cutoff24h && !job.extensionRequestedAt) {
+      if (job.createdAt <= cutoff24h && !job.emailSentAt) {
         try {
-          if (!job.emailSentAt) {
-            if (quoteCount === 0) {
-              await sendCustomerNoQuotesEmail(job);
-              summary.noQuotes.push(job.id);
-            } else if (quoteCount === 1) {
-              await sendCustomerSingleQuoteEmail(job, remaining);
-              summary.oneQuote.push(job.id);
-            } else if (quoteCount >= 2) {
-              await sendCustomerMultipleQuotesEmail(job, remaining);
-              summary.multiQuotes.push(job.id);
-            }
-            job.extensionRequestedAt = now;
-            job.emailSentAt = now;
-            await job.save();
-          } else {
-            console.log(`⏩ Skipped Job #${job.id} – Already emailed at ${job.emailSentAt}`);
+          if (quoteCount === 0) {
+            await sendCustomerNoQuotesEmail(job);
+            summary.noQuotes.push(job.id);
+          } else if (quoteCount === 1) {
+            await sendCustomerSingleQuoteEmail(job, remaining);
+            summary.oneQuote.push(job.id);
+          } else if (quoteCount >= 2) {
+            await sendCustomerMultipleQuotesEmail(job, remaining);
+            summary.multiQuotes.push(job.id);
           }
+
+          job.extensionRequestedAt = now;
+          job.emailSentAt = now;
+          await job.save();
         } catch (err) {
           console.error(`❌ Failed to process 24h logic for job ${job.id}:`, err);
         }
         continue;
       }
-
-      if (job.extended && job.extensionRequestedAt && !job.emailSentAt) {
-        job.emailSentAt = new Date();
-        await job.save();
-      }
+      
 
       if (job.extended && quoteCount >= 2 && !job.paid && job.status !== 'pending_payment') {
         if (!dryRun) await sendCustomerPaymentEmail(job);
         summary.paymentRequested.push(job.id);
       }
 
+      
+      //48h logic
       if (job.createdAt <= cutoff48h) {
         if (quoteCount === 0) {
           if (job.extended) {

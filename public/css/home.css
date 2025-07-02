@@ -243,6 +243,103 @@ body {
   margin-bottom: 1rem;
 }
 
+.testimonials {
+  background: #f3f8fc;
+  padding: 60px 20px;
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+}
+
+.testimonials .section-title {
+  font-size: 28px;
+  color: #002f5c;
+  margin-bottom: 40px;
+}
+
+.testimonial-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.testimonial-card {
+  flex: 1 1 300px;
+  max-width: 360px;
+  background: #fff;
+  border-left: 5px solid #0074d9;
+  padding: 25px 20px;
+  border-radius: 8px;
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.testimonial-card p {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.testimonial-card strong {
+  font-weight: 600;
+  color: #004080;
+  font-size: 15px;
+}
+
+.testimonials-carousel {
+  background: #f3f8fc;
+  padding: 60px 20px;
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+}
+
+.testimonials-carousel .section-title {
+  font-size: 28px;
+  color: #002f5c;
+  margin-bottom: 40px;
+}
+
+.carousel-container {
+  position: relative;
+  max-width: 700px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  width: 100%;
+  transition: transform 0.6s ease-in-out;
+}
+
+.carousel-card {
+  flex: 0 0 100%;
+  padding: 30px 20px;
+  background: #ffffff;
+  border-left: 5px solid #0074d9;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  text-align: left;
+}
+
+.carousel-card p {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.carousel-card strong {
+  font-weight: 600;
+  color: #004080;
+  font-size: 15px;
+}
+
+
+
 
 /* =================================
    Mobile‐Specific Spacing Fixes
@@ -298,5 +395,28 @@ body {
       margin-top: 1.5rem; 
       padding: 1.5rem 1rem;
     }
+
+      .testimonials {
+    padding: 40px 15px;
+  }
+
+  .testimonial-card {
+    max-width: 100%;
+  }
+
+  .testimonials .section-title {
+    font-size: 24px;
+  }
+  testimonials-carousel {
+    padding: 40px 15px;
+  }
+
+  .carousel-card {
+    padding: 25px 15px;
+  }
+
+  .testimonials-carousel .section-title {
+    font-size: 24px;
+  }
   }
   
