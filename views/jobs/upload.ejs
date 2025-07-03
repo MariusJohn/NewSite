@@ -44,16 +44,28 @@
         <input type="text" id="location" name="postcode" placeholder="Your post code" required>
         <span class="error-message" id="postcode-error"></span>
 
-        <div class="upload-file-wrapper">
-          <button type="button" id="showInstructionsBtn" class="choose-file-btn">Choose Files</button>
-          <input type="file" id="images" name="images" accept="image/*" multiple required hidden>
-          <span id="images-feedback" class="upload-feedback"></span>
-          <span id="images-error" class="error-message"></span>
-        </div>
-        
-        
-        
-         
+            <div class="upload-file-wrapper">
+              <!-- Input updated to prevent camera use -->
+          <input
+            type="file"
+            id="images"
+            name="images"
+            accept="image/jpeg,image/png"
+            multiple
+            required
+            style="display: none;"
+          />
+
+
+              <button type="button" id="showInstructionsBtn" class="choose-file-btn">Choose Images</button>
+
+              <!-- Live preview stack -->
+              <div id="preview-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;"></div>
+
+              <span id="images-feedback" class="upload-feedback"></span>
+              <span id="images-error" class="error-message"></span>
+            </div>
+
 
         <div class="g-recaptcha" data-sitekey="<%= recaptchaSiteKey %>"></div> 
 
@@ -61,22 +73,31 @@
 
         <p id="form-error-message" style="color: rgb(41, 250, 26); display: none;"></p>
       </form>
-                  <!-- Upload Instructions Modal -->
-                  <div id="uploadInstructionsModal" class="upload-modal-overlay">
-                    <div class="upload-modal-content">
-                      <h2>Upload Guide</h2>
-                      <ol>
-                        <li>📸 1 photo of the <strong>FRONT </strong>of your car</li>
-                        <li>📸 1 photo of the <strong>BACK </strong> of your car</li>
-                        <li>📸 1 photo of the <strong>DAMAGED SIDE </strong>of your car</li>
-                        <li>📸 1 photo with the  <strong>OVERALL DAMAGE</strong></li>
-                        <li>📸 1 photo or more <strong>close-up photos of the damage</strong></li>
-                      </ol>
-                      <p class="final-tip" style="color: blue;"><strong>Then choose and attach your pictures from your phone gallery.</strong></p>
-                      <button id="closeModalBtn" class="modal-close-btn">Got it</button>
-                    </div>
-                  </div>
 
+      <!-- Upload Instructions Modal -->
+      <div id="uploadInstructionsModal" class="upload-modal-overlay">
+        <div class="upload-modal-content">
+          <h2>Upload Guide</h2>
+          <ol>
+              <ul style="margin-top: 10px;">
+                  <li>✅ Choose -<strong>Photo Library</strong> (📂)</li>
+                  <li>❌ Avoid -<strong>Take Photo directly using camera</strong> (📷)</li>
+               </ul>
+
+            <li>📸 1 photo of the <strong>FRONT</strong> of your car</li>
+            <li>📸 1 photo of the <strong>BACK</strong> of your car</li>
+            <li>📸 1 photo of the <strong>DAMAGED SIDE</strong> of your car</li>
+            <li>📸 1 photo with the <strong>OVERALL DAMAGE</strong></li>
+            <li>📸 1 or more <strong>close-up photos</strong> of the damage</li>
+          </ol>
+  
+            <p class="upload-tip" style="margin-top: 10px; color: #d9534f;">
+                📱 On iPhones: Tap "Photo Library" instead of "Take Photo" to select multiple images at once.
+              </p>
+
+          <button id="closeModalBtn" class="modal-close-btn">Got it</button>
+        </div>
+      </div>
 
     </section>
   </main>

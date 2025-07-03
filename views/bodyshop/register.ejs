@@ -40,20 +40,28 @@
       <input type="email" id="email" name="email" placeholder="Email Address" required autocomplete="email">
 
 
-      <label for="phone">Phone Number:</label>
-      <input type="tel" id="phone" name="phone" placeholder="07..." required pattern="^07[0-9]{9}$"  title="Enter a valid UK phone number (07...)">
-      <span class="error-message" id="phone-error"></span>
+        <label for="phone">Phone Number:</label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          placeholder="e.g. 07123 456789 or 020 7946 0958"
+          required
+          pattern="^(?:07\d{9}|01\d{8,9}|02\d{8,9}|03\d{8,9})$"
+          title="Enter a valid UK mobile (07...) or landline (01/02/03...) number">
+        <span class="error-message" id="phone-error"></span>
+
 
       <label for="password">Password:</label>
       <div class="password-container">
         <input type="password" id="password" name="password" placeholder="Password" required autocomplete="new-password">
-        <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
+        <span class="password-toggle" >👁️</span>
       </div>
 
       <label for="confirmPassword">Confirm Password:</label>
       <div class="password-container">
         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required autocomplete="new-password">
-        <span class="password-toggle" onclick="togglePasswordVisibility(this)">👁️</span>
+        <span class="password-toggle" >👁️</span>
       </div>
 
       <span class="error-message" id="password-error"></span>

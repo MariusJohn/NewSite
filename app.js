@@ -125,7 +125,7 @@ if (process.env.NODE_ENV !== 'production') {
   app.use('/dev', devRoutes);
 }
 
-app.use(express.static(path.join(process.cwd(), 'public')));
+    
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/webhook', webhookRoutes);
 
