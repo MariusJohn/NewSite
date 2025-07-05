@@ -261,24 +261,27 @@ router.post('/:jobId/soft-delete', adminAuth, softDeleteQuotedJob);
 // === DELETE AND RESTORE ARCHIVED JOBS ===
 router.post('/:jobId/delete', async (req, res) => {
   const job = await Job.findByPk(req.params.jobId);
+
   if (job?.status === 'archived') {
     await job.update({ status: 'deleted' });
-    res.redirect(`/jobs${ADMIN_BASE}?filter=deleted`);
-
+    return res.redirect(`/jobs${ADMIN_BASE}?filter=deleted`);
   }
+
   res.status(400).send('Only archived jobs can be deleted.');
 });
 
 // === RESTORE DELETED JOBS ===
 router.post('/:jobId/restore-deleted', async (req, res) => {
   const job = await Job.findByPk(req.params.jobId);
+
   if (job?.status === 'deleted') {
     await job.update({ status: 'pending' });
-    res.redirect(`/jobs${ADMIN_BASE}?filter=deleted`);
-
+    return res.redirect(`/jobs${ADMIN_BASE}?filter=deleted`);
   }
+
   res.status(400).send('Only deleted jobs can be restored.');
 });
+
 
 // === HARD DELETE POST === //
 router.post('/:jobId/hard-delete', hardDeleteJob);

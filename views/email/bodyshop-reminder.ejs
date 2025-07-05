@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nearby Job Alert – My Car Quote</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      color: #333;
+    }
+    .box {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      border-radius: 8px;
+      padding: 30px;
+      box-sizing: border-box;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo img {
+      max-width: 160px;
+      height: auto;
+    }
+    h2 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #002f5c;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 20px;
+      background: #17a2b8;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      white-space: nowrap;
+      max-width: 100%;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .footer-links {
+      margin-top: 30px;
+      font-size: 12px;
+      text-align: center;
+    }
+    .footer-links a {
+      color: #007bff;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+    @media (max-width: 600px) {
+      .btn {
+        display: block;
+        width: 100%;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="logo">
+      <img src="cid:logoemailcid" alt="My Car Quote Logo" width="160" style="display:block; margin:auto;" />
+    </div>
+
+    <h2>Hello <%= bodyshopName %>,</h2>
+
+    <p>A new job request <strong>#<%= job.id %></strong> has been extended by a customer.</p>
+    <p>This job is approximately <strong><%= distance %> miles</strong> from your location.</p>
+    <p>Click below to view and submit your quote:</p>
+
+    <a class="btn" href="<%= baseUrl %>/bodyshop/dashboard">Quote Now</a>
+
+    <div class="footer-links">
+      <a href="<%= baseUrl %>/bodyshop/dashboard">My Dashboard</a> |
+      <a href="<%= baseUrl %>">Visit My Car Quote</a>
+    </div>
+  </div>
+</body>
+</html>

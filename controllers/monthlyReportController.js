@@ -6,7 +6,7 @@ import ejs from 'ejs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { transporter } from '../scheduler.js';
+import transporter from '../utils/emailTransporter.js'; // ✅
 import dotenv from 'dotenv';
 import { Job, Quote } from '../models/index.js';
 

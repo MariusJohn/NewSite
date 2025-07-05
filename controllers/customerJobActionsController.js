@@ -1,29 +1,13 @@
 // controllers/customerJobActionsController.js
 import { Job, Bodyshop } from '../models/index.js';
-import { sendHtmlMail } from '../utils/sendMail.js';
+import { sendHtmlEmail
+ } from '../utils/sendMail.js';
 import { deleteImagesFromS3 } from './imageCleanupController.js';
-
-
-
-
-function getDistanceInKm(lat1, lon1, lat2, lon2) {
-  const toRad = deg => deg * (Math.PI / 180);
-  const R = 6371;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a = Math.sin(dLat / 2) ** 2 +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLon / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
+import { getBodyshopsWithinRadius } from './radiusTargetingController.js'; 
 
 // Handle unified job action (extend OR cancel)
 const handleJobAction = async (req, res) => {
-
   console.log('💡 handleJobAction triggered');
-
-
 
   try {
     const { jobId, token } = req.params;
@@ -31,7 +15,6 @@ const handleJobAction = async (req, res) => {
     if (!job) return res.status(404).render('jobs/action-expired');
 
     const action = req.query.action;
-
 
     console.log({
       jobId: job.id,
@@ -45,20 +28,15 @@ const handleJobAction = async (req, res) => {
       action
     });
 
-    
-    
-
     if (job.status === 'deleted' || (job.extendTokenUsed && job.cancelTokenUsed)) {
       return res.status(403).render('jobs/action-expired');
     }
 
+    // === ✅ EXTEND LOGIC ===
     if (action === 'extend') {
       if (job.extendToken !== token || job.extendTokenUsed || job.extended) {
         return res.status(403).render('jobs/action-expired');
       }
-
-      const currentExpiry = job.quoteExpiry || new Date();
-      console.log('📅 Current quoteExpiry:', job.quoteExpiry);
 
       const newExpiry = new Date(job.quoteExpiry.getTime() + 24 * 60 * 60 * 1000);
       await job.update({
@@ -69,14 +47,12 @@ const handleJobAction = async (req, res) => {
         extendTokenUsed: true
       });
 
-      const allBodyshops = await Bodyshop.findAll({ where: { adminApproved: true } });
-      const RADIUS_KM = 16.1;
-      const nearby = allBodyshops.filter(bs =>
-        getDistanceInKm(job.latitude, job.longitude, bs.latitude, bs.longitude) <= RADIUS_KM
-      );
+      // ✅ Use radius-aware controller to find matching bodyshops
+      const nearby = await getBodyshopsWithinRadius(job.latitude, job.longitude);
 
       for (const bs of nearby) {
-        await sendHtmlMail(
+        await sendHtmlEmail
+(
           bs.email,
           `Extension Notice – Job #${job.id}`,
           `<p>Hello ${bs.name},</p>
@@ -89,6 +65,7 @@ const handleJobAction = async (req, res) => {
       return res.render('jobs/extension-confirmation', { job });
     }
 
+    // === ✅ CANCEL LOGIC ===
     if (action === 'cancel') {
       if (job.cancelToken !== token || job.cancelTokenUsed || job.status === 'deleted') {
         return res.status(403).render('jobs/action-expired');
@@ -113,8 +90,6 @@ const handleJobAction = async (req, res) => {
   }
 };
 
-
 export {
   handleJobAction 
 };
-

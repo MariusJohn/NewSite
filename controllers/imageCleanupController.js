@@ -1,5 +1,5 @@
 // controllers/imageCleanupController.js
-import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -13,17 +13,35 @@ const s3Client = new S3Client({
 });
 
 export async function deleteImagesFromS3(imageUrls = []) {
-  for (const url of imageUrls) {
-    const key = url.split('/job-images/')[1];
-    if (!key) continue;
-    try {
-      await s3Client.send(new DeleteObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `job-images/${key}`
-      }));
-      console.log(`🧹 Deleted from S3: ${key}`);
-    } catch (err) {
-      console.error(`❌ Failed to delete ${key}:`, err.message);
+  if (!Array.isArray(imageUrls) || imageUrls.length === 0) {
+    console.warn('⚠️ No valid image URLs provided for deletion.');
+    return;
+  }
+
+  // Extract filenames
+  const imageKeys = imageUrls
+    .map(url => {
+      const match = url.match(/job-images\/(.+\.jpg)/);
+      return match ? match[1] : null;
+    })
+    .filter(Boolean);
+
+  if (!imageKeys.length) {
+    console.warn('⚠️ No valid S3 keys extracted from image URLs.');
+    return;
+  }
+
+  const deleteParams = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Delete: {
+      Objects: imageKeys.map(filename => ({ Key: `job-images/${filename}` }))
     }
+  };
+
+  try {
+    await s3Client.send(new DeleteObjectsCommand(deleteParams));
+    console.log(`🧹 Deleted ${imageKeys.length} image(s) from S3`);
+  } catch (err) {
+    console.error(`❌ S3 deletion error:`, err.message);
   }
 }

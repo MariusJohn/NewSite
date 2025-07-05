@@ -104,6 +104,10 @@ const Job = sequelize.define('Job', {
     allowNull: false,
     defaultValue: 0
   },
+  finalExtended: {
+  type: DataTypes.BOOLEAN,
+  defaultValue: false
+},
   customerDecision: {
     type: DataTypes.ENUM('waiting', 'accepted', 'rejected', 'pending_payment'),
     defaultValue: 'waiting',

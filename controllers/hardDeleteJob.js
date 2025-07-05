@@ -23,12 +23,35 @@ export const hardDeleteJob = async (req, res) => {
       return res.status(400).send('Only deleted jobs can be permanently removed.');
     }
 
-    const imageKeys = (job.images || [])
-      .map(url => {
-        const match = url.match(/job-images\/(.+\.jpg)/);
-        return match ? `job-images/${match[1]}` : null;
-      })
-      .filter(Boolean);
+const rawImages = job.images;
+
+let imageArray = [];
+
+if (Array.isArray(rawImages)) {
+  imageArray = rawImages;
+} else if (typeof rawImages === 'string') {
+  try {
+    const parsed = JSON.parse(rawImages);
+    if (Array.isArray(parsed)) {
+      imageArray = parsed;
+    } else {
+      console.warn(`⚠️ Job ${jobId} images parsed but not an array:`, parsed);
+    }
+  } catch (parseErr) {
+    console.warn(`⚠️ Failed to parse images for job ${jobId}:`, parseErr.message);
+    console.warn('Raw images value:', rawImages);
+  }
+}
+
+
+
+
+const imageKeys = imageArray
+  .map(url => {
+    const match = url.match(/job-images\/(.+\.jpg)/);
+    return match ? { Key: `job-images/${match[1]}` } : null;
+  })
+  .filter(Boolean);
 
     if (imageKeys.length) {
       await s3Client.send(

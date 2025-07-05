@@ -132,6 +132,8 @@ app.use('/webhook', webhookRoutes);
 app.set('views', path.join(process.cwd(), 'views'));
 app.set('view engine', 'ejs');
 
+app.use(express.static(path.join(process.cwd(), 'public')));
+
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,

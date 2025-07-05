@@ -1,5 +1,6 @@
 // controllers/emailController.js
-import { sendHtmlMail } from '../utils/sendMail.js';
+import { sendHtmlEmail
+ } from '../utils/sendMail.js';
 
 export async function sendFinalEmails(job, quote) {
   const customerHtml = `
@@ -55,8 +56,10 @@ const bodyshopHtml = `
 `;
 
 
-  await sendHtmlMail(job.customerEmail, 'Repair Bodyshop Selected', customerHtml);
-  await sendHtmlMail(quote.bodyshop.email, 'New Customer Assigned', bodyshopHtml);
+  await sendHtmlEmail
+(job.customerEmail, 'Repair Bodyshop Selected', customerHtml);
+  await sendHtmlEmail
+(quote.bodyshop.email, 'New Customer Assigned', bodyshopHtml);
 }
 
 

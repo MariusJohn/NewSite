@@ -3,6 +3,8 @@ import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { logScheduler } from '../helpers/schedulerLogger.js';
+
 
 dotenv.config();
 
@@ -22,30 +24,32 @@ const transporter = nodemailer.createTransport({
 });
 
 // === Send plain text ===
-export async function sendHtmlMail(to, subject, html) {
+//
+async function sendHtmlEmail(to, subject, html) {
   try {
-    const info = await transporter.sendMail({
+    await transporter.sendMail({
       from: `"My Car Quote" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,
       attachments: [
         {
-          filename: 'logo-email.png',
-          path: path.join(__dirname, '../public/img/logo-email.png'),
-          cid: 'logoemailcid' 
+          filename: 'logo-true.svg',
+          path: path.join(process.cwd(), 'public', 'img', 'logo-true.svg'),
+          cid: 'logoemailcid' // Must match the "cid:" used in the EJS
         }
       ]
     });
 
-    console.log(`✅ HTML Email sent to ${to}: ${info.messageId}`);
+    console.log(`✅ Email sent: ${subject} -> ${to}`);
+    await logScheduler(`✅ Email sent: ${subject} -> ${to}`);
   } catch (err) {
-    console.error(`❌ Failed to send HTML email to ${to}:`, err);
+    console.error(`❌ Email failed: ${subject} -> ${to}`, err);
+    await logScheduler(`❌ Email failed: ${subject} -> ${to}`);
   }
 }
 
 
 
-
-export default sendHtmlMail;
+export { sendHtmlEmail };
 

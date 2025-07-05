@@ -183,48 +183,39 @@
                             </td>
 
                             
-                            
-                                <td class="job-actions">
-                                    <% if (job.status === 'pending') { %>
-                                        
-                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/approve" method="POST">
-                                            <button type="submit" class="btn btn-remind">Approve</button>
-                                          </form>
-                                          <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/reject" method="POST">
-                                            <button type="submit" class="btn btn-reject">Reject</button>
-                                          </form>
-                                         
-                                
-                                    <% } else if (job.status === 'approved') { %>
-                                        <em>Approved</em>
-                                
-                                    <% } else if (job.status === 'rejected') { %>
-                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/restore" method="POST">
-                                            <button type="submit" class="restore-btn">Restore</button>
-                                        </form>
-                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/archive" method="POST" onsubmit="return confirm('Are you sure you want to archive this job? This action can be reversed.')">
-                                            <button type="submit">Archive</button>
-                                        </form>
-                                
-                                    <% } else if (job.status === 'archived') { %>
-                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/restore" method="POST">
-                                            <button type="submit" class="restore-btn">Restore</button>
-                                        </form>
-                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to move this job to the deleted section? This action can still be reversed.')">
-                                            <button type="submit" class="delete-btn">Move to Deleted</button>
-                                        </form>
-                                
-                                    <% } else if (job.status === 'deleted') { %>
-                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/restore-deleted" method="POST">
-                                            <button type="submit" class="restore-btn">Restore</button>
-                                        </form>
-                                        <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/hard-delete" method="POST" onsubmit="return confirm('Are you absolutely sure you want to permanently delete this job? This action cannot be undone.')">
-                                            <button type="submit" class="hard-delete-btn">Permanently Delete</button>
-                                        </form>
-                                    <% } %>
-                                
+                                                    
+                        <td class="job-actions">
+                          <% if (job.status === 'pending') { %>
+                            <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/approve" method="POST">
+                              <button type="submit" class="btn btn-remind">Approve</button>
+                            </form>
+                            <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/reject" method="POST">
+                              <button type="submit" class="btn btn-reject">Reject</button>
+                            </form>
 
-                                </td>
+                          <% } else if (job.status === 'approved') { %>
+                            <em>Approved</em>
+
+                          <% } else if (job.status === 'rejected') { %>
+                            <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/restore" method="POST">
+                              <button type="submit" class="restore-btn">Restore</button>
+                            </form>
+                            <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/archive" method="POST" onsubmit="return confirm('Are you sure you want to archive this job? This action can be reversed.')">
+                              <button type="submit">Archive</button>
+                            </form>
+
+                          <% } else if (job.status === 'archived') { %>
+                            <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to move this job to the deleted section? This action can still be reversed.')">
+                              <button type="submit" class="delete-btn">Move to Deleted</button>
+                            </form>
+
+                          <% } else if (job.status === 'deleted') { %>
+                            <form action="/jobs<%= ADMIN_BASE %>/<%= job.id %>/hard-delete" method="POST" onsubmit="return confirm('Are you absolutely sure you want to permanently delete this job? This action cannot be undone.')">
+                              <button type="submit" class="hard-delete-btn">Permanently Delete</button>
+                            </form>
+                          <% } %>
+                        </td>
+
                              
                         </tr>
                     <% }) %>

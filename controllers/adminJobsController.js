@@ -1,7 +1,8 @@
 //controllers/adminJobsController.js
 import { Job, Quote, Bodyshop } from '../models/index.js';
 import { Parser } from 'json2csv';
-import { sendHtmlMail } from '../utils/sendMail.js';
+import { sendHtmlEmail
+ } from '../utils/sendMail.js';
 import { sendCustomerPaymentEmail } from '../scheduler.js';
 const ADMIN_BASE = process.env.ADMIN_BASE;
 
@@ -87,7 +88,8 @@ export async function remindBodyshops(req, res) {
     );
 
     for (const bs of nearbyShops) {
-      await sendHtmlMail(
+      await sendHtmlEmail
+(
         bs.email,
         `Reminder: New Quote Request - Job #${job.id}`,
         `<p>Please log in and quote for Job #${job.id}.</p>`
@@ -130,7 +132,8 @@ export async function remindUnselectedJobs(req, res) {
     for (const job of jobs) {
       for (const quote of job.quotes) {
         if (quote.bodyshop?.email) {
-          await sendHtmlMail(
+          await sendHtmlEmail
+(
             quote.bodyshop.email,
             `Reminder: Job #${job.id} still open for customer`,
             `<p>The customer has not yet selected a bodyshop.</p>

@@ -1,16 +1,16 @@
 // scheduler.js
 import cron from 'node-cron';
-import nodemailer from 'nodemailer';
-import { Op } from 'sequelize';
 import ejs from 'ejs';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import { S3Client, DeleteObjectsCommand } from '@aws-sdk/client-s3';
 import { DeletedJob, Job, Quote, Bodyshop } from './models/index.js';
 import { sendMonthlyProcessedReport } from './controllers/monthlyReportController.js';
-import { logScheduler } from './helpers/schedulerLogger.js';
+import { getBodyshopsWithinRadius } from './controllers/radiusTargetingController.js';
+import { sendHtmlEmail } from './utils/sendMail.js';
+import { deleteImagesFromS3 } from './controllers/imageCleanupController.js';
+
 
 dotenv.config();
 
@@ -19,45 +19,7 @@ const __dirname = path.dirname(__filename);
 const EMAIL_VIEWS_PATH = path.join(__dirname, 'views', 'email');
 const baseUrl = process.env.BASE_URL || 'https://mcquote.co.uk';
 
-export const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: process.env.EMAIL_SECURE === 'true',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
 
-transporter.verify(error => {
-  if (error) console.error("Email connection failed:", error);
-  else console.log("✅ Email transporter ready");
-});
-
-//
-async function sendHtmlEmail(to, subject, html) {
-  try {
-    await transporter.sendMail({
-      from: `"My Car Quote" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html,
-      attachments: [
-        {
-          filename: 'logo-true.svg',
-          path: path.join(process.cwd(), 'public', 'img', 'logo-true.svg'),
-          cid: 'logoemailcid' // Must match the "cid:" used in the EJS
-        }
-      ]
-    });
-
-    console.log(`✅ Email sent: ${subject} -> ${to}`);
-    await logScheduler(`✅ Email sent: ${subject} -> ${to}`);
-  } catch (err) {
-    console.error(`❌ Email failed: ${subject} -> ${to}`, err);
-    await logScheduler(`❌ Email failed: ${subject} -> ${to}`);
-  }
-}
 
 async function sendCustomerNoQuotesEmail(job) {
   const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes.ejs'), {
@@ -130,7 +92,17 @@ export async function runSchedulerNow() {
     console.log('⛔ Scheduler already running. Skipping...');
     return;
   }
+
+  // const day = new Date().getDay(); // 0 = Sunday, 6 = Saturday
+  // if (day === 0 || day === 6) {
+  //   console.log('📆 Weekend detected – skipping scheduler run.');
+  //   return;
+  // }
+
   global.schedulerRunning = true;
+
+
+
   const dryRun = process.argv.includes('--dry-run');
 
   console.log('=== Scheduler started ===');
@@ -150,6 +122,7 @@ export async function runSchedulerNow() {
     const now = new Date();
     const cutoff24h = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const cutoff48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+    const cutoff72h = new Date(now.getTime() - 72 * 60 * 60 * 1000);
 
     const jobs = await Job.findAll({
       where: { status: 'approved' },
@@ -160,113 +133,171 @@ export async function runSchedulerNow() {
       const quoteCount = await Quote.count({ where: { jobId: job.id } });
       const bodyshopsInRange = await Bodyshop.count({ where: { area: job.location } });
       const remaining = Math.max(0, bodyshopsInRange - quoteCount);
-      
-      
-      const jobAgeMinutes = (new Date() - new Date(job.createdAt)) / 1000 / 60;
-      console.log(`🕒 Job #${job.id} – age: ${jobAgeMinutes.toFixed(2)}min, quotes: ${quoteCount}`);
-      // EARLY TRIGGER: Send payment request as soon as 2+ quotes received
-      if (
-        quoteCount >= 3 &&
-        jobAgeMinutes >= 10 &&
-        !job.paid &&
-        job.status !== 'pending_payment'
-      ) {
-        if (!dryRun) await sendCustomerPaymentEmail(job);
-        summary.earlyEmails.push(job.id);
-        continue;
-      }
+      const jobAgeMinutes = Math.floor((now - new Date(job.createdAt)) / 60000);
       
 
-      // 24h logic
-      if (job.createdAt <= cutoff24h && !job.emailSentAt) {
-        try {
-          if (quoteCount === 0) {
-            await sendCustomerNoQuotesEmail(job);
-            summary.noQuotes.push(job.id);
-          } else if (quoteCount === 1) {
-            await sendCustomerSingleQuoteEmail(job, remaining);
-            summary.oneQuote.push(job.id);
-          } else if (quoteCount >= 2) {
-            await sendCustomerMultipleQuotesEmail(job, remaining);
-            summary.multiQuotes.push(job.id);
-          }
-
-          job.extensionRequestedAt = now;
-          job.emailSentAt = now;
-          await job.save();
-        } catch (err) {
-          console.error(`❌ Failed to process 24h logic for job ${job.id}:`, err);
-        }
-        continue;
-      }
-      
-
-      if (job.extended && quoteCount >= 2 && !job.paid && job.status !== 'pending_payment') {
-        if (!dryRun) await sendCustomerPaymentEmail(job);
-        summary.paymentRequested.push(job.id);
-      }
+    // === EARLY TRIGGER ===
+    if (
+       quoteCount >= 3 &&
+      jobAgeMinutes >= 10 &&
+      !job.paid &&
+      job.status !== 'pending_payment'
+    ) {
+      if (!dryRun) await sendCustomerPaymentEmail(job);
+      summary.earlyEmails.push(job.id);
+      continue;
+    }
 
       
-      //48h logic
-      if (job.createdAt <= cutoff48h) {
-        if (quoteCount === 0) {
-          if (job.extended) {
-            const html = await ejs.renderFile(path.join(EMAIL_VIEWS_PATH, 'no-quotes-archive.ejs'), {
-              customerName: job.customerName,
-              job,
-              homeUrl: `${baseUrl}/`,
-              newRequestUrl: `${baseUrl}/jobs/upload`
-            });
+     // === 0–24h LOGIC ===
+    if (job.createdAt <= cutoff24h && !job.emailSentAt) {
+      try {
+        // 🔁 Reminder to bodyshops (only if 0 or 1 quotes)
+        if (quoteCount <= 1) {
+          const nearbyBodyshops = await getBodyshopsWithinRadius(job.latitude, job.longitude);
 
-            if (!job.emailSentAt) {
-              await sendCustomerJobDeletedEmail(job);
-              job.emailSentAt = now;
-              await job.save();
+          for (const shop of nearbyBodyshops) {
+            const alreadyQuoted = await Quote.findOne({ where: { jobId: job.id, bodyshopId: shop.id } });
+            if (alreadyQuoted) {
+              console.log(`⏭️ Skipping ${shop.email} (already quoted Job #${job.id})`);
+              continue;
             }
+
+            const html = await ejs.renderFile(
+              path.join(EMAIL_VIEWS_PATH, 'bodyshop-reminder.ejs'),
+              {
+                bodyshopName: shop.name,
+                job,
+                distance: Math.round(shop.distance),
+                baseUrl
+              }
+            );
 
             if (!dryRun) {
-              await sendHtmlEmail(job.customerEmail, `Job #${job.id} – No Quotes Received`, html);
-              job.status = 'archived';
-              await job.save();
+              await sendHtmlEmail(shop.email, `🚗 New Job Nearby (${Math.round(shop.distance)} mi)`, html);
             }
-            summary.jobsArchived.push(job.id);
-          } else {
-            if (!dryRun) await sendCustomerJobDeletedEmail(job);
-            const s3Client = new S3Client({
-              region: process.env.AWS_REGION,
-              credentials: {
-                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-              }
-            });
 
-            async function deleteJobImagesFromS3(imageKeys = []) {
-              if (!imageKeys.length) return;
-              const deleteParams = {
-                Bucket: process.env.AWS_BUCKET_NAME,
-                Delete: { Objects: imageKeys.map(key => ({ Key: `job-images/${key}` })) }
-              };
-              await s3Client.send(new DeleteObjectsCommand(deleteParams));
+            console.log(`📨 Reminder sent to ${shop.email} for Job #${job.id}`);
+          }
+        }
+
+        // 📨 Customer-facing emails
+        if (quoteCount === 0) {
+          await sendCustomerNoQuotesEmail(job);
+          summary.noQuotes.push(job.id);
+        } else if (quoteCount === 1) {
+          await sendCustomerSingleQuoteEmail(job, remaining);
+          summary.oneQuote.push(job.id);
+        } else if (quoteCount >= 2) {
+          await sendCustomerMultipleQuotesEmail(job, remaining);
+          summary.multiQuotes.push(job.id);
+        }
+
+        job.extensionRequestedAt = now;
+        job.emailSentAt = now;
+        await job.save();
+      } catch (err) {
+        console.error(`❌ Failed to process 0–24h logic for Job #${job.id}:`, err);
+      }
+
+      continue;
+    }
+
+       // === 24–48h LOGIC ===
+        if (
+          job.createdAt > cutoff48h &&
+          job.createdAt <= cutoff24h &&
+          !job.paid &&
+          job.extended &&
+          quoteCount >= 2 &&
+          job.status !== 'pending_payment'
+        ) {
+          if (!dryRun) await sendCustomerPaymentEmail(job);
+          summary.paymentRequested.push(job.id);
+          continue;
+        }
+      
+         // === 48h+ LOGIC ===
+           if (quoteCount === 0 && !job.finalExtended) {
+          job.extended = true;
+          job.finalExtended = true; 
+          job.extensionRequestedAt = now;
+          await job.save();
+          console.log(`🕒 Job #${job.id} auto-extended to 72h due to 0 quotes.`);
+          continue;
+        }
+
+        summary.noQuotes.push(job.id);
+
+
+        // ✅ FINAL 72h logic
+        if (job.createdAt <= cutoff72h) {
+          if (quoteCount === 0) {
+            if (!dryRun) {
+              const html = await ejs.renderFile(
+                path.join(EMAIL_VIEWS_PATH, 'no-quotes-archive.ejs'),
+                {
+                  customerName: job.customerName,
+                  job,
+                  homeUrl: `${baseUrl}/`,
+                  newRequestUrl: `${baseUrl}/jobs/upload`
+                }
+              );
+              await sendHtmlEmail(job.customerEmail, `Job #${job.id} Removed – No Quotes Received`, html);
             }
+
+            job.status = 'archived';
+            job.emailSentAt = now;
+            await job.save();
+            summary.jobsArchived.push(job.id);
+            continue;
+          }
+
+            if (quoteCount === 1 && !job.paid && job.status !== 'pending_payment') {
+              if (!dryRun) await sendCustomerPaymentEmail(job);
+              job.status = 'pending_payment';
+              job.emailSentAt = now;
+              await job.save();
+              summary.paymentRequested.push(job.id);
+              continue;
+            }
+
+
+            if (quoteCount >= 2 && job.status !== 'pending_payment') {
+              if (!dryRun) await sendCustomerPaymentEmail(job);
+              job.status = 'pending_payment';
+              summary.paymentRequested.push(job.id);
+              job.emailSentAt = now;
+              await job.save();
+            
+              continue;
+            }
+          }
+
+          console.log(`📦 Archived job #${job.id} after 72h with 0 quotes`);
+
+
+          // 🔚 Non-extended jobs after 48h — hard delete
+          if (!job.extended) {
+            if (!dryRun) await sendCustomerJobDeletedEmail(job);
+
             await DeletedJob.create({
               jobId: job.id,
               customerName: job.customerName,
               customerEmail: job.customerEmail,
               location: job.location
             });
-            await deleteJobImagesFromS3(job.images || []);
+
+            await deleteImagesFromS3(job.images || []);
             await job.destroy();
             summary.jobsDeleted.push(job.id);
+            continue;
           }
-        } else {
-          if (!job.paid && job.status !== 'pending_payment') {
-            if (!dryRun) await sendCustomerPaymentEmail(job);
-            summary.paymentRequested.push(job.id);
-          }
-        }
-      }
-    }
 
+          
+        }
+
+      
     console.log('\n=== Scheduler Summary ===');
     for (const [category, jobs] of Object.entries(summary)) {
       const jobList = jobs.length ? ` => ${jobs.join(', ')}` : '';
@@ -305,5 +336,5 @@ if (process.argv[1].endsWith('scheduler.js')) {
 }
 
 if (process.argv.includes('--send-report')) {
-  await sendMonthlyProcessedReport();
+  (async () => await sendMonthlyProcessedReport())();
 }

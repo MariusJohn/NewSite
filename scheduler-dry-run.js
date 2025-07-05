@@ -3,29 +3,43 @@ import { Job, Quote } from './models/index.js';
 import { runSchedulerNow } from './scheduler.js';
 
 (async () => {
-  // Find a job with 0 quotes
   const jobs = await Job.findAll({
     include: [{ model: Quote, as: 'quotes' }]
   });
 
+  const now = new Date();
+
   for (const job of jobs) {
-    // Skip job 37 to preserve your manual 49h update
     if (job.id === 37) continue;
-  
-    if ((job.quotes?.length || 0) === 0) {
-      job.setDataValue('createdAt', new Date(Date.now() - 25 * 60 * 60 * 1000));
+
+    const quoteCount = job.quotes?.length || 0;
+    const jobAgeMs = now - new Date(job.createdAt);
+    const jobAgeHours = jobAgeMs / (1000 * 60 * 60);
+
+    let newAgeHours = null;
+
+    if (jobAgeHours < 24) {
+      newAgeHours = 25;
+    } else if (jobAgeHours >= 25 && jobAgeHours < 48) {
+      newAgeHours = 49;
+    } else if (jobAgeHours >= 49 && jobAgeHours < 72) {
+      newAgeHours = 72;
+    }
+
+    if (newAgeHours !== null) {
+      job.setDataValue('createdAt', new Date(now - newAgeHours * 60 * 60 * 1000));
       job.changed('createdAt', true);
-  
       job.status = 'approved';
       job.extensionRequestedAt = null;
-  
+
       await job.save({ silent: false });
-      console.log(`✅ Updated Job #${job.id} to be 25h old with 0 quotes`);
+
+      console.log(`✅ Job #${job.id} updated to ${newAgeHours}h old (${quoteCount} quotes)`);
+    } else {
+      console.log(`ℹ️ Job #${job.id} left unchanged (age: ${jobAgeHours.toFixed(2)}h, ${quoteCount} quotes)`);
     }
   }
-  
 
-
-  // Run scheduler without dry-run
+  console.log('🚀 Running scheduler...');
   await runSchedulerNow();
 })();
